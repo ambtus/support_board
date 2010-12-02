@@ -18,4 +18,12 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
+
+  s.add_dependency "rails"
+
+  s.add_development_dependency "cucumber-rails"
+  s.add_development_dependency "capybara"
+  s.add_development_dependency "pickle"
+  s.add_development_dependency "factory_girl"
+
 end

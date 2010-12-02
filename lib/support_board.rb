@@ -1,3 +1,4 @@
 module SupportBoard
-  # Your code goes here...
+  class Railtie < Rails::Railtie
+  end
 end
