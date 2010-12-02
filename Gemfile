@@ -1,11 +1,30 @@
-source "http://rubygems.org"
+source 'http://rubygems.org'
 
-# Specify your gem's dependencies in support_board.gemspec
-gemspec
+# rails gems
+gem 'bundler', '~>1.0.0'
+gem 'rails', '3.0.3'
+
+gem 'mysql2'
+
+gem 'authlogic',
+  :git     => 'git://github.com/odorcicd/authlogic.git',
+  :branch  => 'rails3',
+  :require => 'authlogic'
+gem 'permit_yo'
+
+gem "escape_utils"
+
+group :development do
+  # enable debugging with "rails server -u" or "rails server --debugger"
+  gem 'ruby-debug19', :require => 'ruby-debug'
+end
 
 group :test do
-  gem "mysql2"
-  gem "autotest"
-  gem "launchy"
-  gem "ruby-debug19"
+  gem 'autotest'
+  gem 'cucumber-rails'
+  gem 'capybara'
+  gem 'pickle'
+  gem 'factory_girl'
+  gem 'launchy' 
 end
+
