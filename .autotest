@@ -1,0 +1,4 @@
+Autotest.add_hook :initialize do |at|
+  %w{.git .DS_Store rerun.txt log tmp}.each {|exception| at.add_exception(exception)}
+  at.add_exception(/capybara-(\d+).html/)
+end
