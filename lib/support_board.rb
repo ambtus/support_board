@@ -1,0 +1,3 @@
+module SupportBoard
+  # Your code goes here...
+end
