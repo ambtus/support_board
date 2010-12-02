@@ -6,6 +6,7 @@ class CreateUsers < ActiveRecord::Migration
       t.datetime "activated_at"
       t.string   "crypted_password"
       t.string   "salt"
+      t.string   "persistence_token"
 
       t.timestamps
     end
