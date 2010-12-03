@@ -4,11 +4,23 @@ class UserSessionsController < ApplicationController
   def create
     @user_session = UserSession.new(params[:user_session])
     if @user_session.save
-      flash[:notice] = "Successfully logged in."
       @current_user = @user_session.record
+      flash[:notice] = "Hi, #{current_user.login}!"
+      redirect_back_or_default
     else
-      flash[:error] = "Sorry"
+      # reset user session so errors don't indicate where the problem is
+      @user_session = UserSession.new(params[:user_session])
+      render :new
     end
-    redirect_back_or_default
   end
+
+  def destroy
+    @user_session = UserSession.find
+    if @user_session
+      flash[:notice] = "Bye, #{current_user.login}!"
+      @user_session.destroy
+    end
+    redirect_back_or_default root_url
+  end
+
 end
