@@ -1,0 +1,37 @@
+<%= form_for(@ticket) do |t| %>
+  <p>
+    <% if @ticket.being_watched?(current_user) %>
+      <%= t.check_box :turn_off_notifications %>
+      <%= t.label :turn_off_notifications, "Turn off notifications"%>
+    <% else %>
+      <%= t.check_box :turn_on_notifications %>
+      <%= t.label :turn_on_notifications, "Turn on notifications"%>
+    <% end %>
+  </p>
+  <dl>
+    <dt><%= "Status" %>:</dt>
+      <dd><%= @ticket.resolved? ? "Resolved" : @ticket.pseud_id ? "Being worked on by support volunteer " + @ticket.pseud.name : "Open" %>
+    <dt><%= "Category" %>:</dt>
+      <dd><%= @ticket.category || "Uncategorized" %>
+    <dt><%= raw "Summary" %>:</dt>
+      <dd><%= @ticket.summary %></dd>
+    <%= t.fields_for :support_details do |d| %>
+      <% if d.object.new_record? %>
+        <dt><%= d.label :pseud_id, "Pseud (Will be visible)" %>:</dt>
+          <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }%></dd>
+        <dt><%= d.label :content, "Add details" %>:</dt>
+          <dd><%= d.text_area :content %>
+      <% else %>
+        <% if d.object.resolved_ticket? %>
+          <dt><%= "Answered by" %> <%= d.object.byline %>:</dt>
+        <% else %>
+          <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
+        <% end %>
+            <dd><%= raw d.object.content %></dd>
+      <% end %>
+    <% end %>
+  </dl>
+  <p class="submit">
+    <%= t.submit %>
+  </p>
+<% end %>

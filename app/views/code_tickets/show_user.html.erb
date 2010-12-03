@@ -1,0 +1,20 @@
+<%= form_for(@ticket) do |f| %>
+  <% if current_user.try(:is_support_volunteer?) %>
+    <p class="submit"><%= f.submit (@ticket.pseud ? "Untake" : "Take") %></p>
+    <p class="submit"><%= f.submit "Categorize" %></p>
+    <dl>
+      <dt><%= f.label :category %>:</dt>
+        <dd>
+          <%= f.radio_button :category, 'Feature' %><%= f.label :category, 'Feature Request', :value => 'feature' %>
+          <%= f.radio_button :category, 'Bug' %><%= f.label :category, 'Bug Report', :value => 'bug' %>
+          <%= f.radio_button :category, 'Irritant' %><%= f.label :category, 'Irritant', :value => 'irritant' %>
+        </dd>
+  <% else %>
+      <dl>
+  <% end %>
+      <dt><%= "Title" %>:</dt>
+        <dd><%= @ticket.title %></dd>
+      <dt><%= "Description" %>:</dt>
+        <dd><%= raw @ticket.description %></dd>
+     </dl>
+<% end %>

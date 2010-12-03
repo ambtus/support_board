@@ -1,0 +1,92 @@
+class SupportTicketsController < ApplicationController
+
+  def index
+    @tickets = SupportTicket.open.where(:pseud_id => nil)
+    @tickets = @tickets.where(:private => false) unless current_user.try(:is_support_volunteer?)
+  end
+
+  def show
+    @ticket = SupportTicket.find(params[:id])
+    is_owner = @ticket.owner?(params[:authentication_code], current_user) # is viewer owner of ticket?
+
+    if @ticket.private && (!is_owner && !current_user.try(:is_support_volunteer?))
+      flash[:error] = "Sorry, you don't have permission to view this ticket"
+      redirect_to support_path and return
+    end
+
+    if is_owner
+      @details = @ticket.support_details.not_private
+      @ticket.support_details.build # create a new empty response template
+      render :show_owner
+    elsif !current_user
+      @details = @ticket.support_details.not_private
+      render :show_guest
+    elsif current_user.is_support_volunteer?
+      @details = @ticket.support_details
+      @ticket.support_details.build # create a new empty response template
+      render :show_volunteer
+    else # logged in as non-support volunteer
+      @details = @ticket.support_details.not_private
+      if !@ticket.pseud_id # not currently being worked by support
+        @ticket.support_details.build # create a new empty response template
+      end
+      render :show_user
+    end
+
+  end
+
+  def new
+    @ticket = SupportTicket.new
+  end
+
+  def create
+    if params[:email]
+      @tickets = SupportTicket.where(:email => params[:email])
+      if @tickets.count > 0
+        SupportMailer.send_links(params[:email], @tickets).deliver
+        flash[:notice] = "Email sent"
+      else
+        flash[:error] = "Sorry, no support tickets found for " + params[:email]
+      end
+      redirect_to support_path and return
+    end
+    @ticket = SupportTicket.new(params[:support_ticket])
+    if @ticket.save
+      flash[:notice] = "Support ticket created"
+      if @ticket.authentication_code
+        redirect_to support_ticket_path(@ticket, :authentication_code => @ticket.authentication_code)
+      else
+        redirect_to @ticket
+      end
+      SupportMailer.create_notification(@ticket).deliver unless @ticket.skip_notifications?
+    else
+      # reset so don't get field with errors
+      flash[:error] = @ticket.errors.full_messages.join(", ")
+      @ticket = SupportTicket.new(params[:support_ticket])
+      render :new
+    end
+  end
+
+  def update
+    # FIXME check authorization to update ticket
+    @ticket = SupportTicket.find(params[:id])
+    if params[:commit] == "Take"
+      @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
+      redirect_to @ticket and return
+    end
+    @ticket.update_attributes(params[:support_ticket])
+    if @ticket.save
+    Rails.logger.debug "saved here"
+      flash[:notice] = "Support ticket updated"
+      @ticket.update_notifications(current_user)
+      SupportMailer.update_notification(@ticket).deliver unless @ticket.skip_notifications?
+      if !current_user && @ticket.authentication_code
+        redirect_to support_ticket_path(@ticket, :authentication_code => @ticket.authentication_code)
+      else
+        redirect_to @ticket
+      end
+    else
+      render :edit
+    end
+  end
+end

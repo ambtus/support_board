@@ -22,9 +22,10 @@ end
 group :test do
   gem 'autotest'
   gem 'cucumber-rails'
+  gem 'database_cleaner'
   gem 'capybara'
   gem 'pickle'
   gem 'factory_girl'
-  gem 'launchy' 
+  gem 'launchy'
 end
 

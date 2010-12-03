@@ -1,0 +1,16 @@
+<dl>
+  <dt><%= "Status" %>:</dt>
+    <dd><%= @ticket.resolved? ? "Resolved" : @ticket.pseud_id ? "Being worked on by support volunteer " + @ticket.pseud.name : "Open" %>
+  <dt><%= "Category" %>:</dt>
+    <dd><%= @ticket.category || "Uncategorized" %>
+  <dt><%= "Summary" %>:</dt>
+    <dd><%= raw @ticket.summary %></dd>
+  <% @details.each do |detail| %>
+    <% if detail.resolved_ticket? %>
+      <dt><%= "Answered by" %> <%= detail.byline %>:</dt>
+    <% else %>
+      <dt><%= detail.byline %> <%= "wrote" %>:</dt>
+    <% end %>
+        <dd><%= raw detail.content %></dd>
+  <% end %>
+</dl>

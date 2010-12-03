@@ -1,0 +1,34 @@
+<%= form_for(@ticket) do |f| %>
+  <div>
+    <% if current_user %>
+      <%= f.hidden_field :user_id, :value => current_user.id %>
+    <% else %>
+      <dl>
+        <dt><%= f.label :email, "Email (not visible)" %>:</dt>
+        <dd><%= f.text_field :email %>
+      </dl>
+    <% end %>
+    <p>
+      <%= f.check_box :turn_off_notifications %> <%= f.label :turn_off_notifications, "Don't send me email notifications about this ticket" %>
+    </p>
+    <p>
+      <%= f.check_box :private %>
+      <%= f.label :private, "Private. (Ticket will only be visible to official Support volunteers)"%>
+    </p>
+  </div>
+  <div>
+    <dl>
+      <dt><%= f.label :summary, "Summary (You can add a longer description in the next step)" %>:</dt>
+      <dd><%= f.text_field :summary, :size => 100 %>
+    </dl>
+  </div>
+  <div>
+    <%= f.hidden_field :url, :value => session[:return_to] %>
+    <%= f.hidden_field :user_agent, :value => request.user_agent %>
+    <%= f.hidden_field :archive_revision, :value => app_version %>
+    <%= f.hidden_field :ip_address, :value => request.remote_ip %>
+  </div>
+  <p class="submit">
+    <%= f.submit %>
+  </p>
+<% end %>

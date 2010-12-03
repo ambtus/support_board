@@ -8,8 +8,6 @@ class AdminSessionsController < ApplicationController
       flash[:notice] = "Hi, #{current_admin.login}!"
       redirect_back_or_default
     else
-      Rails.logger.debug @admin_session
-      Rails.logger.debug @admin_session.errors
       # reset admin session so errors don't indicate where the problem is
       @admin_session = AdminSession.new(params[:admin_session])
       render :new

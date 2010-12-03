@@ -1,0 +1,33 @@
+<%= form_for(@ticket) do |t| %>
+  <p class="submit"><%= t.submit (@ticket.pseud ? "Untake" : "Take") %></p>
+  <dl>
+    <dt><%= "Access" %>:</dt>
+      <dd><%= @ticket.private? ? "Private" : "Public" %>
+    <dt><%= "Status" %>:</dt>
+      <dd><%= @ticket.resolved? ? "Resolved" : @ticket.pseud_id ? "Being worked on by support volunteer " + @ticket.pseud.name : "Open" %>
+    <dt><%= t.label :category %>:</dt>
+      <dd>
+        <%= t.radio_button :category, 'Question' %><%= t.label :category, 'Question', :value => 'question' %>
+        <%= t.radio_button :category, 'Problem' %><%= t.label :category, 'Problem', :value => 'problem' %>
+        <%= t.radio_button :category, 'Suggestion' %><%= t.label :category, 'Suggestion', :value => 'suggestion' %>
+        <%= t.radio_button :category, 'Kudo' %><%= t.label :category, 'Kudo', :value => 'kudo' %>
+      </dd>
+    <dt><%= "Summary" %>:</dt>
+      <dd><%= raw @ticket.summary %></dd>
+    <%= t.fields_for :support_details do |r| %>
+      <% if !r.object.new_record? %>
+        <dt><%= "Response from" %><%= r.object.byline %>
+      <% else %>
+        <% if !r.object.resolved_ticket? %>
+          <dt><%= "Answered by" %> <%= r.object.byline %>:</dt>
+        <% else %>
+          <dt><%= r.object.byline %> <%= "wrote" %>:</dt>
+        <% end %>
+            <dd><%= raw r.object.content %></dd>
+      <% end %>
+    <% end %>
+  </dl>
+  <p class="submit">
+    <%= t.submit %>
+  </p>
+<% end %>

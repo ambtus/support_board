@@ -11,5 +11,12 @@ SupportBoard::Application.routes.draw do
   match 'admin/login' => 'admin_sessions#new'
   match 'admin/logout' => 'admin_sessions#destroy'
 
+  resources :archive_faqs
+  resources :known_issues
+  resources :admin_posts
+  resources :support_tickets
+  resources :code_tickets
+
+  match 'support' => 'home#support'
   root :to => "home#index"
 end

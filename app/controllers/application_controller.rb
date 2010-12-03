@@ -1,6 +1,13 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
+  helper_method :app_version
+
+  # should be gotten from source control, otherwise update with every deploy
+  def app_version
+    1.0
+  end
+
   helper_method :current_user
   helper_method :current_admin
   before_filter :store_location

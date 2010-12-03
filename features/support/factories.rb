@@ -16,3 +16,13 @@ Factory.define :pseud do |f|
   f.name "my test pseud"
   f.association :user
 end
+
+Factory.define :support_ticket do |f|
+  f.sequence(:summary) { |n| "support ticket #{n}" }
+  f.sequence(:email) { |n| "foo#{n}@ao3.org" }
+end
+
+Factory.define :code_ticket do |f|
+  f.sequence(:summary) { |n| "code ticket #{n}" }
+  f.association :pseud
+end

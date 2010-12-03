@@ -1,0 +1,4 @@
+<% @tickets.each do |ticket| %>
+  <p><%= link_to(ticket.name, ticket) %></p>
+  <%=raw ticket.summary %>
+<% end %>
