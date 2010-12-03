@@ -130,6 +130,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "summary"
     t.integer  "summary_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.boolean  "private",                                :default => false
+    t.boolean  "display_user_name",                      :default => false
     t.string   "url"
     t.string   "archive_revision"
     t.string   "user_agent"

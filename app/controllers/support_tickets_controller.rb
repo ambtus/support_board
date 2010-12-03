@@ -1,8 +1,30 @@
 class SupportTicketsController < ApplicationController
 
   def index
-    @tickets = SupportTicket.open.where(:pseud_id => nil)
-    @tickets = @tickets.where(:private => false) unless current_user.try(:is_support_volunteer?)
+    @tickets = SupportTicket.open
+    owner = params[:user_id] ? User.find_by_login(params[:user_id]) : false
+
+    # if not support volunteer, and not looking at list of own tickets, can only view public tickets
+    if !current_user.try(:is_support_volunteer?) && current_user != owner
+      @tickets = @tickets.where(:private => false)
+    end
+
+    # support volunteer's working tickets
+    if params[:pseud_id]
+      @tickets = @tickets.where(:pseud_id => params[:pseud_id])
+
+    # user's owned tickets
+    elsif params[:user_id]
+      @tickets = @tickets.where(:user_id => owner.id)
+      if current_user != owner
+        # if not owner, can only see tickets where name is displayed
+        @tickets = @tickets.where(:display_user_name => true)
+      end
+
+    # front page - only show unowned tickets
+    else
+      @tickets = @tickets.where(:pseud_id => nil)
+    end
   end
 
   def show

@@ -9,10 +9,14 @@
     <% end %>
   </p>
   <dl>
+    <% if @ticket.display_user_name %>
+      <dt><%= "User" %>:</dt>
+        <dd><%= link_to @ticket.user.login, @ticket.user %>
+    <% end %>
     <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.resolved? ? "Resolved" : @ticket.pseud_id ? "Being worked on by support volunteer " + @ticket.pseud.name : "Open" %>
+      <dd><%= @ticket.resolved? ? "Resolved" : @ticket.pseud_id ? "Being worked on by support volunteer " + @ticket.pseud.name : "Open" %></dd>
     <dt><%= "Category" %>:</dt>
-      <dd><%= @ticket.category || "Uncategorized" %>
+      <dd><%= @ticket.category || "Uncategorized" %></dd>
     <dt><%= raw "Summary" %>:</dt>
       <dd><%= @ticket.summary %></dd>
     <%= t.fields_for :support_details do |d| %>
@@ -20,7 +24,7 @@
         <dt><%= d.label :pseud_id, "Pseud (Will be visible)" %>:</dt>
           <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }%></dd>
         <dt><%= d.label :content, "Add details" %>:</dt>
-          <dd><%= d.text_area :content %>
+          <dd><%= d.text_area :content %></dd>
       <% else %>
         <% if d.object.resolved_ticket? %>
           <dt><%= "Answered by" %> <%= d.object.byline %>:</dt>

@@ -2,6 +2,9 @@
   <div>
     <% if current_user %>
       <%= f.hidden_field :user_id, :value => current_user.id %>
+      <p>
+        <%= f.check_box :display_user_name %> <%= f.label :display_user_name, "Display my user name" %>
+      </p>
     <% else %>
       <dl>
         <dt><%= f.label :email, "Email (not visible)" %>:</dt>
@@ -13,7 +16,7 @@
     </p>
     <p>
       <%= f.check_box :private %>
-      <%= f.label :private, "Private. (Ticket will only be visible to official Support volunteers)"%>
+      <%= f.label :private, "Private. (Ticket will only be visible to official Support volunteers. This cannot be undone.)"%>
     </p>
   </div>
   <div>

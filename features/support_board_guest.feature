@@ -65,7 +65,7 @@ Scenario: guests can create private support tickets
     And I follow "Open a New Ticket"
   When I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Why are there no results when I search for wattersports?"
-    And I check "Private. (Ticket will only be visible to official Support volunteers)"
+    And I check "Private. (Ticket will only be visible to official Support volunteers. This cannot be undone.)"
   When I press "Create Support ticket"
   Then I should see "Support ticket created"
     And I should see "Summary: Why are there no results when I search for wattersports?"
@@ -143,7 +143,7 @@ Scenario: guests email notifications should have a link with authentication code
   Then I should see "Add details"
 
   # guests can make their support tickets private when they came in through an authorized link
-  When I check "Private. (Ticket will only be visible to official Support volunteers)"
+  When I check "Private. (Ticket will only be visible to official Support volunteers. This cannot be undone.)"
 
   # guests can resolve support tickets when they came in through an authorized link
   And I check "This answer resolves my issue"

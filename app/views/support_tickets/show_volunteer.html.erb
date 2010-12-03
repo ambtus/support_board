@@ -2,9 +2,9 @@
   <p class="submit"><%= t.submit (@ticket.pseud ? "Untake" : "Take") %></p>
   <dl>
     <dt><%= "Access" %>:</dt>
-      <dd><%= @ticket.private? ? "Private" : "Public" %>
+      <dd><%= @ticket.private? ? "Private" : "Public" %></dd>
     <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.resolved? ? "Resolved" : @ticket.pseud_id ? "Being worked on by support volunteer " + @ticket.pseud.name : "Open" %>
+      <dd><%= @ticket.resolved? ? "Resolved" : @ticket.pseud_id ? "Being worked on by support volunteer " + @ticket.pseud.name : "Open" %></dd>
     <dt><%= t.label :category %>:</dt>
       <dd>
         <%= t.radio_button :category, 'Question' %><%= t.label :category, 'Question', :value => 'question' %>
@@ -12,6 +12,10 @@
         <%= t.radio_button :category, 'Suggestion' %><%= t.label :category, 'Suggestion', :value => 'suggestion' %>
         <%= t.radio_button :category, 'Kudo' %><%= t.label :category, 'Kudo', :value => 'kudo' %>
       </dd>
+    <% if @ticket.display_user_name %>
+      <dt><%= "User" %>:</dt>
+        <dd><%= link_to @ticket.user.login, @ticket.user %></dd>
+    <% end %>
     <dt><%= "Summary" %>:</dt>
       <dd><%= raw @ticket.summary %></dd>
     <%= t.fields_for :support_details do |r| %>

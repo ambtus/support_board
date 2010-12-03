@@ -1,6 +1,9 @@
 SupportBoard::Application.routes.draw do
   resources :users do
-    resources :pseuds
+    resources :pseuds do
+      resource :support_tickets
+    end
+    resources :support_tickets
   end
 
   resources :user_sessions

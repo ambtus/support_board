@@ -24,3 +24,13 @@ When /^a user responds to support ticket (\d+)$/ do |number|
   SupportMailer.update_notification(ticket).deliver if ticket.support_watchers.count > 0
 end
 
+Given /the following activated support volunteers? exists?/ do |table|
+  table.hashes.each do |hash|
+    user = Factory.create(:user, hash)
+    user.activate
+    user.support_volunteer = '1'
+    pseud = user.default_pseud
+    pseud.update_attribute(:support_volunteer, true)
+  end
+end
+

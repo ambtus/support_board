@@ -3,3 +3,4 @@
 <% @user.pseuds.each do |pseud| %>
   <%= link_to pseud.name, [@user, pseud] %>
 <% end %>
+<h2><%= link_to "Support tickets opened by #{@user.login}", user_support_tickets_path(@user) %></h2>
