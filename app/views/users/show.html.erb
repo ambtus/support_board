@@ -1,1 +1,5 @@
 <h1><%= @user.login %>'s page</h1>
+<h2><%= @user.login %>'s pseuds</h2>
+<% @user.pseuds.each do |pseud| %>
+  <%= link_to pseud.name, [@user, pseud] %>
+<% end %>
