@@ -41,7 +41,7 @@ class CodeTicket < ActiveRecord::Base
     watcher.destroy if (watcher && self.turn_off_notifications == "1")
     # if they aren't, and they want to start, add a watcher.
     if !watcher && self.turn_on_notifications == "1"
-      self.support_watchers.create(:email => current_user.email)
+      self.code_watchers.create(:email => current_user.email)
     end
   end
 
@@ -77,7 +77,7 @@ class CodeTicket < ActiveRecord::Base
   def send_create_notifications
     unless self.skip_notifications?
       self.mail_to.each do |recipient|
-        CodeMailer.create_notification(self, recipient).deliver
+        CodeTicketMailer.create_notification(self, recipient).deliver
       end
     end
   end
@@ -85,7 +85,7 @@ class CodeTicket < ActiveRecord::Base
   def send_update_notifications
     unless self.skip_notifications?
       self.mail_to.each do |recipient|
-        CodeMailer.update_notification(self, recipient).deliver
+        CodeTicketMailer.update_notification(self, recipient).deliver
       end
     end
   end

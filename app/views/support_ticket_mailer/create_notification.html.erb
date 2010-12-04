@@ -1,0 +1,6 @@
+<p>"A new support ticket has been created: <%= link_to(@ticket.name, @url) %></p>
+<%=raw @ticket.summary %>
+<% if @detail %>
+  <dt>Details:</dt>
+    <dd><%= raw @detail.content %></dd>
+<% end %>

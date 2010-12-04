@@ -81,7 +81,7 @@ class SupportTicketsController < ApplicationController
     if params[:email]
       @tickets = SupportTicket.where(:email => params[:email])
       if @tickets.count > 0
-        SupportMailer.send_links(params[:email], @tickets).deliver
+        SupportTicketMailer.send_links(params[:email], @tickets).deliver
         flash[:notice] = "Email sent"
       else
         flash[:error] = "Sorry, no support tickets found for " + params[:email]

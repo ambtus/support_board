@@ -124,7 +124,7 @@ class SupportTicket < ActiveRecord::Base
   def send_create_notifications
     unless self.skip_notifications?
       self.mail_to.each do |recipient|
-        SupportMailer.create_notification(self, recipient).deliver
+        SupportTicketMailer.create_notification(self, recipient).deliver
       end
     end
   end
@@ -132,7 +132,7 @@ class SupportTicket < ActiveRecord::Base
   def send_update_notifications
     unless self.skip_notifications?
       self.mail_to.each do |recipient|
-        SupportMailer.update_notification(self, recipient).deliver
+        SupportTicketMailer.update_notification(self, recipient).deliver
       end
     end
   end

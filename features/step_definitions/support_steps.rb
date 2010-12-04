@@ -26,6 +26,17 @@ When /^a support volunteer responds to support ticket (\d+)$/ do |number|
   ticket.send_update_notifications
 end
 
+When /^a support volunteer responds to code ticket (\d+)$/ do |number|
+  ticket = CodeTicket.all[number.to_i - 1]
+  user = Factory.create(:user)
+  user.activate
+  user.support_volunteer = '1'
+  user.pseuds.create(:support_volunteer => true, :name => "foo")
+  ticket.code_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
+  ticket.save
+  ticket.send_update_notifications
+end
+
 When /^a user responds to support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
   user = Factory.create(:user)
