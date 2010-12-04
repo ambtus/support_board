@@ -30,7 +30,7 @@ Scenario: guests can't create a support ticket without a valid email address. (w
     And I press "Create Support ticket"
   Then I should see "Email does not seem to be a valid address."
 
-Scenario: guests can create a support ticket with a valid email address which is not visible
+Scenario: guests can create a support ticket with a valid email address which is not visible even by choice
   Given I am on the home page
   When I follow "Support"
     And I follow "Open a New Ticket"
@@ -41,6 +41,7 @@ Scenario: guests can create a support ticket with a valid email address which is
     And I should see "Category: Uncategorized"
     And I should see "Summary: Archive is very slow"
   But I should not see "guest@ao3.org"
+    And I should not see "Display my user name"
 
   # guests should be able to fill in more details immediately, without waiting for email confirmation
   When I fill in "Add details" with "For example, it took a minute for this page to render"
@@ -65,7 +66,7 @@ Scenario: guests can create private support tickets
     And I follow "Open a New Ticket"
   When I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Why are there no results when I search for wattersports?"
-    And I check "Private. (Ticket will only be visible to official Support volunteers. This cannot be undone.)"
+    And I check "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"
   When I press "Create Support ticket"
   Then I should see "Support ticket created"
     And I should see "Summary: Why are there no results when I search for wattersports?"
@@ -82,11 +83,11 @@ Scenario: guests can create support tickets with no initial notifications
   When I press "Create Support ticket"
   Then 0 emails should be delivered to "guest@ao3.org"
 
-Scenario: guests can enter an email address to have authorized links re-sent and can turn on/off notifications for individual tickets
+Scenario: guests can enter an email address to have authorized links re-sent and can toggle notifications for individual tickets
   Given the following support tickets exist
-    | email         | private |
-    | guest@ao3.org | false   |
-    | guest@ao3.org | true    |
+    | email         | summary |
+    | guest@ao3.org | first   |
+    | guest@ao3.org | second  |
     And all emails have been delivered
   When I am on the home page
     And I follow "Support"
@@ -103,17 +104,22 @@ Scenario: guests can enter an email address to have authorized links re-sent and
   When a user responds to support ticket 1
   Then 0 emails should be delivered to "guest@ao3.org"
 
-  When a support volunteer responds to support ticket 2
+  # turning off notifications for one shouldn't affect the other
+  When a user responds to support ticket 2
   Then 1 email should be delivered to "guest@ao3.org"
     And all emails have been delivered
 
   # I'm still on support ticket 1's page
+  Then I should see "first"
   When I check "Turn on notifications"
     And I press "Update Support ticket"
-  Then 1 email should be delivered to "guest@ao3.org"
+  Then I should see "Turn off notifications"
+
+  # just toggling notifications shouldn't trigger an email. the ticket itself hasn't changed
+  Then 0 emails should be delivered to "guest@ao3.org"
     And all emails have been delivered
 
-  When a support volunteer responds to support ticket 1
+  When a user responds to support ticket 1
   Then 1 email should be delivered to "guest@ao3.org"
 
 Scenario: if there are no tickets, the guest should be told
@@ -143,7 +149,7 @@ Scenario: guests email notifications should have a link with authentication code
   Then I should see "Add details"
 
   # guests can make their support tickets private when they came in through an authorized link
-  When I check "Private. (Ticket will only be visible to official Support volunteers. This cannot be undone.)"
+  When I check "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"
 
   # guests can resolve support tickets when they came in through an authorized link
   And I check "This answer resolves my issue"

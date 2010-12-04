@@ -19,7 +19,7 @@ end
 
 Factory.define :support_ticket do |f|
   f.sequence(:summary) { |n| "support ticket #{n}" }
-  f.sequence(:email) { |n| "foo#{n}@ao3.org" }
+  f.email { |u| "guest@ao3.org" unless u.user_id }
 end
 
 Factory.define :code_ticket do |f|

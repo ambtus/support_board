@@ -80,7 +80,7 @@ class SupportTicketsController < ApplicationController
       else
         redirect_to @ticket
       end
-      SupportMailer.create_notification(@ticket).deliver unless @ticket.skip_notifications?
+      @ticket.send_create_notifications
     else
       # reset so don't get field with errors
       flash[:error] = @ticket.errors.full_messages.join(", ")
@@ -100,8 +100,8 @@ class SupportTicketsController < ApplicationController
     if @ticket.save
     Rails.logger.debug "saved here"
       flash[:notice] = "Support ticket updated"
-      @ticket.update_notifications(current_user)
-      SupportMailer.update_notification(@ticket).deliver unless @ticket.skip_notifications?
+      @ticket.update_watchers(current_user)
+      @ticket.send_update_notifications
       if !current_user && @ticket.authentication_code
         redirect_to support_ticket_path(@ticket, :authentication_code => @ticket.authentication_code)
       else

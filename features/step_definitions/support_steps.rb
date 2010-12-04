@@ -12,16 +12,18 @@ When /^a support volunteer responds to support ticket (\d+)$/ do |number|
   user.activate
   user.support_volunteer = '1'
   user.pseuds.create(:support_volunteer => true, :name => "foo")
-  ticket.support_details.create!(:pseud => user.support_pseud, :support_response => true, :content => "blah blah")
-  SupportMailer.update_notification(ticket).deliver if ticket.support_watchers.count > 0
+  ticket.support_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
+  ticket.save
+  ticket.send_update_notifications
 end
 
 When /^a user responds to support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
   user = Factory.create(:user)
   user.activate
-  ticket.support_details.create!(:pseud => user.default_pseud, :content => "blah blah")
-  SupportMailer.update_notification(ticket).deliver if ticket.support_watchers.count > 0
+  ticket.support_details.build(:pseud => user.default_pseud, :content => "blah blah")
+  ticket.save
+  ticket.send_update_notifications
 end
 
 Given /the following activated support volunteers? exists?/ do |table|

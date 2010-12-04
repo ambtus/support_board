@@ -1,20 +1,20 @@
 class SupportMailer < ActionMailer::Base
   default :from => "do-not-reply@ao3.org"
 
-  def create_notification(ticket)
+  def create_notification(ticket, recipient)
     @ticket = ticket
     mail(
-      :to => ticket.mail_to,
+      :to => recipient,
       :subject => "[AO3] New #{ticket.name}"
     )
   end
 
-  def update_notification(ticket)
+  def update_notification(ticket, recipient)
     @ticket = ticket
-    @details = (@ticket.support_details.count > 0) ? @ticket.support_details.reverse : []
+    @details = (@ticket.support_details.count > 0) ? @ticket.support_details : []
     mail(
-      :to => ticket.mail_to,
-      :subject => "[AO3] New #{ticket.name}"
+      :to => recipient,
+      :subject => "[AO3] Updated #{ticket.name}"
     )
   end
 

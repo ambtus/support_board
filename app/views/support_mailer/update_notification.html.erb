@@ -1,4 +1,4 @@
-<p>A support ticket has been updated: <%= link_to(@ticket.name, support_ticket_path(@ticket, :only_path => false, :authentication_code => @ticket.authentication_code)) %></p>
+<p><%= link_to(@ticket.name, support_ticket_path(@ticket, :only_path => false, :authentication_code => @ticket.authentication_code)) %> has been updated.</p>
 <%=raw @ticket.summary %>
 <% @details.each do |detail| %>
   <% if detail.resolved_ticket? %>

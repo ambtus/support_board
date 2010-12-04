@@ -5,3 +5,9 @@
 #
 #   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :city => cities.first)
+User.create!(:login => "dean", :email => "dean@ao3.org",
+  :password => "secret", :password_confirmation => "secret")
+sam = User.create!(:login => "sam", :email => "sam@ao3.org",
+  :password => "secret", :password_confirmation => "secret")
+sam.support_volunteer = "1"
+sam.pseuds.create(:name => "sammy", :support_volunteer => true)

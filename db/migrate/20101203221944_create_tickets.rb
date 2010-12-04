@@ -30,10 +30,15 @@ class CreateTickets < ActiveRecord::Migration
       t.boolean :private, :default => false
       t.boolean :resolved_ticket, :default => false
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
+
+      t.timestamps
     end
     create_table :support_watchers do |t|
       t.integer :support_ticket_id
+      t.boolean :public_watcher, :default => false
       t.string :email
+
+      t.timestamps
     end
     add_column :pseuds, :support_volunteer, :boolean
     add_column :archive_faqs, :user_id, :integer
@@ -60,15 +65,21 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.string :archive_revision
       t.string :code_revision
+
+      t.timestamps
     end
     create_table :code_votes do |t|
       t.integer :code_ticket_id
       t.integer :pseud_id
       t.integer :vote, :limit => 1
+
+      t.timestamps
     end
     create_table :code_watchers do |t|
       t.integer :code_ticket_id
       t.string :email
+
+      t.timestamps
     end
     add_column :admin_posts, :user_id, :integer
     add_column :admin_posts, :posted, :boolean

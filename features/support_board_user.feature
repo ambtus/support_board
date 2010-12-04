@@ -13,8 +13,8 @@ Scenario: users can't access private tickets even with a direct link
 
 Scenario: users can (un)monitor public tickets
   Given the following support tickets exist
-    | summary                           | private | id |
-    | publicly visible support ticket   | false   | 1  |
+    | summary                           | id |
+    | publicly visible support ticket   | 1  |
     And the following activated users exist
     | login    | password | email            |
     | troubled | secret   | troubled@ao3.org |
@@ -24,8 +24,7 @@ Scenario: users can (un)monitor public tickets
     And I follow "Support Ticket #1"
     And I check "Turn on notifications"
     And I press "Update Support ticket"
-  Then 1 email should be delivered to "troubled@ao3.org"
-    And all emails have been delivered
+  Then 0 email should be delivered to "troubled@ao3.org"
   When a support volunteer responds to support ticket 1
   Then 1 email should be delivered to "troubled@ao3.org"
   When I click the first link in the email
@@ -40,8 +39,8 @@ Scenario: users can comment on unowned tickets and those comments can be chosen 
     | login    | password | id |
     | confused | secret   | 1  |
   Given the following support tickets exist
-    | summary                           | private | user_id  | id |
-    | publicly visible support ticket   | false   | 1        | 1  |
+    | summary                           | user_id  | id |
+    | publicly visible support ticket   | 1        | 1  |
   Given I am logged in as "helper"
   When I follow "Support"
     And I follow "Open Support Tickets"
@@ -82,13 +81,13 @@ Scenario: users cannot comment on owned tickets.
   Then I should see "support volunteer oracle"
   And I should not see "Add details"
 
-Scenario: users don't need to provide an email address to open a ticket and their name is not automatically displayed, and they should receive notifications by default
+Scenario: user defaults for opening a new ticket
   Given I am logged in as "troubled"
   When I follow "Support"
     And I follow "Open a New Ticket"
   When I press "Create Support ticket"
   Then I should not see "Email does not seem to be a valid address."
-    And I should see "Summary can't be blank"
+    But I should see "Summary can't be blank"
   When I fill in "Summary" with "Archive is very slow"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
@@ -121,21 +120,38 @@ Scenario: users can create private support tickets
   When I follow "Support"
     And I follow "Open a New Ticket"
     And I fill in "Summary" with "Why are there no results when I search for wattersports?"
-    And I check "Private. (Ticket will only be visible to official Support volunteers. This cannot be undone.)"
+    And I check "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"
   When I press "Create Support ticket"
   Then I should see "Support ticket created"
     And I should see "Summary: Why are there no results when I search for wattersports?"
     And I should see "Access: Private"
     And 1 email should be delivered to "troubled@ao3.org"
 
-Scenario: guests can create support tickets with no initial notifications
-  Given I am logged in as "troubled"
-  When I follow "Support"
-    And I follow "Open a New Ticket"
-  And I check "Don't send me email notifications about this ticket"
-    And I fill in "Summary" with "Please stop sending me notifications"
-  When I press "Create Support ticket"
-  Then 0 emails should be delivered to "troubled@ao3.org"
+Scenario: private user support tickets should be private and can't be made public
+  Given the following activated user exists
+    | login     | id |
+    | troubled  | 1  |
+  And the following activated support volunteer exists
+    | login    |
+    | oracle   |
+  And the following support tickets exist
+    | summary      | private | user_id |
+    | embarrassing | true    | 1       |
+  When I am logged out
+    And I go to the first support ticket page
+  Then I should see "Sorry, you don't have permission"
+    And I should not see "embarrassing"
+  When I am logged in as "tricksy"
+    And I go to the first support ticket page
+  Then I should see "Sorry, you don't have permission"
+    And I should not see "embarrassing"
+  When I am logged in as "oracle"
+    And I go to the first support ticket page
+  Then I should see "embarrassing"
+  When I am logged in as "troubled"
+    And I go to the first support ticket page
+  Then I should see "embarrassing"
+    And I should not see "Ticket will only be visible to"
 
 Scenario: users can choose to have their name displayed during creation
   Given I am logged in as "troubled"
@@ -208,3 +224,91 @@ Scenario: user's tickets should be available from their user page
     And I should see "Support Ticket #2"
     But I should not see "Support Ticket #5"
     But I should not see "Support Ticket #6"
+
+Scenario: guests can create support tickets with no initial notifications
+  Given I am logged in as "troubled"
+  When I follow "Support"
+    And I follow "Open a New Ticket"
+  And I check "Don't send me email notifications about this ticket"
+    And I fill in "Summary" with "Please stop sending me notifications"
+  When I press "Create Support ticket"
+  Then 0 emails should be delivered to "troubled@ao3.org"
+
+Scenario: guests can turn notifications on and off their own and other tickets. notifications shouldn't trigger email.
+  Given the following activated users exist
+    | login     | id |
+    | troubled  | 1  |
+    | tricksy   | 2  |
+  And the following activated support volunteer exists
+    | login    | id |
+    | oracle   | 3  |
+  And the following support tickets exist
+    | summary                    | private| user_id | turn_off_notifications |
+    | public ticket by tricksy   | false  | 2       | 1                      |
+  Then 0 emails should be delivered
+  When I am logged in as "troubled"
+  When I go to the first support ticket page
+  When I check "Turn on notifications"
+    And I fill in "Add details" with "possible answer"
+    And I press "Update Support ticket"
+  Then I should see "Turn off notifications"
+    And I should see "possible answer"
+    And 1 emails should be delivered to "troubled@ao3.org"
+    And 0 emails should be delivered to "tricksy@ao3.org"
+    And all emails have been delivered
+  When I am logged in as "oracle"
+  When I go to the first support ticket page
+    And I fill in "Add details" with "different answer"
+    And I press "Update Support ticket"
+  Then 1 emails should be delivered to "troubled@ao3.org"
+    And 0 emails should be delivered to "tricksy@ao3.org"
+    And all emails have been delivered
+  When I am logged in as "tricksy"
+  When I go to the first support ticket page
+  When I check "Turn on notifications"
+    And I press "Update Support ticket"
+  Then I should see "Turn off notifications"
+    And 0 emails should be delivered
+  When I fill in "Add details" with "neither answer works, thanks anyway"
+    And I press "Update Support ticket"
+  Then 1 emails should be delivered to "troubled@ao3.org"
+    And 1 emails should be delivered to "tricksy@ao3.org"
+
+Scenario: Making a ticket private should remove notifications from non-owner/non-volunteer
+  Given the following activated users exist
+    | login     | id |
+    | troubled  | 1  |
+    | tricksy   | 2  |
+  And the following activated support volunteer exists
+    | login    | id |
+    | oracle   | 3  |
+  And the following support tickets exist
+    | summary                    | user_id |
+    | public ticket by tricksy   | 2       |
+  When I am logged in as "troubled"
+  When I go to the first support ticket page
+    Then I should see "public ticket by tricksy"
+  When I check "Turn on notifications"
+    And I press "Update Support ticket"
+  Then I should see "Turn off notifications"
+    And 0 emails should be delivered
+  When a user responds to support ticket 1
+  Then 1 emails should be delivered to "troubled@ao3.org"
+    And 1 emails should be delivered to "tricksy@ao3.org"
+    And all emails have been delivered
+  When I am logged in as "tricksy"
+  When I go to the first support ticket page
+    And I check "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"
+    And I press "Update Support ticket"
+  Then I should see "Access: Private"
+    And 1 emails should be delivered to "tricksy@ao3.org"
+    But 0 emails should be delivered to "troubled@ao3.org"
+    And all emails have been delivered
+  When I am logged in as "troubled"
+  When I go to the first support ticket page
+    Then I should not see "public ticket by tricksy"
+    But I should see "Sorry, you don't have permission"
+  When a support volunteer responds to support ticket 1
+    Then 1 emails should be delivered to "tricksy@ao3.org"
+    But 0 emails should be delivered to "troubled@ao3.org"
+

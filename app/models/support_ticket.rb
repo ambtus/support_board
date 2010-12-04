@@ -54,6 +54,7 @@ class SupportTicket < ActiveRecord::Base
 
   attr_accessor :turn_off_notifications
   attr_accessor :turn_on_notifications
+  attr_accessor :send_notifications
 
   after_create :add_owner_as_watcher
   def add_owner_as_watcher
@@ -64,19 +65,30 @@ class SupportTicket < ActiveRecord::Base
   end
 
   # run from controller after update
-  def update_notifications(current_user)
+  def update_watchers(current_user)
+    # take care of the current user's wishes re notification
     # the email of the user editing the ticket. if there is no current_user, it must be the guest owner
     email_address = current_user ? current_user.email : self.email
     # are they already watching?
     watcher = self.support_watchers.where(:email => email_address).first
     # if they are, and they want to stop, remove the watcher
     watcher.destroy if (watcher && self.turn_off_notifications == "1")
-    # if they aren't, and they want to start, add a watcher
-    self.support_watchers.create(:email => email_address) if (!watcher && self.turn_on_notifications == "1")
+    # if they aren't, and they want to start, add a watcher.
+    if !watcher && self.turn_on_notifications == "1"
+      # mark the watcher as a public watcher if not the owner or a support volunteer
+      public = true
+      public = !current_user.try(:is_support_volunteer?) # support volunteers
+      public = false if self.email # guest owners
+      public = false if self.user && self.user == current_user # user owner
+      self.support_watchers.create(:email => email_address, :public_watcher => public)
+    end
+
+    # if the ticket has been made private remove all watchers who aren't support volunteers or owners
+    self.support_watchers.where(:public_watcher => true).delete_all if self.private?
   end
 
   def mail_to
-    self.support_watchers.map(&:email).uniq.join(", ")
+    self.support_watchers.map(&:email).uniq
   end
 
   # used in view to determine whether to offer to turn on or off notifications
@@ -89,12 +101,44 @@ class SupportTicket < ActiveRecord::Base
     self.support_watchers.where(:email => email_address).first
   end
 
+  before_save :check_if_changed
+  def check_if_changed
+    self.send_notifications = true if self.changed?
+    self.send_notifications = true if !self.support_details.select{|d| d.changed?}.empty?
+    true
+  end
+
+  # situations where notifications should not be sent
   def skip_notifications?
+    # skip the notification if neither the support ticket nor any of its details have changed, just the watchers
+    # set in check_if_changed before save. will only trigger if you use self.support_details.build && self.save
+    # if you update the support_details without going through the master ticket, this will not trigger!
+    return true unless self.send_notifications
+
     # don't try to send email if there's no-one to send it to
     return true if self.support_watchers.count < 1
+
     # skip the notification of the initial update to add more details.
-    return true if self.support_details.count == 1 && self.support_details.first.by_owner?
+    # note, this includes any other initial updates, such as changing privacy, et al.
+    return true if (self.support_details.count == 1 && self.support_details.first.by_owner?)
+
     false
+  end
+
+  def send_create_notifications
+    unless self.skip_notifications?
+      self.mail_to.each do |recipient|
+        SupportMailer.create_notification(self, recipient).deliver
+      end
+    end
+  end
+
+  def send_update_notifications
+    unless self.skip_notifications?
+      self.mail_to.each do |recipient|
+        SupportMailer.update_notification(self, recipient).deliver
+      end
+    end
   end
 
   # AUTHENTICATION stuff
@@ -125,7 +169,8 @@ class SupportTicket < ActiveRecord::Base
 
   def check_for_spam?
     # don't check for spam while running tests or if logged in
-    self.approved = Rails.env.test? || self.user_id || !Akismetor.spam?(akismet_attributes)
+    # FIXME set up Akismetor and remove || true
+    self.approved = Rails.env.test? || self.user_id || true || !Akismetor.spam?(akismet_attributes)
   end
 
   def mark_as_spam!

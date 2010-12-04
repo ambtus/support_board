@@ -11,13 +11,15 @@
   <% unless @ticket.private %>
     <p>
       <%= t.check_box :private %>
-      <%= t.label :private, "Private. (Ticket will only be visible to official Support volunteers. This cannot be undone.)"%>
+      <%= t.label :private, "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"%>
     </p>
   <% end %>
-  <p>
-    <%= t.check_box :display_user_name %>
-    <%= t.label :display_user_name, "Display my user name" %>
-  </p>
+  <% if current_user %>
+    <p>
+      <%= t.check_box :display_user_name %>
+      <%= t.label :display_user_name, "Display my user name" %>
+    </p>
+  <% end %>
   <dl>
     <% if @ticket.display_user_name %>
       <dt><%= "User" %>:</dt>
@@ -33,18 +35,21 @@
       <dd><%= raw @ticket.summary %></dd>
 
     <%= t.fields_for :support_details do |d| %>
-      <% if current_user %>
-        <dt><%= d.label :pseud_id, "Pseud (Will not be visible)" %>:</dt>
-          <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }%></dd>
-      <% end %>
       <% if d.object.new_record? %>
+        <% if current_user %>
+          <dt><%= d.label :pseud_id, "Pseud (Will not be visible)" %>:</dt>
+            <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }%></dd>
+        <% end %>
         <dt><%= d.label :content, "Add details" %>:</dt>
           <dd><%= d.text_area :content %>
       <% else %>
-        <dt><%= "I" %> <%= "wrote" %>:
-        </dt>
+        <dt><% if d.object.by_owner? %>
+          <%= "I" %>
+        <% else %>
+          <%= d.object.byline %>
+        <% end %><%= "wrote" %>:</dt>
           <dd><%= raw d.object.content %></dd>
-        <dt></dt>
+        <dt>&nbsp;</dt>
           <dd><%= d.check_box :resolved_ticket %> <%= d.label :resolved_ticket, "This answer resolves my issue" %></dd>
       <% end %>
     <% end %>
