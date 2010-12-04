@@ -36,18 +36,14 @@ Scenario: guests can create a support ticket with a valid email address which is
     And I follow "Open a New Ticket"
   When I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
+    And I fill in "Details" with "For example, it took a minute for this page to render"
   When I press "Create Support ticket"
   Then I should see "Support ticket created"
     And I should see "Category: Uncategorized"
     And I should see "Summary: Archive is very slow"
+    And I should see "Ticket owner wrote: For example"
   But I should not see "guest@ao3.org"
     And I should not see "Display my user name"
-
-  # guests should be able to fill in more details immediately, without waiting for email confirmation
-  When I fill in "Add details" with "For example, it took a minute for this page to render"
-    And I press "Update Support ticket"
-  Then I should see "Support ticket updated"
-    And I should see "For example"
 
   # guests should receive 1 initial notification (skip the update notification if the first update is by the owner)
   And 1 email should be delivered to "guest@ao3.org"

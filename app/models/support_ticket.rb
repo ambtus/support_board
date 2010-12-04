@@ -118,10 +118,6 @@ class SupportTicket < ActiveRecord::Base
     # don't try to send email if there's no-one to send it to
     return true if self.support_watchers.count < 1
 
-    # skip the notification of the initial update to add more details.
-    # note, this includes any other initial updates, such as changing privacy, et al.
-    return true if (self.support_details.count == 1 && self.support_details.first.by_owner?)
-
     false
   end
 

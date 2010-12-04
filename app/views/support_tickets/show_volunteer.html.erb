@@ -38,8 +38,8 @@
 
     <%= t.fields_for :support_details do |d| %>
       <% if d.object.new_record? %>
-        <dt><%= d.label :pseud_id, "Pseud (Will be visible)" %>:</dt>
-          <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }%></dd>
+        <dt><%= d.label :pseud_id, "Pseud (Will be visible). If you don't use your support pseud, this comment will not be marked official" %>:</dt>
+          <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }, :selected => current_user.support_pseud.id %></dd>
         <dt><%= d.label :content, "Add details" %>:</dt>
           <dd><%= d.text_area :content %></dd>
       <% else %>

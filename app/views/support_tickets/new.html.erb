@@ -1,37 +1,45 @@
-<%= form_for(@ticket) do |f| %>
+<%= form_for(@ticket) do |t| %>
   <div>
     <% if current_user %>
-      <%= f.hidden_field :user_id, :value => current_user.id %>
+      <%= t.hidden_field :user_id, :value => current_user.id %>
       <p>
-        <%= f.check_box :display_user_name %> <%= f.label :display_user_name, "Display my user name" %>
+        <%= t.check_box :display_user_name %> <%= t.label :display_user_name, "Display my user name" %>
       </p>
     <% else %>
       <dl>
-        <dt><%= f.label :email, "Email (not visible)" %>:</dt>
-        <dd><%= f.text_field :email %>
+        <dt><%= t.label :email, "Email (not visible)" %>:</dt>
+        <dd><%= t.text_field :email %>
       </dl>
     <% end %>
     <p>
-      <%= f.check_box :turn_off_notifications %> <%= f.label :turn_off_notifications, "Don't send me email notifications about this ticket" %>
+      <%= t.check_box :turn_off_notifications %> <%= t.label :turn_off_notifications, "Don't send me email notifications about this ticket" %>
     </p>
     <p>
-      <%= f.check_box :private %>
-      <%= f.label :private, "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"%>
+      <%= t.check_box :private %>
+      <%= t.label :private, "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"%>
     </p>
   </div>
   <div>
     <dl>
-      <dt><%= f.label :summary, "Summary (You can add a longer description in the next step)" %>:</dt>
-      <dd><%= f.text_field :summary, :size => 100 %>
+      <dt><%= t.label :summary, "Summary" %>:</dt>
+      <dd><%= t.text_field :summary, :size => 100 %>
     </dl>
+    <%= t.fields_for :support_details do |d| %>
+      <% if current_user %>
+        <dt><%= d.label :pseud_id, "Pseud (will not be visible unless you choose 'Display my user name' above)" %>:</dt>
+           <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }, :selected => current_user.default_pseud.id %></dd>
+      <% end %>
+      <dt><%= d.label :content, "Details" %>:</dt>
+        <dd><%= d.text_area :content %>
+    <% end %>
   </div>
   <div>
-    <%= f.hidden_field :url, :value => session[:return_to] %>
-    <%= f.hidden_field :user_agent, :value => request.user_agent %>
-    <%= f.hidden_field :archive_revision, :value => app_version %>
-    <%= f.hidden_field :ip_address, :value => request.remote_ip %>
+    <%= t.hidden_field :url, :value => session[:return_to] %>
+    <%= t.hidden_field :user_agent, :value => request.user_agent %>
+    <%= t.hidden_field :archive_revision, :value => app_version %>
+    <%= t.hidden_field :ip_address, :value => request.remote_ip %>
   </div>
   <p class="submit">
-    <%= f.submit %>
+    <%= t.submit %>
   </p>
 <% end %>

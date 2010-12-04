@@ -13,7 +13,7 @@ class SupportDetail < ActiveRecord::Base
 
   def byline
     if by_owner?
-      self.support_ticket.display_user_name? ? self.support_ticket.user.name : "Ticket submitter"
+      (self.support_ticket.display_user_name? && self.pseud) ? self.pseud.name : "Ticket owner"
     else
       prefix = self.support_response? ? "Support volunteer " : ""
       prefix + self.pseud.name

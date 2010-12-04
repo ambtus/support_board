@@ -88,6 +88,7 @@ Scenario: user defaults for opening a new ticket
   When I press "Create Support ticket"
   Then I should not see "Email does not seem to be a valid address."
     But I should see "Summary can't be blank"
+    And I should not see "Details can't be blank"
   When I fill in "Summary" with "Archive is very slow"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
@@ -96,24 +97,25 @@ Scenario: user defaults for opening a new ticket
     And I should not see "User: troubled"
   And 1 email should be delivered to "troubled@ao3.org"
 
-Scenario: users should receive 1 initial notification (skip the update notification if the first update is by the owner)
+Scenario: users should receive 1 initial notification and 1 for additional updates
   Given I am logged in as "troubled"
   When I follow "Support"
     And I follow "Open a New Ticket"
-  When I press "Create Support ticket"
   When I fill in "Summary" with "Archive is very slow"
+    And I fill in "Details" with "For example, this page took forever to load"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
     And I should see "Category: Uncategorized"
     And I should see "Summary: Archive is very slow"
+    And I should see "Ticket owner wrote: For example"
     And I should not see "User: troubled"
   And 1 email should be delivered to "troubled@ao3.org"
     And all emails have been delivered
   When I fill in "Add details" with "Never mind, I just found out my whole network is slow"
     And I press "Update Support ticket"
   Then I should see "Support ticket updated"
-    And I should see "Never mind"
-  And 0 emails should be delivered to "guest@ao3.org"
+    And I should see "Ticket owner wrote: Never mind"
+  And 1 email should be delivered to "troubled@ao3.org"
 
 Scenario: users can create private support tickets
   Given I am logged in as "troubled"
@@ -158,12 +160,14 @@ Scenario: users can choose to have their name displayed during creation
   When I follow "Support"
     And I follow "Open a New Ticket"
   When I fill in "Summary" with "Archive is very slow"
+    And I fill in "Details" with "For example"
     And I check "Display my user name"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
     And I should see "Category: Uncategorized"
     And I should see "Summary: Archive is very slow"
     And I should see "User: troubled"
+    And I should see "troubled wrote: For example"
 
 Scenario: users can (un)hide their name after creation
   Given I am logged in as "troubled"

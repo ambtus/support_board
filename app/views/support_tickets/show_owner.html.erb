@@ -43,11 +43,7 @@
         <dt><%= d.label :content, "Add details" %>:</dt>
           <dd><%= d.text_area :content %>
       <% else %>
-        <dt><% if d.object.by_owner? %>
-          <%= "I" %>
-        <% else %>
-          <%= d.object.byline %>
-        <% end %><%= "wrote" %>:</dt>
+        <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
           <dd><%= raw d.object.content %></dd>
         <dt>&nbsp;</dt>
           <dd><%= d.check_box :resolved_ticket %> <%= d.label :resolved_ticket, "This answer resolves my issue" %></dd>

@@ -59,6 +59,7 @@ class SupportTicketsController < ApplicationController
 
   def new
     @ticket = SupportTicket.new
+    @ticket.support_details.build
   end
 
   def create
