@@ -157,3 +157,19 @@ Scenario: users can't unvote for closed code tickets
   When "oracle" resolves code ticket 1
     And I am on the first code ticket page
     Then I should not see "Vote up"
+
+Scenario: users can comment on open code tickets, but not closed code tickets
+  Given the following activated support volunteer exists
+    | login    | id |
+    | oracle   | 1  |
+  And the following code tickets exist
+    | summary                        | category | id |
+    | something that could be better | Irritant | 1  |
+  And I am logged in as "curious"
+  When I follow "Support"
+    And I follow "Open Code Tickets"
+    And I follow "Code Ticket #1"
+    And I fill in "Add details" with "Have you tried ..."
+    And I press "Update Code ticket"
+  Then I should see "curious wrote: Have you tried"
+  When "oracle" takes code ticket 1
