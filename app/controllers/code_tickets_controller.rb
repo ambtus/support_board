@@ -89,6 +89,7 @@ class CodeTicketsController < ApplicationController
       if @ticket.save
       Rails.logger.debug "saved here"
         flash[:notice] = "Code ticket updated"
+        @ticket.update_votes(current_user)
         @ticket.update_watchers(current_user)
         @ticket.send_update_notifications
         if !current_user && @ticket.authentication_code

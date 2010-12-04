@@ -23,6 +23,18 @@ class CodeTicket < ActiveRecord::Base
   # VOTES
   attr_accessor :vote_up
 
+  # run from controller after update (only logged in users are offered the choice)
+  def update_votes(current_user)
+    # are they already voting?
+    vote = self.code_votes.where(:user_id => current_user.id).first
+    # if they are, and they want to stop, remove the vote
+    vote.destroy if (vote && self.vote_up == "0")
+    # if they aren't, and they want to, add a vote.
+    if !vote && self.vote_up == "1"
+      self.code_votes.create(:user => current_user, :vote => 1)
+    end
+  end
+
   def vote_count
     code_votes.sum(:vote)
   end

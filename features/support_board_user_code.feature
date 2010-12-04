@@ -90,3 +90,70 @@ Scenario: users can (un)monitor worked code tickets
     And all emails have been delivered
   When a support volunteer responds to code ticket 1
   Then 0 emails should be delivered to "curious@ao3.org"
+
+
+Scenario: users can (un)vote for open code tickets
+  Given the following code tickets exist
+    | summary                        | category | id |
+    | something that could be better | Irritant | 1  |
+  And I am logged in as "curious"
+  When I follow "Support"
+    And I follow "Open Code Tickets"
+    And I follow "Code Ticket #1"
+    And I check "Vote up"
+    And I press "Update Code ticket"
+  Then I should see "Votes: 1"
+  When I uncheck "Vote up"
+    And I press "Update Code ticket"
+  Then I should see "Votes: 0"
+
+Scenario: users can (un)vote for worked code tickets
+  Given the following activated support volunteer exists
+    | login    | id |
+    | oracle   | 1  |
+  And the following code tickets exist
+    | summary                        | category | id |
+    | something that could be better | Irritant | 1  |
+  And "oracle" takes code ticket 1
+  And I am logged in as "curious"
+  When I follow "Support"
+    And I follow "Open Code Tickets"
+    And I follow "Code Ticket #1"
+    And I check "Vote up"
+    And I press "Update Code ticket"
+  Then I should see "Votes: 1"
+  When I uncheck "Vote up"
+    And I press "Update Code ticket"
+  Then I should see "Votes: 0"
+
+Scenario: users can't vote for closed code tickets
+  Given the following activated support volunteer exists
+    | login    | id |
+    | oracle   | 1  |
+  And the following code tickets exist
+    | summary                        | category | id |
+    | something that could be better | Irritant | 1  |
+  And "oracle" takes code ticket 1
+  And "oracle" resolves code ticket 1
+  And I am logged in as "curious"
+    And I am on the first code ticket page
+    Then I should not see "Vote up"
+
+Scenario: users can't unvote for closed code tickets
+  Given the following activated support volunteer exists
+    | login    | id |
+    | oracle   | 1  |
+  And the following code tickets exist
+    | summary                        | category | id |
+    | something that could be better | Irritant | 1  |
+  And "oracle" takes code ticket 1
+  And I am logged in as "curious"
+  When I follow "Support"
+    And I follow "Open Code Tickets"
+    And I follow "Code Ticket #1"
+    And I check "Vote up"
+    And I press "Update Code ticket"
+  Then I should see "Votes: 1"
+  When "oracle" resolves code ticket 1
+    And I am on the first code ticket page
+    Then I should not see "Vote up"
