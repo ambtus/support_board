@@ -229,7 +229,7 @@ Scenario: user's tickets should be available from their user page
     But I should not see "Support Ticket #5"
     But I should not see "Support Ticket #6"
 
-Scenario: guests can create support tickets with no initial notifications
+Scenario: guests can create support tickets with no notifications
   Given I am logged in as "troubled"
   When I follow "Support"
     And I follow "Open a New Ticket"
@@ -315,4 +315,31 @@ Scenario: Making a ticket private should remove notifications from non-owner/non
   When a support volunteer responds to support ticket 1
     Then 1 emails should be delivered to "tricksy@ao3.org"
     But 0 emails should be delivered to "troubled@ao3.org"
+
+Scenario: users can (un)resolve their support tickets
+  Given I am logged in as "troubled"
+  When I follow "Support"
+    And I follow "Open a New Ticket"
+  When I fill in "Summary" with "Archive is very slow"
+    And I fill in "Details" with "For example"
+    And I press "Create Support ticket"
+  Then I should see "Support ticket created"
+    And I should see "Category: Uncategorized"
+    And I should see "Summary: Archive is very slow"
+    And I should not see "User: troubled"
+    And I should see "Ticket owner wrote: For example"
+  When I fill in "Add details" with "Never mind, my router was broken"
+    And I press "Update Support ticket"
+    And I check "This answer resolves my issue"
+    And I press "Update Support ticket"
+  Then I should see "Status: Resolved"
+  When I uncheck "This answer resolves my issue"
+    And I fill in "Add details" with "Router fixed, archive still slow"
+    And I press "Update Support ticket"
+  Then I should see "Status: Open"
+  When a support volunteer responds to support ticket 1
+    And I reload the page
+  When I check "support_ticket_support_details_attributes_3_resolved_ticket"
+    And I press "Update Support ticket"
+  Then I should see "Status: Resolved"
 
