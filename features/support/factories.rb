@@ -24,5 +24,4 @@ end
 
 Factory.define :code_ticket do |f|
   f.sequence(:summary) { |n| "code ticket #{n}" }
-  f.association :pseud
 end

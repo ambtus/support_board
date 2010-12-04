@@ -5,6 +5,7 @@
 <% end %>
 <h2><%= link_to "Support tickets opened by #{@user.login}", user_support_tickets_path(@user) %></h2>
 <h2><%= link_to "Support tickets commented on by #{@user.login}", user_support_tickets_path(@user, :comments => true) %></h2>
+<p><%= @user.login %> has had <%= @user.support_detail_accepted_count %> support ticket comments accepted</p>
 <% if @user == current_user %>
 <h2><%= link_to "Support tickets I am watching", user_support_tickets_path(@user, :watching => true) %></h2>
 <% end %>

@@ -1,20 +1,47 @@
-<%= form_for(@ticket) do |f| %>
-  <% if current_user.try(:is_support_volunteer?) %>
-    <p class="submit"><%= f.submit (@ticket.pseud ? "Untake" : "Take") %></p>
-    <p class="submit"><%= f.submit "Categorize" %></p>
-    <dl>
-      <dt><%= f.label :category %>:</dt>
+<%= form_for(@ticket) do |t| %>
+  <p>
+    <% if @ticket.being_watched?(current_user) %>
+      <%= t.check_box :turn_off_notifications %>
+      <%= t.label :turn_off_notifications, "Turn off notifications"%>
+    <% else %>
+      <%= t.check_box :turn_on_notifications %>
+      <%= t.label :turn_on_notifications, "Turn on notifications"%>
+    <% end %>
+  </p>
+  <dl>
+    <dt><%= "Status" %>:</dt>
+      <dd><%= @ticket.pseud_id ? (@ticket.resolved? ? "Closed by " : "Being worked by ") + @ticket.pseud.name : "Open" %></dd>
+    <dt><%= "Category" %>:</dt>
+      <dd><%= @ticket.category || "Uncategorized" %></dd>
+    <dt><%= "Votes" %>:</dt>
+      <dd><%= @ticket.vote_count %></dd>
+    <% unless @ticket.resolved %>
+      <dt><%= t.label :vote_up %>:</dt>
         <dd>
-          <%= f.radio_button :category, 'Feature' %><%= f.label :category, 'Feature Request', :value => 'feature' %>
-          <%= f.radio_button :category, 'Bug' %><%= f.label :category, 'Bug Report', :value => 'bug' %>
-          <%= f.radio_button :category, 'Irritant' %><%= f.label :category, 'Irritant', :value => 'irritant' %>
+          <%= t.check_box :vote_up %>
         </dd>
-  <% else %>
-      <dl>
-  <% end %>
-      <dt><%= "Title" %>:</dt>
-        <dd><%= @ticket.title %></dd>
-      <dt><%= "Description" %>:</dt>
-        <dd><%= raw @ticket.description %></dd>
-     </dl>
+    <% end %>
+
+    <dt><%= "Summary" %>:</dt>
+      <dd><%= raw @ticket.summary %></dd>
+
+    <%= t.fields_for :code_details do |d| %>
+      <% if d.object.new_record? %>
+        <dt><%= d.label :pseud_id, "Pseud (Will be visible)" %>:</dt>
+          <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }, :selected => current_user.default_pseud.id %></dd>
+        <dt><%= d.label :content, "Add details" %>:</dt>
+          <dd><%= d.text_area :content %></dd>
+      <% elsif !d.object.private? %>
+        <% if d.object.resolved_ticket? %>
+          <dt><%= "Closed by" %> <%= d.object.byline %>:</dt>
+        <% else %>
+          <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
+        <% end %>
+            <dd><%= raw d.object.content %></dd>
+      <% end %>
+    <% end %>
+  </dl>
+  <p class="submit">
+    <%= t.submit %>
+  </p>
 <% end %>

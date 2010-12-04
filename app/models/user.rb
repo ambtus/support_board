@@ -44,4 +44,7 @@ class User < ActiveRecord::Base
     set_role('support_volunteer', should_be_support_volunteer == '1')
   end
 
+  def support_detail_accepted_count
+    SupportDetail.where(:resolved_ticket => true).where(:pseud_id => self.pseud_ids).count
+  end
 end

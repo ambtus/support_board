@@ -163,15 +163,44 @@ Scenario: guests email notifications should have a link with authentication code
   Then I should see "Status: Open"
 
 Scenario: can view code tickets as a guest, but not vote or respond
-  Given the following code tickets exist
-    | summary                                 |
-    | Multichapter works give 500 to admins   |
-    | OpenID broken                           |
-  Given I am on the home page
+  Given the following activated support volunteer exists
+    | login    | id |
+    | oracle   | 1  |
+  And the following code tickets exist
+    | summary                        | category | id |
+    | something that could be better | Irritant | 1  |
+    | something that is  broken      | Bug      | 2  |
+    | something on the horizon       | Feature  | 3  |
+  And "oracle" takes code ticket 1
+  And "oracle" resolves code ticket 1
+  And "oracle" takes code ticket 2
+  Given I am logged out
   When I follow "Support"
-    And I follow "Code Tickets"
-  Then I should see "Multichapter works give 500 to admins"
-  When I follow "OpenID broken"
-  Then I should not see "Vote Up"
-    And I should not see "Vote Down"
+    And I follow "Open Code Tickets"
+  Then I should not see "Code Ticket #1"
+    But I should see "Code Ticket #2"
+    And I should see "something that is broken"
+    And I should see "something on the horizon"
+  When I am on the first code ticket page
+    Then I should see "Status: Closed by oracle"
+    And I should see "Votes: 0"
+    And I should not see "Vote up"
+    And I should not see "Add details"
+  When I follow "Support"
+    And I follow "Open Code Tickets"
+    And I follow "Code Ticket #2"
+  Then I should see "Category: Bug"
+    And I should see "something that is broken"
+    And I should see "Status: Being worked by oracle"
+    And I should see "Votes: 0"
+    But I should not see "Add details"
+    And I should not see "Vote up"
+  When I follow "Support"
+    And I follow "Open Code Tickets"
+    And I follow "Code Ticket #3"
+ Then I should see "Category: Feature"
+    And I should see "something on the horizon"
+    And I should see "Votes: 0"
+    And I should see "Status: Open"
+    But I should not see "Vote up"
     And I should not see "Add details"

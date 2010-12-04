@@ -1,5 +1,4 @@
-<ul>
 <% @tickets.each do |ticket| %>
-  <li><%= link_to ticket.summary, ticket %></li>
+  <p><%= link_to(ticket.name, ticket) %></p>
+  <%=raw ticket.summary %>
 <% end %>
-</ul>

@@ -15,7 +15,6 @@ Given /the following activated support volunteers? exists?/ do |table|
   end
 end
 
-# do this all behind the scenes, so as not to interfere with the users session
 When /^a support volunteer responds to support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
   user = Factory.create(:user)
@@ -51,3 +50,34 @@ Given /^"([^"]*)" watches support ticket (\d+)$/ do |login, number|
   user = User.find_by_login(login)
   ticket.support_watchers.create(:email => user.email, :public_watcher => true)
 end
+
+# this method doesn't send notifications so don't expect it to
+Given /^"([^"]*)" accepts a response to support ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = SupportTicket.all[number.to_i - 1]
+  user = User.find_by_login(login)
+  assert ticket.user == user
+  response = ticket.support_details.where(:resolved_ticket => false).first
+  response.update_attribute(:resolved_ticket, true)
+end
+
+Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = CodeTicket.all[number.to_i - 1]
+  user = User.find_by_login(login)
+  assert user.is_support_volunteer?
+  ticket.pseud = user.support_pseud
+  ticket.save
+  ticket.send_update_notifications
+end
+
+Given /^"([^"]*)" resolves code ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = CodeTicket.all[number.to_i - 1]
+  user = User.find_by_login(login)
+  assert ticket.pseud == user.support_pseud
+  ticket.resolved = true
+  ticket.save
+  ticket.send_update_notifications
+end
+

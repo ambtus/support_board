@@ -60,11 +60,9 @@ class SupportTicketsController < ApplicationController
       @details = @ticket.support_details.not_private
       render :show_guest
     elsif current_user.is_support_volunteer?
-      @details = @ticket.support_details
       @ticket.support_details.build # create a new empty response template
       render :show_volunteer
     else # logged in as non-support volunteer
-      @details = @ticket.support_details.not_private
       if !@ticket.pseud_id # not currently being worked by support
         @ticket.support_details.build # create a new empty response template
       end

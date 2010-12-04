@@ -47,8 +47,11 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   create_table "code_details", :force => true do |t|
     t.integer  "code_ticket_id"
     t.integer  "pseud_id"
+    t.boolean  "support_response",                       :default => false
     t.string   "content"
-    t.integer  "content_sanitizer_version", :limit => 2, :default => 0, :null => false
+    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
+    t.boolean  "private",                                :default => false
+    t.boolean  "resolved_ticket",                        :default => false
     t.string   "archive_revision"
     t.string   "code_revision"
     t.datetime "created_at"
@@ -72,7 +75,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
 
   create_table "code_votes", :force => true do |t|
     t.integer  "code_ticket_id"
-    t.integer  "pseud_id"
+    t.integer  "user_id"
     t.integer  "vote",           :limit => 1
     t.datetime "created_at"
     t.datetime "updated_at"

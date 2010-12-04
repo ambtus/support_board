@@ -23,7 +23,7 @@
     <dt><%= "Access" %>:</dt>
       <dd><%= @ticket.private? ? "Private" : "Public" %>
     <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.resolved? ? "Resolved" : @ticket.pseud_id ? "Being worked on by support volunteer " + @ticket.pseud.name : "Open" %>
+      <dd><%= @ticket.pseud_id ? (@ticket.resolved? ? "Closed" : "Being worked") + " by support volunteer " + @ticket.pseud.name : "Open" %></dd>
     <dt><%= "Category" %>:</dt>
       <dd><%= @ticket.category || "Uncategorized" %>
     <dt><%= t.label :category %>:</dt>

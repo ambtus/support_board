@@ -42,7 +42,7 @@
         <% end %>
         <dt><%= d.label :content, "Add details" %>:</dt>
           <dd><%= d.text_area :content %>
-      <% else %>
+      <% elsif !d.object.private? %>
         <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
           <dd><%= raw d.object.content %></dd>
         <dt>&nbsp;</dt>
