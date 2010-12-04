@@ -60,6 +60,40 @@ Scenario: users can comment on unowned tickets and those comments can be chosen 
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
 
+Scenario: users can comment on unowned tickets with any pseud, with the default pseud selected automatically
+  Given the following activated user exists
+    | login     | id |
+    | helper    | 1  |
+    | confused  | 2  |
+  Given the following pseuds exist
+    | user_id | name    | is_default |
+    | 1       | alfa    |            |
+    | 1       | charlie | true       |
+  Given I am logged in as "troubled"
+  Given the following support tickets exist
+    | summary                           | user_id  | id |
+    | publicly visible support ticket   | 2        | 1  |
+  Given I am logged in as "helper"
+  When I follow "Support"
+    And I follow "Open Support Tickets"
+    And I follow "Support Ticket #1"
+  When I fill in "Add details" with "I think you just need to go to your profile and click..."
+    And I press "Update Support ticket"
+  Then I should see "Support ticket updated"
+    And I should see "charlie wrote: I think you"
+  When I fill in "Add details" with "Or you could..."
+    And I select "alfa" from "Pseud"
+    And I press "Update Support ticket"
+  Then I should see "Support ticket updated"
+    And I should see "charlie wrote: I think you"
+    And I should see "alfa wrote: Or you could..."
+  When I fill in "Add details" with "Or perhaps..."
+    And I press "Update Support ticket"
+  Then I should see "Support ticket updated"
+    And I should see "charlie wrote: I think you"
+    And I should see "alfa wrote: Or you could..."
+    And I should see "charlie wrote: Or perhaps"
+
 Scenario: users cannot comment on owned tickets.
   Given the following activated support volunteer exists
     | login    | password | id |
@@ -155,7 +189,7 @@ Scenario: private user support tickets should be private and can't be made publi
   Then I should see "embarrassing"
     And I should not see "Ticket will only be visible to"
 
-Scenario: users can choose to have their name displayed during creation
+Scenario: users can choose to have their name displayed during creation, when they comment their pseud will be shown
   Given I am logged in as "troubled"
   When I follow "Support"
     And I follow "Open a New Ticket"
@@ -169,22 +203,59 @@ Scenario: users can choose to have their name displayed during creation
     And I should see "User: troubled"
     And I should see "troubled wrote: For example"
 
+Scenario: if their name is displayed during creation they can use any pseud for details, with the default pseud defaulted
+  Given the following activated user exists
+    | login     | id |
+    | troubled  | 1  |
+  Given the following pseuds exist
+    | user_id | name    | is_default |
+    | 1       | alfa    |            |
+    | 1       | charlie | true       |
+  Given I am logged in as "troubled"
+  When I follow "Support"
+    And I follow "Open a New Ticket"
+  When I fill in "Summary" with "Archive is very slow"
+    And I fill in "Details" with "For example"
+    And I check "Display my user name"
+    And I press "Create Support ticket"
+  Then I should see "Support ticket created"
+    And I should see "Category: Uncategorized"
+    And I should see "Summary: Archive is very slow"
+    And I should see "User: troubled"
+    And I should see "charlie wrote: For example"
+  When I fill in "Add details" with "Some more stuff"
+    And I select "alfa" from "Pseud"
+    And I press "Update Support ticket"
+  Then I should see "User: troubled"
+    And I should see "charlie wrote: For example"
+    And I should see "alfa wrote: Some more stuff"
+  When I fill in "Add details" with "Even more stuff"
+    And I press "Update Support ticket"
+  Then I should see "User: troubled"
+    And I should see "charlie wrote: For example"
+    And I should see "alfa wrote: Some more stuff"
+    And I should see "charlie wrote: Even more stuff"
+
 Scenario: users can (un)hide their name after creation
   Given I am logged in as "troubled"
   When I follow "Support"
     And I follow "Open a New Ticket"
   When I fill in "Summary" with "Archive is very slow"
+    And I fill in "Details" with "For example"
     And I check "Display my user name"
     And I press "Create Support ticket"
     And I should see "User: troubled"
+    And I should see "troubled wrote: For example"
   When I uncheck "Display my user name"
     And I press "Update Support ticket"
   Then I should see "Support ticket updated"
     And I should not see "User: troubled"
+    And I should see "Ticket owner wrote: For example"
   When I check "Display my user name"
     And I press "Update Support ticket"
   Then I should see "Support ticket updated"
     And I should see "User: troubled"
+    And I should see "troubled wrote: For example"
 
 Scenario: user's tickets should be available from their user page
   Given the following activated user exists

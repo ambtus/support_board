@@ -37,8 +37,8 @@
     <%= t.fields_for :support_details do |d| %>
       <% if d.object.new_record? %>
         <% if current_user %>
-          <dt><%= d.label :pseud_id, "Pseud (Will not be visible)" %>:</dt>
-            <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }%></dd>
+          <dt><%= d.label :pseud_id, "Pseud (will not be visible unless you choose 'Display my user name' above)" %>:</dt>
+            <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }, :selected => current_user.default_pseud.id %></dd>
         <% end %>
         <dt><%= d.label :content, "Add details" %>:</dt>
           <dd><%= d.text_area :content %>
