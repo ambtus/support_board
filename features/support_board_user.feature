@@ -414,3 +414,53 @@ Scenario: users can (un)resolve their support tickets
     And I press "Update Support ticket"
   Then I should see "Status: Resolved"
 
+Scenario: link to support tickets they've commented on, publicly visible
+  Given the following activated users exist
+    | login     | id |
+    | helper    | 1  |
+    | confused  | 2  |
+    | tricksy   | 3  |
+  And the following support tickets exist
+    | summary                      | id | user_id | email         |
+    | public ticket by confused    | 1  | 2       |               |
+    | public ticket by tricksy     | 2  | 3       |               |
+    | public ticket by helper      | 3  | 1       |               |
+    | public ticket by a guest     | 4  |         | guest@ao3.org |
+  And "helper" responds to support ticket 1
+  And "helper" responds to support ticket 4
+  When I am on helper's user page
+    And I follow "Support tickets commented on by helper"
+  Then I should see "Support Ticket #1"
+    And I should see "Support Ticket #4"
+    But I should not see "Support Ticket #2"
+    And I should not see "Support Ticket #3"
+
+Scenario: links to support tickets they're watching, private
+  Given the following activated users exist
+    | login     | id |
+    | helper    | 1  |
+    | confused  | 2  |
+    | tricksy   | 3  |
+  And the following support tickets exist
+    | summary                      | id | user_id | email         |
+    | public ticket by confused    | 1  | 2       |               |
+    | public ticket by tricksy     | 2  | 3       |               |
+    | public ticket by helper      | 3  | 1       |               |
+    | public ticket by a guest     | 4  |         | guest@ao3.org |
+  And "helper" watches support ticket 1
+  And "helper" watches support ticket 2
+  When I am on helper's user page
+    Then I should not see "watched"
+  When I am logged in as "helper"
+    And I follow "helper"
+    And I follow "Support tickets I am watching"
+  Then I should see "Support Ticket #1"
+    And I should see "Support Ticket #2"
+    And I should see "Support Ticket #3"
+    But I should not see "Support Ticket #4"
+
+
+
+#          can vote up or down code tickets
+#          can (un)watch code tickets
+#          can't comment on code tickets which are owned

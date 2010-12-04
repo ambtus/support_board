@@ -13,12 +13,28 @@ class SupportTicketsController < ApplicationController
     if params[:pseud_id]
       @tickets = @tickets.where(:pseud_id => params[:pseud_id])
 
-    # user's owned tickets
+    # tickets associated with a user
     elsif params[:user_id]
-      @tickets = @tickets.where(:user_id => owner.id)
-      if current_user != owner
-        # if not owner, can only see tickets where name is displayed
-        @tickets = @tickets.where(:display_user_name => true)
+      # tickets I commented on
+      if params[:comments]
+        @tickets = SupportDetail.where(:pseud_id => owner.pseud_ids).includes(:support_ticket).map(&:support_ticket).uniq
+
+      # tickets I am watching, private
+      elsif params[:watching]
+        if current_user != owner
+          flash[:error] = "Sorry, you don't have permission"
+          redirect_back_or_default
+        else
+          @tickets = SupportWatcher.where(:email => owner.email).includes(:support_ticket).map(&:support_ticket).uniq
+        end
+
+      # tickets I opened
+      else
+        @tickets = @tickets.where(:user_id => owner.id)
+        if current_user != owner
+          # if not owner, can only see tickets where name is displayed
+          @tickets = @tickets.where(:display_user_name => true)
+        end
       end
 
     # front page - only show unowned tickets
@@ -63,6 +79,7 @@ class SupportTicketsController < ApplicationController
   end
 
   def create
+    # send a guest links to their tickets
     if params[:email]
       @tickets = SupportTicket.where(:email => params[:email])
       if @tickets.count > 0
@@ -73,6 +90,8 @@ class SupportTicketsController < ApplicationController
       end
       redirect_to support_path and return
     end
+
+    # new support ticket
     @ticket = SupportTicket.new(params[:support_ticket])
     if @ticket.save
       flash[:notice] = "Support ticket created"
@@ -83,7 +102,7 @@ class SupportTicketsController < ApplicationController
       end
       @ticket.send_create_notifications
     else
-      # reset so don't get field with errors
+      # reset so don't get field with errors which breaks definition lists
       flash[:error] = @ticket.errors.full_messages.join(", ")
       @ticket = SupportTicket.new(params[:support_ticket])
       render :new
