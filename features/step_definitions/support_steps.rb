@@ -16,7 +16,7 @@ Given /^an activated support volunteer exists with login "([^"]*)"$/ do |login|
   user = Factory.create(:user, :login => login) unless user
   user.activate
   user.support_volunteer = '1'
-  user.pseuds.create(:name => "#{login} (support volunteer)", :support_volunteer => true)
+  user.pseuds.create(:name => "#{login}(SV)", :support_volunteer => true)
   assert user.is_support_volunteer?
   assert user.support_pseud
 end
@@ -26,7 +26,7 @@ Given /the following activated support volunteers? exists?/ do |table|
     user = Factory.create(:user, hash)
     user.activate
     user.support_volunteer = '1'
-    user.pseuds.create(:name => "#{user.login} (support volunteer)", :support_volunteer => true)
+    user.pseuds.create(:name => "#{user.login}(SV)", :support_volunteer => true)
   end
 end
 
@@ -35,7 +35,7 @@ When /^a support volunteer responds to support ticket (\d+)$/ do |number|
   user = Factory.create(:user)
   user.activate
   user.support_volunteer = '1'
-  user.pseuds.create(:support_volunteer => true, :name => "foo")
+  user.pseuds.create(:support_volunteer => true, :name => "#{user.login}(SV)")
   ticket.support_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
   ticket.save
   ticket.send_update_notifications

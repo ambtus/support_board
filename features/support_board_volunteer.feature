@@ -83,3 +83,25 @@ Scenario: private user support tickets can't be made public by volunteers
   Then I should see "embarrassing"
     And I should see "Access: Private"
     But I should not see "Ticket will only be visible to"
+
+Scenario: by default, when a support volunteer comments, their comments are flagged as by support
+  Given the following support tickets exist
+    | summary                           | id |
+    | publicly visible support ticket   | 1  |
+  Given I am logged in as support volunteer "oracle"
+    And I go to the first support ticket page
+    And I fill in "Add details" with "some very interesting things"
+    And I press "Update Support ticket"
+  Then I should see "Support volunteer oracle(SV) wrote"
+
+Scenario: when a support volunteer comments, they can chose to do so as a regular user
+  Given the following support tickets exist
+    | summary                           | id |
+    | publicly visible support ticket   | 1  |
+  Given I am logged in as support volunteer "oracle"
+    And I go to the first support ticket page
+    And I fill in "Add details" with "some very interesting things"
+    And I select "oracle" from "Pseud"
+    And I press "Update Support ticket"
+  Then I should see "oracle wrote"
+    And I should not see "Support volunteer oracle"

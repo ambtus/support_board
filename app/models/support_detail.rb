@@ -20,6 +20,12 @@ class SupportDetail < ActiveRecord::Base
     end
   end
 
+  before_create :check_for_support
+  def check_for_support
+    self.support_response = true if self.pseud.try(:support_volunteer)
+    return true
+  end
+
   # SANITIZER stuff
 
   attr_protected :content_sanitizer_version
