@@ -5,4 +5,5 @@ log/*.log
 tmp/**/*
 .DS_Store
 config/initializers/akismetor.rb
+config/initializers/email.rb
 config/database.yml
