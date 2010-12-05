@@ -7,7 +7,7 @@ Scenario: guests can browse public tickets but not update them. they can't acces
     | private support ticket            | true    | guest@ao3.org | 1  |
     | publicly visible support ticket   | false   | guest@ao3.org | 2  |
   Given I am on the home page
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
   When I follow "Support Ticket #2"
@@ -18,8 +18,7 @@ Scenario: guests can browse public tickets but not update them. they can't acces
 
 Scenario: guests can't create a support ticket without a valid email address. (we need it for spam catching, plus it would make the ticket too hard for them to access later)
   Given I am on the home page
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   When I press "Create Support ticket"
   Then I should see "Email does not seem to be a valid address."
     And I should see "Summary can't be blank"
@@ -32,8 +31,7 @@ Scenario: guests can't create a support ticket without a valid email address. (w
 
 Scenario: guests can create a support ticket with a valid email address which is not visible even by choice
   Given I am on the home page
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   When I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
     And I fill in "Details" with "For example, it took a minute for this page to render"
@@ -58,8 +56,7 @@ Scenario: guests can create a support ticket with a valid email address which is
 
 Scenario: guests can create private support tickets
   Given I am on the home page
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   When I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Why are there no results when I search for wattersports?"
     And I check "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"
@@ -71,8 +68,7 @@ Scenario: guests can create private support tickets
 
 Scenario: guests can create support tickets with no initial notifications
   Given I am on the home page
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   And I check "Don't send me email notifications about this ticket"
   When I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Please stop sending me notifications"
@@ -86,7 +82,7 @@ Scenario: guests can enter an email address to have authorized links re-sent and
     | guest@ao3.org | second  |
     And all emails have been delivered
   When I am on the home page
-    And I follow "Support"
+    And I follow "Support Board"
     And I fill in "email" with "guest@ao3.org"
     And I press "Send me access links to my support tickets"
   Then 1 email should be delivered to "guest@ao3.org"
@@ -94,9 +90,11 @@ Scenario: guests can enter an email address to have authorized links re-sent and
     And all emails have been delivered
 
   When I click the first link in the email
+  Then show me the page
     And I check "Turn off notifications"
     And I press "Update Support ticket"
-  Then I should see "Turn on notifications"
+  Then I should see "Support ticket updated"
+    And I should see "Turn on notifications"
   When a user responds to support ticket 1
   Then 0 emails should be delivered to "guest@ao3.org"
 
@@ -125,7 +123,7 @@ Scenario: if there are no tickets, the guest should be told
     | guest2@ao3.org |
     And all emails have been delivered
   When I am on the home page
-    And I follow "Support"
+    And I follow "Support Board"
     And I fill in "email" with "guest@ao3.org"
     And I press "Send me access links to my support tickets"
   Then 0 emails should be delivered
@@ -175,7 +173,7 @@ Scenario: can view code tickets as a guest, but not vote or respond
   And "oracle" resolves code ticket 1
   And "oracle" takes code ticket 2
   Given I am logged out
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Code Tickets"
   Then I should not see "Code Ticket #1"
     But I should see "Code Ticket #2"
@@ -186,7 +184,7 @@ Scenario: can view code tickets as a guest, but not vote or respond
     And I should see "Votes: 0"
     And I should not see "Vote up"
     And I should not see "Add details"
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Code Tickets"
     And I follow "Code Ticket #2"
   Then I should see "Category: Bug"
@@ -195,7 +193,7 @@ Scenario: can view code tickets as a guest, but not vote or respond
     And I should see "Votes: 0"
     But I should not see "Add details"
     And I should not see "Vote up"
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Code Tickets"
     And I follow "Code Ticket #3"
  Then I should see "Category: Feature"

@@ -5,7 +5,7 @@ Scenario: users can't access private tickets even with a direct link
     | summary                           | private | id |
     | private support ticket            | true    |  1 |
   Given I am logged in as "troubled"
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
   When I go to the first support ticket page
@@ -19,7 +19,7 @@ Scenario: users can (un)monitor public tickets
     | login    | password | email            |
     | troubled | secret   | troubled@ao3.org |
   And I am logged in as "troubled"
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
     And I check "Turn on notifications"
@@ -42,7 +42,7 @@ Scenario: users can comment on unowned tickets and those comments can be chosen 
     | summary                           | user_id  | id |
     | publicly visible support ticket   | 1        | 1  |
   Given I am logged in as "helper"
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
   When I fill in "Add details" with "I think you just need to go to your profile and click..."
@@ -56,7 +56,7 @@ Scenario: users can comment on unowned tickets and those comments can be chosen 
   When I check "This answer resolves my issue"
     And I press "Update Support ticket"
   Then I should see "Status: Resolved"
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
 
@@ -74,7 +74,7 @@ Scenario: users can comment on unowned tickets with any pseud, with the default 
     | summary                           | user_id  | id |
     | publicly visible support ticket   | 2        | 1  |
   Given I am logged in as "helper"
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
   When I fill in "Add details" with "I think you just need to go to your profile and click..."
@@ -102,13 +102,13 @@ Scenario: users cannot comment on owned tickets.
     | summary                           | id |
     | publicly visible support ticket   | 1  |
   Given I am logged in as "oracle"
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
     And I press "Take"
   When I am logged out
   And I am logged in as "helper"
-  When I follow "Support"
+  When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
   When I go to the first support ticket page
@@ -117,8 +117,7 @@ Scenario: users cannot comment on owned tickets.
 
 Scenario: user defaults for opening a new ticket
   Given I am logged in as "troubled"
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   When I press "Create Support ticket"
   Then I should not see "Email does not seem to be a valid address."
     But I should see "Summary can't be blank"
@@ -133,8 +132,7 @@ Scenario: user defaults for opening a new ticket
 
 Scenario: users should receive 1 initial notification and 1 for additional updates
   Given I am logged in as "troubled"
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   When I fill in "Summary" with "Archive is very slow"
     And I fill in "Details" with "For example, this page took forever to load"
     And I press "Create Support ticket"
@@ -153,8 +151,7 @@ Scenario: users should receive 1 initial notification and 1 for additional updat
 
 Scenario: users can create private support tickets
   Given I am logged in as "troubled"
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
     And I fill in "Summary" with "Why are there no results when I search for wattersports?"
     And I check "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"
   When I press "Create Support ticket"
@@ -191,8 +188,7 @@ Scenario: private user support tickets should be private and can't be made publi
 
 Scenario: users can choose to have their name displayed during creation, when they comment their pseud will be shown
   Given I am logged in as "troubled"
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   When I fill in "Summary" with "Archive is very slow"
     And I fill in "Details" with "For example"
     And I check "Display my user name"
@@ -212,8 +208,7 @@ Scenario: if their name is displayed during creation they can use any pseud for 
     | 1       | alfa    |            |
     | 1       | charlie | true       |
   Given I am logged in as "troubled"
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   When I fill in "Summary" with "Archive is very slow"
     And I fill in "Details" with "For example"
     And I check "Display my user name"
@@ -238,8 +233,7 @@ Scenario: if their name is displayed during creation they can use any pseud for 
 
 Scenario: users can (un)hide their name after creation
   Given I am logged in as "troubled"
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   When I fill in "Summary" with "Archive is very slow"
     And I fill in "Details" with "For example"
     And I check "Display my user name"
@@ -302,8 +296,7 @@ Scenario: user's tickets should be available from their user page
 
 Scenario: guests can create support tickets with no notifications
   Given I am logged in as "troubled"
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   And I check "Don't send me email notifications about this ticket"
     And I fill in "Summary" with "Please stop sending me notifications"
   When I press "Create Support ticket"
@@ -389,8 +382,7 @@ Scenario: Making a ticket private should remove notifications from non-owner/non
 
 Scenario: users can (un)resolve their support tickets
   Given I am logged in as "troubled"
-  When I follow "Support"
-    And I follow "Open a New Ticket"
+  When I follow "Open a New Support Ticket"
   When I fill in "Summary" with "Archive is very slow"
     And I fill in "Details" with "For example"
     And I press "Create Support ticket"
