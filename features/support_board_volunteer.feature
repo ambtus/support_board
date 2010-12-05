@@ -161,21 +161,26 @@ Scenario: working support tickets should be available from the user page
     And I follow "Support tickets claimed by oracle"
     Then I should see "Support Ticket #3"
 
-Scenario: support board volunteers can categorize support tickets
+Scenario: support volunteers can mark a support ticket spam/ham
   Given the following support tickets exist
-    | summary    | id |
-    | question   | 1  |
+    | summary       | id |
+    | buy viagra    | 1  |
+    And all emails have been delivered
   When I am logged in as support volunteer "oracle"
-    And I go to the first support ticket page
-    And I choose "Question"
-    And I press "Update Support ticket"
-  Then I should see "Category: Question"
-  When I choose "Problem"
-    And I press "Update Support ticket"
-  Then I should see "Category: Problem"
-  When I choose "Kudo"
-    And I press "Update Support ticket"
-  Then I should see "Category: Kudo"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+    And I follow "Support Ticket #1"
+    And I press "Spam"
+  Then 0 emails should be delivered to "guest@ao3.org"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should not see "Support Ticket #1"
+    When I go to the first support ticket page
+    And I press "Ham"
+  Then 1 emails should be delivered to "guest@ao3.org"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should see "Support Ticket #1"
 
 Scenario: support volunteers can mark a support ticket for an Admin to resolve
   Given the following support tickets exist
@@ -191,4 +196,20 @@ Scenario: support volunteers can mark a support ticket for an Admin to resolve
     And I follow "Support tickets requiring Admin attention"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
+
+Scenario: support board volunteers can categorize support tickets
+  Given the following support tickets exist
+    | summary    | id |
+    | question   | 1  |
+  When I am logged in as support volunteer "oracle"
+    And I go to the first support ticket page
+    And I choose "Question"
+    And I press "Update Support ticket"
+  Then I should see "Category: Question"
+  When I choose "Problem"
+    And I press "Update Support ticket"
+  Then I should see "Category: Problem"
+  When I choose "Kudo"
+    And I press "Update Support ticket"
+  Then I should see "Category: Kudo"
 

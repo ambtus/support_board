@@ -1,7 +1,7 @@
 class SupportTicketsController < ApplicationController
 
   def index
-    @tickets = SupportTicket.where(:resolved => false)
+    @tickets = SupportTicket.where(:approved => true).where(:resolved => false)
     owner = params[:user_id] ? User.find_by_login(params[:user_id]) : false
 
     # if not support volunteer, and not looking at list of own tickets, can only view public tickets
@@ -120,24 +120,34 @@ class SupportTicketsController < ApplicationController
   end
 
   def update
-    # this, and the hidden field in show_owner.html shouldn't be necessary
-    # but capybara is loosing the session information for some reason on post
+    @ticket = SupportTicket.find(params[:id])
+
+    # boolean toggles for support volunteers
+    if current_user.try(:is_support_volunteer?)
+      if params[:commit] == "Take"
+        @ticket.send_steal_notification(current_user.support_pseud) if @ticket.pseud_id
+        @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
+      elsif params[:commit] == "Untake"
+        @ticket.update_attribute(:pseud_id, nil)
+      elsif params[:commit] == "Ham"
+        @ticket.mark_as_ham!
+      elsif params[:commit] == "Spam"
+        @ticket.mark_as_spam!
+      end
+      redirect_to @ticket and return if @ticket.changed?
+    end
+
+    # this, and the corresponding hidden field in show_owner.html shouldn't be needed
+    # but capybara is loosing the session information for some reason when posting
+    Rails.logger.debug "update session: #{session}"
     if params[:authentication_code]
       session[:authentication_code] = params[:authentication_code]
     end
-    Rails.logger.debug "update session: #{session}"
-    @ticket = SupportTicket.find(params[:id])
-    if params[:commit] == "Take"
-      if @ticket.pseud_id
-        @ticket.send_steal_notification(current_user.support_pseud)
-      end
-      @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
-      redirect_to @ticket and return
-    elsif params[:commit] == "Untake"
-      @ticket.update_attribute(:pseud_id, nil)
-      redirect_to @ticket and return
-    end
-    # FIXME check authorization to update ticket
+    Rails.logger.debug "update fixed session: #{session}"
+
+    # at the moment we're relying on the displayed form to limit the fields
+    # FIXME only allow update_attributes for the submitter's authorization
+    # to prevent malicious changes from people not using the web form
     @ticket.update_attributes(params[:support_ticket])
     if @ticket.save
       flash[:notice] = "Support ticket updated"
@@ -145,6 +155,7 @@ class SupportTicketsController < ApplicationController
       @ticket.send_update_notifications
       redirect_to @ticket
     else
+      flash[:error] = @ticket.errors.full_messages.join(", ")
       render :edit
     end
   end

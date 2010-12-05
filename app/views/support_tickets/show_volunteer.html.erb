@@ -1,5 +1,8 @@
 <%= form_for(@ticket) do |t| %>
-  <p class="submit"><%= t.submit (@ticket.pseud == current_user.support_pseud ? "Untake" : "Take") %></p>
+  <p class="submit">
+    <%= t.submit (@ticket.pseud == current_user.support_pseud ? "Untake" : "Take") %>
+    <%= t.submit (@ticket.approved? ? "Spam" : "Ham") %>
+  </p>
   <p>
     <% if @ticket.being_watched?(current_user) %>
       <%= t.check_box :turn_off_notifications %>

@@ -294,7 +294,7 @@ Scenario: user's tickets should be available from their user page
     But I should not see "Support Ticket #5"
     But I should not see "Support Ticket #6"
 
-Scenario: guests can create support tickets with no notifications
+Scenario: users can create support tickets with no notifications
   Given I am logged in as "troubled"
   When I follow "Open a New Support Ticket"
   And I check "Don't send me email notifications about this ticket"
@@ -302,7 +302,7 @@ Scenario: guests can create support tickets with no notifications
   When I press "Create Support ticket"
   Then 0 emails should be delivered to "troubled@ao3.org"
 
-Scenario: guests can turn notifications on and off their own and other tickets. notifications shouldn't trigger email.
+Scenario: users can turn notifications on and off their own and other tickets. notifications shouldn't trigger email.
   Given the following activated users exist
     | login     | id |
     | troubled  | 1  |

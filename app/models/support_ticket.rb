@@ -115,6 +115,9 @@ class SupportTicket < ActiveRecord::Base
     # don't try to send email if there's no-one to send it to
     return true if self.support_watchers.count < 1
 
+    # don't send email when something is spam
+    return true unless self.approved
+
     false
   end
 
@@ -159,7 +162,7 @@ class SupportTicket < ActiveRecord::Base
   # SPAM stuff
   attr_protected :approved
 
-  validate :check_for_spam
+  before_create :check_for_spam
   def check_for_spam
     errors.add(:base, "^This ticket looks like spam to our system, sorry! Please try again, or create an account to submit.") unless check_for_spam?
   end
@@ -171,12 +174,14 @@ class SupportTicket < ActiveRecord::Base
 
   def mark_as_spam!
     update_attribute(:approved, false)
-    Akismetor.submit_spam(akismet_attributes)
+    # don't submit spam reports unless in production mode
+    Rails.env.production? && Akismetor.submit_spam(akismet_attributes)
   end
 
   def mark_as_ham!
     update_attribute(:approved, true)
-    #Akismetor.submit_ham(akismet_attributes)
+    # don't submit ham reports unless in production mode
+    Rails.env.production? && Akismetor.submit_ham(akismet_attributes)
   end
 
   def akismet_attributes
