@@ -4,3 +4,4 @@ pkg/*
 log/*.log
 tmp/**/*
 .DS_Store
+config/initializers/akismetor.rb

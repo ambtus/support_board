@@ -165,8 +165,7 @@ class SupportTicket < ActiveRecord::Base
 
   def check_for_spam?
     # don't check for spam while running tests or if logged in
-    # FIXME set up Akismetor and remove || true
-    self.approved = Rails.env.test? || self.user_id || true || !Akismetor.spam?(akismet_attributes)
+    self.approved = Rails.env.test? || self.user_id || !Akismetor.spam?(akismet_attributes)
   end
 
   def mark_as_spam!
@@ -181,8 +180,6 @@ class SupportTicket < ActiveRecord::Base
 
   def akismet_attributes
     {
-      :key => ArchiveConfig.AKISMET_KEY,
-      :blog => ArchiveConfig.AKISMET_NAME,
       :user_ip => ip_address,
       :user_agent => user_agent,
       :comment_author_email => email,
