@@ -1,4 +1,5 @@
 <%= form_for(@ticket) do |t| %>
+ <%= hidden_field_tag :authentication_code, session[:authentication_code] %>
   <p>
     <% if @ticket.being_watched?(current_user) %>
       <%= t.check_box :turn_off_notifications %>

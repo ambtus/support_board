@@ -44,8 +44,12 @@ class SupportTicketsController < ApplicationController
   end
 
   def show
+    if params[:authentication_code]
+      session[:authentication_code] = params[:authentication_code]
+    end
+    Rails.logger.debug "show session: #{session}"
     @ticket = SupportTicket.find(params[:id])
-    is_owner = @ticket.owner?(params[:authentication_code], current_user) # is viewer owner of ticket?
+    is_owner = @ticket.owner?(session[:authentication_code], current_user) # is viewer owner of ticket?
 
     if @ticket.private && (!is_owner && !current_user.try(:is_support_volunteer?))
       flash[:error] = "Sorry, you don't have permission to view this ticket"
@@ -68,7 +72,6 @@ class SupportTicketsController < ApplicationController
       end
       render :show_user
     end
-
   end
 
   def new
@@ -94,10 +97,10 @@ class SupportTicketsController < ApplicationController
     if @ticket.save
       flash[:notice] = "Support ticket created"
       if @ticket.authentication_code
-        redirect_to support_ticket_path(@ticket, :authentication_code => @ticket.authentication_code)
-      else
-        redirect_to @ticket
+        session[:authentication_code] = @ticket.authentication_code
+        Rails.logger.debug "create session: #{session}"
       end
+      redirect_to @ticket
       @ticket.send_create_notifications
     else
       # reset so don't get field with errors which breaks definition lists
@@ -108,25 +111,28 @@ class SupportTicketsController < ApplicationController
   end
 
   def update
-    # FIXME check authorization to update ticket
+    # this, and the hidden field in show_owner.html shouldn't be necessary
+    # but capybara is loosing the session information for some reason on post
+    if params[:authentication_code]
+      session[:authentication_code] = params[:authentication_code]
+    end
+    Rails.logger.debug "update session: #{session}"
     @ticket = SupportTicket.find(params[:id])
     if params[:commit] == "Take"
       @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
       redirect_to @ticket and return
     end
+    # FIXME check authorization to update ticket
     @ticket.update_attributes(params[:support_ticket])
     if @ticket.save
     Rails.logger.debug "saved here"
       flash[:notice] = "Support ticket updated"
       @ticket.update_watchers(current_user)
       @ticket.send_update_notifications
-      if !current_user && @ticket.authentication_code
-        redirect_to support_ticket_path(@ticket, :authentication_code => @ticket.authentication_code)
-      else
-        redirect_to @ticket
-      end
+      redirect_to @ticket
     else
       render :edit
     end
   end
+
 end

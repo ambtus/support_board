@@ -54,6 +54,14 @@ Scenario: guests can create a support ticket with a valid email address which is
     And I should see "Never mind"
   And 1 email should be delivered to "guest@ao3.org"
 
+  # guests can come back to the ticket later (session persistent authorization)
+  When I follow "Open a New Support Ticket"
+    And I am on the homepage
+  And I follow "Support Board"
+  And I follow "Open Support Tickets"
+  And I follow "Support Ticket"
+    Then I should see "Add details"
+
 Scenario: guests can create private support tickets
   Given I am on the home page
   When I follow "Open a New Support Ticket"
@@ -90,7 +98,6 @@ Scenario: guests can enter an email address to have authorized links re-sent and
     And all emails have been delivered
 
   When I click the first link in the email
-  Then show me the page
     And I check "Turn off notifications"
     And I press "Update Support ticket"
   Then I should see "Support ticket updated"
