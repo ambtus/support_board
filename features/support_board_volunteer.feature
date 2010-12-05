@@ -105,3 +105,58 @@ Scenario: when a support volunteer comments, they can chose to do so as a regula
     And I press "Update Support ticket"
   Then I should see "oracle wrote"
     And I should not see "Support volunteer oracle"
+
+Scenario: working support tickets should be available from the user page
+  Given the following activated user exists
+    | login     | id |
+    | troubled  | 1  |
+  And the following support tickets exist
+    | id | summary | user_id |
+    | 1  | easy    | 1       |
+    | 2  | hard    |         |
+    | 3  | right   | 1       |
+    | 4  | wrong   |         |
+  And an activated support volunteer exists with login "oracle"
+    And "oracle" takes support ticket 1
+    And "oracle" responds to support ticket 1
+    And "oracle" takes support ticket 3
+    And "oracle" takes support ticket 4
+  When I am on oracle's user page
+    And I follow "Support tickets claimed by oracle"
+  Then I should see "Support Ticket #1"
+    But I should not see "Support Ticket #2"
+    But I should see "Support Ticket #3"
+    And I should see "Support Ticket #4"
+  When "troubled" accepts a response to support ticket 1
+    And I reload the page
+  Then I should not see "Support Ticket #1"
+    And I should not see "Support Ticket #2"
+    But I should see "Support Ticket #3"
+    And I should see "Support Ticket #4"
+  When I am logged in as support volunteer "oracle"
+    And I am on oracle's user page
+    And I follow "Support tickets claimed by oracle"
+    And I follow "Support Ticket #4"
+    And I press "Untake"
+  When I am on oracle's user page
+    And I follow "Support tickets claimed by oracle"
+  Then I should not see "Support Ticket #1"
+    And I should not see "Support Ticket #2"
+    But I should see "Support Ticket #3"
+    And I should not see "Support Ticket #4"
+  When I am logged in as "troubled"
+    And I am on oracle's user page
+    And I follow "Support tickets claimed by oracle"
+    And I follow "Support Ticket #3"
+    And I check "Private"
+    And I press "Update Support ticket"
+  When I am on oracle's user page
+    And I follow "Support tickets claimed by oracle"
+  Then I should not see "Support Ticket #1"
+    And I should not see "Support Ticket #2"
+    And I should not see "Support Ticket #3"
+    And I should not see "Support Ticket #4"
+  When I am logged in as support volunteer "hermione"
+    And I am on oracle's user page
+    And I follow "Support tickets claimed by oracle"
+    Then I should see "Support Ticket #3"

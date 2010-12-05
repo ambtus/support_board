@@ -34,10 +34,14 @@ class SupportTicket < ActiveRecord::Base
     self.owner_resolved? || self.support_resolved?
   end
 
+  attr_accessor :updated_resolved
+
   # support tickets can be user resolved (the user accepts one or more answers)
   # or support resolved (the support person has linked to a FAQ or a ticket, or handed it off to an admin
-  before_save :update_resolved
+  after_save :update_resolved
   def update_resolved
+    return if updated_resolved # already updated, don't check and save again
+
     self.owner_resolved = self.support_details.resolved.count
     # if there are no details which have been marked "resolved_ticket" the count will be 0
     # and owner_resolved? will return false,
@@ -47,7 +51,8 @@ class SupportTicket < ActiveRecord::Base
     # if there are no links, or it hasn't been handed of to admins then support_resolved? will be false
     # otherwise it will be true
 
-    true
+    self.updated_resolved = true # set attr_accessor so don't trigger infinite loop
+    self.save
   end
 
   # NOTIFICATION stuff

@@ -11,7 +11,8 @@ class SupportTicketsController < ApplicationController
 
     # support volunteer's working tickets
     if params[:pseud_id]
-      @tickets = @tickets.where(:pseud_id => params[:pseud_id])
+      pseud = Pseud.find_by_name(params[:pseud_id])
+      @tickets = @tickets.where(:pseud_id => pseud.id)
 
     # tickets associated with a user
     elsif params[:user_id]

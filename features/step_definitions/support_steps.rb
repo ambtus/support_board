@@ -77,14 +77,15 @@ Given /^"([^"]*)" watches support ticket (\d+)$/ do |login, number|
   ticket.support_watchers.create(:email => user.email, :public_watcher => true)
 end
 
-# this method doesn't send notifications so don't expect it to
 Given /^"([^"]*)" accepts a response to support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
   user = User.find_by_login(login)
   assert ticket.user == user
   response = ticket.support_details.where(:resolved_ticket => false).first
-  response.update_attribute(:resolved_ticket, true)
+  ticket.support_details_attributes = {"0"=>{"resolved_ticket"=>"1", "id"=>response.id}}
+  ticket.save
+  ticket.send_update_notifications
 end
 
 Given /^"([^"]*)" takes support ticket (\d+)$/ do |login, number|
@@ -96,7 +97,6 @@ Given /^"([^"]*)" takes support ticket (\d+)$/ do |login, number|
   ticket.save
   ticket.send_update_notifications
 end
-
 
 Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
