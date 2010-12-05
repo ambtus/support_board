@@ -1,6 +1,5 @@
 Setup:
 
-create a config/initializers/akismetor.rb file similar to:
+thor setup:config
 
-Akismetor.blog = 'http://myblog.org'
-Akismetor.key = '1234567890'
+you will need to edit the resulting files

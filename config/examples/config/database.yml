@@ -1,0 +1,15 @@
+defaults: &defaults
+  adapter: mysql2
+  encoding: utf8
+  collation: utf8_general_ci
+  username: root
+  password:
+development:
+  database: support_board_development
+  <<: *defaults
+test: &test
+  database: support_board_test
+  <<: *defaults
+production:
+  database: support_board_production
+  <<: *defaults
