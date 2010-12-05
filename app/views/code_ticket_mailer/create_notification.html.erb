@@ -1,4 +1,4 @@
-<p>A new support ticket has been created: <%= link_to @ticket.name, code_ticket_path(@ticket, :only_path => false) %></p>
+<p>A new support ticket has been created: <%= link_to @ticket.name, code_ticket_url(@ticket) %></p>
 <%=raw @ticket.summary %>
 <% if @detail %>
   <dt>Details:</dt>

@@ -4,9 +4,9 @@ class SupportTicketMailer < ActionMailer::Base
   def create_notification(ticket, recipient)
     @ticket = ticket
     if @ticket.authentication_code
-      @url = support_ticket_path(@ticket, :only_path => false, :authentication_code => @ticket.authentication_code)
+      @url = support_ticket_url(@ticket, :authentication_code => @ticket.authentication_code)
     else
-      @url = support_ticket_path(@ticket, :only_path => false)
+      @url = support_ticket_url(@ticket)
     end
     @detail = @ticket.support_details.first
     mail(
@@ -18,9 +18,9 @@ class SupportTicketMailer < ActionMailer::Base
   def update_notification(ticket, recipient)
     @ticket = ticket
     if @ticket.authentication_code
-      @url = support_ticket_path(@ticket, :only_path => false, :authentication_code => @ticket.authentication_code)
+      @url = support_ticket_url(@ticket, :authentication_code => @ticket.authentication_code)
     else
-      @url = support_ticket_path(@ticket, :only_path => false)
+      @url = support_ticket_url(@ticket)
     end
     @details = (@ticket.support_details.count > 0) ? @ticket.support_details : []
     mail(
@@ -40,7 +40,7 @@ class SupportTicketMailer < ActionMailer::Base
   def steal_notification(ticket, stealer)
     @ticket = ticket
     @stealer = stealer
-    @url = support_ticket_path(@ticket, :only_path => false)
+    @url = support_ticket_url(@ticket)
     @details = (@ticket.support_details.count > 0) ? @ticket.support_details : []
     mail(
       :to => @ticket.pseud.user.email,
