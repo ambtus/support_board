@@ -17,8 +17,8 @@ class CreateTickets < ActiveRecord::Migration
       t.string :category
       t.integer :archive_faq_id
       t.integer :code_ticket_id
-      t.integer :owner_resolved, :default => 0
-      t.boolean :support_resolved, :default => false
+      t.integer :resolved, :default => false
+      t.boolean :admin_resolved, :default => false
 
       t.timestamps
     end

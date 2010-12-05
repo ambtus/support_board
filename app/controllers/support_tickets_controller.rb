@@ -1,7 +1,7 @@
 class SupportTicketsController < ApplicationController
 
   def index
-    @tickets = SupportTicket.open
+    @tickets = SupportTicket.where(:resolved => false)
     owner = params[:user_id] ? User.find_by_login(params[:user_id]) : false
 
     # if not support volunteer, and not looking at list of own tickets, can only view public tickets
@@ -41,6 +41,10 @@ class SupportTicketsController < ApplicationController
     # claimed support tickets
     elsif params[:claimed]
       @tickets = @tickets.where("pseud_id is NOT NULL")
+
+    # admin support tickets
+    elsif params[:admin]
+      @tickets = @tickets.where(:category => 'Admin')
 
     # default - unowned tickets
     else
@@ -136,7 +140,6 @@ class SupportTicketsController < ApplicationController
     # FIXME check authorization to update ticket
     @ticket.update_attributes(params[:support_ticket])
     if @ticket.save
-    Rails.logger.debug "saved here"
       flash[:notice] = "Support ticket updated"
       @ticket.update_watchers(current_user)
       @ticket.send_update_notifications

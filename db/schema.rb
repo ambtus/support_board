@@ -151,8 +151,8 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "category"
     t.integer  "archive_faq_id"
     t.integer  "code_ticket_id"
-    t.integer  "owner_resolved",                         :default => 0
-    t.boolean  "support_resolved",                       :default => false
+    t.integer  "resolved",                               :default => 0
+    t.boolean  "admin_resolved",                         :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

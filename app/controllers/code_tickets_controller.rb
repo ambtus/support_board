@@ -91,7 +91,6 @@ class CodeTicketsController < ApplicationController
       end
       @ticket.update_attributes(params[:code_ticket])
       if @ticket.save
-      Rails.logger.debug "saved here"
         flash[:notice] = "Code ticket updated"
         @ticket.update_votes(current_user)
         @ticket.update_watchers(current_user)

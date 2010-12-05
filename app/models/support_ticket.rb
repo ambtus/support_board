@@ -25,34 +25,26 @@ class SupportTicket < ActiveRecord::Base
 
   # RESOLUTION stuff
 
-  # scope
-  def self.open
-    where(:owner_resolved => 0).where(:support_resolved => false)
-  end
-
-  def resolved?
-    self.owner_resolved? || self.support_resolved?
-  end
-
   attr_accessor :updated_resolved
 
-  # support tickets can be user resolved (the user accepts one or more answers)
-  # or support resolved (the support person has linked to a FAQ or a ticket, or handed it off to an admin
+  # support tickets can be owner resolved (the owner accepts one or more answers),
+  # support resolved (the support person has linked to a FAQ or a ticket),
+  # or handed off to an admin who can mark it resolved
   after_save :update_resolved
   def update_resolved
     return if updated_resolved # already updated, don't check and save again
+    old = self.resolved
+    Rails.logger.debug self.resolved.class
+    owner_resolved = (self.support_details.resolved.count > 0)
 
-    self.owner_resolved = self.support_details.resolved.count
-    # if there are no details which have been marked "resolved_ticket" the count will be 0
-    # and owner_resolved? will return false,
-    # otherwise it will be a positive number, and owner_resolved? will return true
+    support_resolved = (self.archive_faq || self.code_ticket)
 
-    self.support_resolved = self.archive_faq || self.code_ticket || self.category == "Admin"
-    # if there are no links, or it hasn't been handed of to admins then support_resolved? will be false
-    # otherwise it will be true
-
+    self.resolved = owner_resolved || support_resolved || self.admin_resolved
+    new = self.resolved
     self.updated_resolved = true # set attr_accessor so don't trigger infinite loop
-    self.save
+    # for some very strange reason, updating 0 with 0 makes rails think the attribute
+    # is dirty, and it's acting as if it had changed.
+    self.save unless old == new
   end
 
   # NOTIFICATION stuff
