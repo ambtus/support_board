@@ -36,4 +36,16 @@ class SupportTicketMailer < ActionMailer::Base
       :subject => "[AO3] Access links for support tickets"
     )
   end
+
+  def steal_notification(ticket, stealer)
+    @ticket = ticket
+    @stealer = stealer
+    @url = support_ticket_path(@ticket, :only_path => false)
+    @details = (@ticket.support_details.count > 0) ? @ticket.support_details : []
+    mail(
+      :to => @ticket.pseud.user.email,
+      :subject => "[AO3] Stolen #{ticket.name}"
+    )
+  end
+
 end

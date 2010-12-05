@@ -137,6 +137,10 @@ class SupportTicket < ActiveRecord::Base
     end
   end
 
+  def send_steal_notification(current_user)
+    SupportTicketMailer.steal_notification(self, current_user).deliver
+  end
+
   # AUTHENTICATION stuff
 
   before_create :create_authentication_code

@@ -37,7 +37,11 @@ class SupportTicketsController < ApplicationController
         end
       end
 
-    # front page - only show unowned tickets
+    # claimed support tickets
+    elsif params[:claimed]
+      @tickets = @tickets.where("pseud_id is NOT NULL")
+
+    # default - unowned tickets
     else
       @tickets = @tickets.where(:pseud_id => nil)
     end
@@ -119,7 +123,13 @@ class SupportTicketsController < ApplicationController
     Rails.logger.debug "update session: #{session}"
     @ticket = SupportTicket.find(params[:id])
     if params[:commit] == "Take"
+      if @ticket.pseud_id
+        @ticket.send_steal_notification(current_user.support_pseud)
+      end
       @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
+      redirect_to @ticket and return
+    elsif params[:commit] == "Untake"
+      @ticket.update_attribute(:pseud_id, nil)
       redirect_to @ticket and return
     end
     # FIXME check authorization to update ticket

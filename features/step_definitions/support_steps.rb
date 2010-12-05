@@ -1,8 +1,24 @@
+Given /^I am logged in as support volunteer "([^"]*)"$/ do |login|
+  # " reset quotes for color
+  visit logout_path
+  Given %{an activated support volunteer exists with login "#{login}"}
+  visit root_path
+  fill_in "User name", :with => login
+  fill_in "Password", :with => "secret"
+  check "Remember me"
+  click_button "Log in"
+  assert UserSession.find
+end
+
 Given /^an activated support volunteer exists with login "([^"]*)"$/ do |login|
+  # " reset quotes for color
   user = User.find_by_login(login)
   user = Factory.create(:user, :login => login) unless user
   user.activate
+  user.support_volunteer = '1'
   user.pseuds.create(:name => "#{login} (support volunteer)", :support_volunteer => true)
+  assert user.is_support_volunteer?
+  assert user.support_pseud
 end
 
 Given /the following activated support volunteers? exists?/ do |table|
@@ -10,8 +26,7 @@ Given /the following activated support volunteers? exists?/ do |table|
     user = Factory.create(:user, hash)
     user.activate
     user.support_volunteer = '1'
-    pseud = user.default_pseud
-    pseud.update_attribute(:support_volunteer, true)
+    user.pseuds.create(:name => "#{user.login} (support volunteer)", :support_volunteer => true)
   end
 end
 
@@ -71,6 +86,17 @@ Given /^"([^"]*)" accepts a response to support ticket (\d+)$/ do |login, number
   response = ticket.support_details.where(:resolved_ticket => false).first
   response.update_attribute(:resolved_ticket, true)
 end
+
+Given /^"([^"]*)" takes support ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = SupportTicket.all[number.to_i - 1]
+  user = User.find_by_login(login)
+  assert user.is_support_volunteer?
+  ticket.pseud = user.support_pseud
+  ticket.save
+  ticket.send_update_notifications
+end
+
 
 Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
