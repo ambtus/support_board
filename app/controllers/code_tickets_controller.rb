@@ -8,10 +8,14 @@ class CodeTicketsController < ApplicationController
 
     # tickets associated with a user
     elsif params[:user_id]
-      user = params[:user_id] ? User.find_by_login(params[:user_id]) : false
+      user = User.find_by_login(params[:user_id])
+
+      # tickets I voted on, public
+      if params[:votes]
+        @tickets = CodeVote.where(:user_id => user.id).includes(:code_ticket).map(&:code_ticket).uniq
 
       # tickets I commented on, public
-      if params[:comments]
+      elsif params[:comments]
         @tickets = CodeDetail.where(:pseud_id => user.pseud_ids).includes(:code_ticket).map(&:code_ticket).uniq
 
       # tickets I am watching, private

@@ -2,8 +2,10 @@ SupportBoard::Application.routes.draw do
   resources :users do
     resources :pseuds do
       resource :support_tickets
+      resources :code_tickets
     end
     resources :support_tickets
+    resources :code_tickets
   end
 
   resources :user_sessions

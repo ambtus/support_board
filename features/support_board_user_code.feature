@@ -173,3 +173,57 @@ Scenario: users can comment on open code tickets, but not closed code tickets
     And I press "Update Code ticket"
   Then I should see "curious wrote: Have you tried"
   When "oracle" takes code ticket 1
+
+Scenario: link to code tickets they've voted on, public
+  Given the following activated users exist
+    | login     | id |
+    | helper    | 1  |
+  And the following code tickets exist
+    | summary                        | category | id |
+    | something that could be better | Irritant | 1  |
+    | something that is  broken      | Bug      | 2  |
+    | something on the horizon       | Feature  | 3  |
+  And "helper" votes up code ticket 1
+  And "helper" votes up code ticket 3
+  When I am on helper's user page
+    And I follow "Code tickets voted up by helper"
+  Then I should see "Code Ticket #1"
+    And I should see "Code Ticket #3"
+    But I should not see "Code Ticket #2"
+
+Scenario: link to code tickets they've commented on, public
+  Given the following activated users exist
+    | login     | id |
+    | helper    | 1  |
+  And the following code tickets exist
+    | summary                        | category | id |
+    | something that could be better | Irritant | 1  |
+    | something that is  broken      | Bug      | 2  |
+    | something on the horizon       | Feature  | 3  |
+  And "helper" comments on code ticket 1
+  And "helper" comments on code ticket 3
+  When I am on helper's user page
+    And I follow "Code tickets commented on by helper"
+  Then I should see "Code Ticket #1"
+    And I should see "Code Ticket #3"
+    But I should not see "Code Ticket #2"
+
+Scenario: links to code tickets they're watching, private
+  Given the following activated users exist
+    | login     | id |
+    | helper    | 1  |
+  And the following code tickets exist
+    | summary                        | category | id |
+    | something that could be better | Irritant | 1  |
+    | something that is  broken      | Bug      | 2  |
+    | something on the horizon       | Feature  | 3  |
+  And "helper" watches code ticket 1
+  And "helper" watches code ticket 3
+  When I am on helper's user page
+    Then I should not see "watched"
+  When I am logged in as "helper"
+    And I follow "helper"
+    And I follow "Code tickets I am watching"
+  Then I should see "Code Ticket #1"
+    And I should see "Code Ticket #3"
+    But I should not see "Code Ticket #2"

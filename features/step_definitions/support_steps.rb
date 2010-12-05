@@ -92,3 +92,26 @@ Given /^"([^"]*)" resolves code ticket (\d+)$/ do |login, number|
   ticket.send_update_notifications
 end
 
+Given /^"([^"]*)" votes up code ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = CodeTicket.all[number.to_i - 1]
+  user = User.find_by_login(login)
+  ticket.code_votes.create(:user_id => user.id, :vote => 1)
+end
+
+Given /^"([^"]*)" comments on code ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = CodeTicket.all[number.to_i - 1]
+  user = User.find_by_login(login)
+  ticket.code_details.build(:pseud => user.default_pseud, :content => "blah blah")
+  ticket.save
+  ticket.send_update_notifications
+end
+
+Given /^"([^"]*)" watches code ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = CodeTicket.all[number.to_i - 1]
+  user = User.find_by_login(login)
+  ticket.code_watchers.create(:email => user.email)
+end
+
