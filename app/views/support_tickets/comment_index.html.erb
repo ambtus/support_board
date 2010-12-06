@@ -1,0 +1,6 @@
+<% @tickets.each do |ticket| %>
+  <p>
+  <%= link_to "#" + ticket.id.to_s, ticket%>
+  <%= ticket.comment_name(current_user) %> left the following comment:<p>
+  <%=raw ticket.summary %>
+<% end %>

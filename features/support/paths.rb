@@ -13,7 +13,10 @@ module NavigationHelpers
 
    when /^(.*)'s user page$/i
       user_path(:id => $1)
- 
+
+   when /^the page for the first support ticket/
+      support_ticket_path(:id => SupportTicket.first.id)
+
     # the following are examples using path_to_pickle
 
     when /^#{capture_model}(?:'s)? page$/                           # eg. the forum's page

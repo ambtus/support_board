@@ -7,3 +7,5 @@ tmp/**/*
 config/initializers/akismetor.rb
 config/initializers/email.rb
 config/database.yml
+pickle-email-*.html
+capybara-*.html

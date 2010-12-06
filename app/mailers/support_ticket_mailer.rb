@@ -3,7 +3,7 @@ class SupportTicketMailer < ActionMailer::Base
 
   def create_notification(ticket, recipient)
     @ticket = ticket
-    if @ticket.authentication_code
+    if @ticket.authentication_code && recipient == ticket.email
       @url = support_ticket_url(@ticket, :authentication_code => @ticket.authentication_code)
     else
       @url = support_ticket_url(@ticket)
@@ -17,7 +17,7 @@ class SupportTicketMailer < ActionMailer::Base
 
   def update_notification(ticket, recipient)
     @ticket = ticket
-    if @ticket.authentication_code
+    if @ticket.authentication_code && recipient == ticket.email
       @url = support_ticket_url(@ticket, :authentication_code => @ticket.authentication_code)
     else
       @url = support_ticket_url(@ticket)

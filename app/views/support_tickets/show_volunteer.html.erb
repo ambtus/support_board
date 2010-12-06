@@ -1,7 +1,13 @@
 <%= form_for(@ticket) do |t| %>
   <p class="submit">
     <%= t.submit (@ticket.pseud == current_user.support_pseud ? "Untake" : "Take") %>
-    <%= t.submit (@ticket.approved? ? "Spam" : "Ham") %>
+    <% unless @ticket.user %>
+      <%= t.submit (@ticket.approved? ? "Spam" : "Ham") %>
+    <% end %>
+    <%= t.submit (@ticket.comment? ? "Needs Attention" : "Comment") %>
+    <% unless @ticket.admin %>
+      <%= t.submit "Needs Admin Attention" %>
+    <% end %>
   </p>
   <p>
     <% if @ticket.being_watched?(current_user) %>
@@ -26,17 +32,7 @@
     <dt><%= "Access" %>:</dt>
       <dd><%= @ticket.private? ? "Private" : "Public" %>
     <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.pseud_id ? (@ticket.resolved? ? "Closed" : "Being worked") + " by support volunteer " + @ticket.pseud.name : "Open" %></dd>
-    <dt><%= "Category" %>:</dt>
-      <dd><%= @ticket.category || "Uncategorized" %>
-    <dt><%= t.label :category %>:</dt>
-      <dd>
-        <%= t.radio_button :category, 'Question' %><%= t.label :category, 'Question', :value => 'question' %>
-        <%= t.radio_button :category, 'Problem' %><%= t.label :category, 'Problem', :value => 'problem' %>
-        <%= t.radio_button :category, 'Suggestion' %><%= t.label :category, 'Suggestion', :value => 'suggestion' %>
-        <%= t.radio_button :category, 'Kudo' %><%= t.label :category, 'Kudo', :value => 'kudo' %>
-        <%= t.radio_button :category, 'Admin' %><%= t.label :category, 'Admin', :value => 'admin' %>
-      </dd>
+      <dd><%= @ticket.status_line %></dd>
     <dt><%= "Summary" %>:</dt>
       <dd><%= raw @ticket.summary %></dd>
 

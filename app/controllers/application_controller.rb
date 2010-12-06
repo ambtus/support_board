@@ -3,9 +3,8 @@ class ApplicationController < ActionController::Base
 
   helper_method :app_version
 
-  # should be gotten from source control, otherwise update with every deploy
   def app_version
-    1.0
+    @app_version || File.read(Rails.root + "REVISION")
   end
 
   helper_method :current_user

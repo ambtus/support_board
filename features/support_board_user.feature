@@ -1,5 +1,22 @@
 Feature: the support board as seen by logged in users for support tickets
 
+Scenario: what users should (not) see
+  Given I am logged in as "someone"
+  When I follow "Support Board"
+  Then I should see "Open a New Support Ticket"
+    And I should see "Comments"
+    And I should see "FAQ"
+    And I should see "Known Issues"
+    And I should see "Coming Soon"
+    And I should see "Release Notes"
+    And I should see "Open Support Tickets"
+    And I should see "Open Code Tickets"
+  # since they aren't volunteers
+  But I should not see "Admin attention"
+    And I should not see "Claimed"
+    And I should not see "Spam"
+    And I should not see "Resolved"
+
 Scenario: users can't access private tickets even with a direct link
   Given the following support tickets exist
     | summary                           | private | id |
@@ -12,13 +29,8 @@ Scenario: users can't access private tickets even with a direct link
   Then I should see "Sorry, you don't have permission"
 
 Scenario: users can (un)monitor public tickets
-  Given the following support tickets exist
-    | summary                           | id |
-    | publicly visible support ticket   | 1  |
-    And the following activated users exist
-    | login    | password | email            |
-    | troubled | secret   | troubled@ao3.org |
-  And I am logged in as "troubled"
+  Given a support ticket exists with id: 1
+  When I am logged in as "troubled"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -27,10 +39,9 @@ Scenario: users can (un)monitor public tickets
   Then 0 email should be delivered to "troubled@ao3.org"
   When a support volunteer responds to support ticket 1
   Then 1 email should be delivered to "troubled@ao3.org"
-  When I click the first link in the email
-    And I check "Turn off notifications"
-    And I press "Update Support ticket"
     And all emails have been delivered
+  When I check "Turn off notifications"
+    And I press "Update Support ticket"
   When a support volunteer responds to support ticket 1
   Then 0 emails should be delivered to "troubled@ao3.org"
 
@@ -55,7 +66,8 @@ Scenario: users can comment on unowned tickets and those comments can be chosen 
   Then I should see "Status: Open"
   When I check "This answer resolves my issue"
     And I press "Update Support ticket"
-  Then I should see "Status: Resolved"
+  Then I should see "Status: Owner resolved"
+    And I should see "Answered by helper: I think you"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
@@ -95,13 +107,8 @@ Scenario: users can comment on unowned tickets with any pseud, with the default 
     And I should see "charlie wrote: Or perhaps"
 
 Scenario: users cannot comment on owned tickets.
-  Given the following activated support volunteer exists
-    | login    | password | id |
-    | oracle   | secret   | 1  |
-  Given the following support tickets exist
-    | summary                           | id |
-    | publicly visible support ticket   | 1  |
-  Given I am logged in as "oracle"
+  Given a support ticket exists with id: 1
+  Given I am logged in as support volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -112,7 +119,7 @@ Scenario: users cannot comment on owned tickets.
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
   When I go to the first support ticket page
-  Then I should see "support volunteer oracle"
+  Then I should see "Status: In progress"
   And I should not see "Add details"
 
 Scenario: user defaults for opening a new ticket
@@ -125,7 +132,6 @@ Scenario: user defaults for opening a new ticket
   When I fill in "Summary" with "Archive is very slow"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
-    And I should see "Category: Uncategorized"
     And I should see "Summary: Archive is very slow"
     And I should not see "User: troubled"
   And 1 email should be delivered to "troubled@ao3.org"
@@ -136,18 +142,19 @@ Scenario: users should receive 1 initial notification and 1 for additional updat
   When I fill in "Summary" with "Archive is very slow"
     And I fill in "Details" with "For example, this page took forever to load"
     And I press "Create Support ticket"
-  Then I should see "Support ticket created"
-    And I should see "Category: Uncategorized"
-    And I should see "Summary: Archive is very slow"
-    And I should see "Ticket owner wrote: For example"
-    And I should not see "User: troubled"
-  And 1 email should be delivered to "troubled@ao3.org"
+  Then 1 email should be delivered to "troubled@ao3.org"
     And all emails have been delivered
   When I fill in "Add details" with "Never mind, I just found out my whole network is slow"
     And I press "Update Support ticket"
   Then I should see "Support ticket updated"
     And I should see "Ticket owner wrote: Never mind"
   And 1 email should be delivered to "troubled@ao3.org"
+    And all emails have been delivered
+  When a support volunteer responds to support ticket 1
+  Then 1 email should be delivered to "troubled@ao3.org"
+    And all emails have been delivered
+  When a user responds to support ticket 1
+  Then 1 email should be delivered to "troubled@ao3.org"
 
 Scenario: users can create private support tickets
   Given I am logged in as "troubled"
@@ -194,7 +201,6 @@ Scenario: users can choose to have their name displayed during creation, when th
     And I check "Display my user name"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
-    And I should see "Category: Uncategorized"
     And I should see "Summary: Archive is very slow"
     And I should see "User: troubled"
     And I should see "troubled wrote: For example"
@@ -214,7 +220,6 @@ Scenario: if their name is displayed during creation they can use any pseud for 
     And I check "Display my user name"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
-    And I should see "Category: Uncategorized"
     And I should see "Summary: Archive is very slow"
     And I should see "User: troubled"
     And I should see "charlie wrote: For example"
@@ -384,27 +389,41 @@ Scenario: users can (un)resolve their support tickets
   Given I am logged in as "troubled"
   When I follow "Open a New Support Ticket"
   When I fill in "Summary" with "Archive is very slow"
-    And I fill in "Details" with "For example"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
-    And I should see "Category: Uncategorized"
     And I should see "Summary: Archive is very slow"
-    And I should not see "User: troubled"
-    And I should see "Ticket owner wrote: For example"
   When I fill in "Add details" with "Never mind, my router was broken"
     And I press "Update Support ticket"
+    And I should see "Ticket owner wrote: Never mind"
     And I check "This answer resolves my issue"
     And I press "Update Support ticket"
-  Then I should see "Status: Resolved"
+  Then I should see "Status: Owner resolved"
+    And I should see "Answered by Ticket owner: Never mind"
   When I uncheck "This answer resolves my issue"
     And I fill in "Add details" with "Router fixed, archive still slow"
     And I press "Update Support ticket"
   Then I should see "Status: Open"
   When a support volunteer responds to support ticket 1
     And I reload the page
-  When I check "support_ticket_support_details_attributes_3_resolved_ticket"
+  When I check "support_ticket_support_details_attributes_2_resolved_ticket"
     And I press "Update Support ticket"
-  Then I should see "Status: Resolved"
+  Then I should see "Status: Owner resolved"
+    And I should see "Answered by Support volunteer"
+
+Scenario: users can answer their support tickets with visible names
+  Given I am logged in as "troubled"
+  When I follow "Open a New Support Ticket"
+  When I fill in "Summary" with "Archive is very slow"
+    And I check "Display my user name"
+    And I press "Create Support ticket"
+  Then I should see "Support ticket created"
+  When I fill in "Add details" with "Never mind, my router was broken"
+    And I press "Update Support ticket"
+    And I should see "troubled wrote: Never mind"
+    And I check "This answer resolves my issue"
+    And I press "Update Support ticket"
+  Then I should see "Status: Owner resolved"
+    And I should see "Answered by troubled: Never mind"
 
 Scenario: link to support tickets they've commented on, publicly visible
   Given the following activated users exist
@@ -470,4 +489,3 @@ Scenario: users should get a badge for every response they leave which resolves 
   And "confused" accepts a response to support ticket 3
   When I am on helper's user page
     Then I should see "helper has had 2 support ticket comments accepted"
-

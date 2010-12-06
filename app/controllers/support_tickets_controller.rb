@@ -1,11 +1,13 @@
 class SupportTicketsController < ApplicationController
 
   def index
-    @tickets = SupportTicket.where(:approved => true).where(:resolved => false)
+    # start a scope
+    @tickets = SupportTicket.scoped
+
     owner = params[:user_id] ? User.find_by_login(params[:user_id]) : false
 
-    # if not support volunteer, and not looking at list of own tickets, can only view public tickets
-    if !current_user.try(:is_support_volunteer?) && current_user != owner
+    # if not support volunteer, and not looking at list of own tickets, rule out private tickets
+    if !current_user.try(:support_volunteer) && current_user != owner
       @tickets = @tickets.where(:private => false)
     end
 
@@ -18,7 +20,7 @@ class SupportTicketsController < ApplicationController
     elsif params[:user_id]
       # tickets I commented on
       if params[:comments]
-        @tickets = SupportDetail.where(:pseud_id => owner.pseud_ids).includes(:support_ticket).map(&:support_ticket).uniq
+        @tickets = @tickets.joins(:support_details) & SupportDetail.where(:pseud_id => owner.pseud_ids)
 
       # tickets I am watching, private
       elsif params[:watching]
@@ -26,7 +28,7 @@ class SupportTicketsController < ApplicationController
           flash[:error] = "Sorry, you don't have permission"
           redirect_back_or_default
         else
-          @tickets = SupportWatcher.where(:email => owner.email).includes(:support_ticket).map(&:support_ticket).uniq
+          @tickets = @tickets.joins(:support_notifications) & SupportNotification.where(:email => owner.email)
         end
 
       # tickets I opened
@@ -38,18 +40,28 @@ class SupportTicketsController < ApplicationController
         end
       end
 
-    # claimed support tickets
-    elsif params[:claimed]
-      @tickets = @tickets.where("pseud_id is NOT NULL")
-
-    # admin support tickets
-    elsif params[:admin]
-      @tickets = @tickets.where(:category => 'Admin')
+    # specific support tickets
+    elsif params[:only]
+      case params[:only]
+      when "claimed"
+        @tickets = @tickets.where("pseud_id is NOT NULL")
+      when "admin"
+        @tickets = @tickets.where(:admin => true)
+      when "comment"
+        @tickets = @tickets.where(:comment => true)
+        render :comment_index and return
+      when "spam"
+        @tickets = @tickets.where(:approved => false)
+        render :index and return
+      end
 
     # default - unowned tickets
     else
       @tickets = @tickets.where(:pseud_id => nil)
     end
+
+    # if we haven't rendered before this, rule out closed tickets and spam
+    @tickets = @tickets.where(:resolved => false).where(:approved => true)
   end
 
   def show
@@ -60,7 +72,7 @@ class SupportTicketsController < ApplicationController
     @ticket = SupportTicket.find(params[:id])
     is_owner = @ticket.owner?(session[:authentication_code], current_user) # is viewer owner of ticket?
 
-    if @ticket.private && (!is_owner && !current_user.try(:is_support_volunteer?))
+    if @ticket.private && (!is_owner && !current_user.try(:support_volunteer))
       flash[:error] = "Sorry, you don't have permission to view this ticket"
       redirect_to support_path and return
     end
@@ -72,11 +84,11 @@ class SupportTicketsController < ApplicationController
     elsif !current_user
       @details = @ticket.support_details.not_private
       render :show_guest
-    elsif current_user.is_support_volunteer?
+    elsif current_user.support_volunteer
       @ticket.support_details.build # create a new empty response template
       render :show_volunteer
     else # logged in as non-support volunteer
-      if !@ticket.pseud_id # not currently being worked by support
+      if !@ticket.pseud_id # if support took it, it's not longer open for comment
         @ticket.support_details.build # create a new empty response template
       end
       render :show_user
@@ -123,18 +135,26 @@ class SupportTicketsController < ApplicationController
     @ticket = SupportTicket.find(params[:id])
 
     # boolean toggles for support volunteers
-    if current_user.try(:is_support_volunteer?)
-      if params[:commit] == "Take"
-        @ticket.send_steal_notification(current_user.support_pseud) if @ticket.pseud_id
-        @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
-      elsif params[:commit] == "Untake"
+    if current_user.try(:support_volunteer) && params[:commit] != "Update Support ticket"
+      pseud = current_user.support_pseud
+      case params[:commit]
+      when "Take"
+        @ticket.send_steal_notification(pseud) if @ticket.pseud_id
+        @ticket.update_attribute(:pseud_id, pseud.id)
+      when "Untake"
         @ticket.update_attribute(:pseud_id, nil)
-      elsif params[:commit] == "Ham"
+      when "Ham"
         @ticket.mark_as_ham!
-      elsif params[:commit] == "Spam"
+      when "Spam"
         @ticket.mark_as_spam!
+      when "Comment"
+        @ticket.mark_as_comment!(pseud)
+      when "Needs Attention"
+        @ticket.mark_as_ticket!(pseud)
+      when "Needs Admin Attention"
+        @ticket.update_attribute(:admin, true)
       end
-      redirect_to @ticket and return if @ticket.changed?
+      redirect_to @ticket and return
     end
 
     # this, and the corresponding hidden field in show_owner.html shouldn't be needed

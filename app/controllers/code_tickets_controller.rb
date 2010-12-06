@@ -16,7 +16,7 @@ class CodeTicketsController < ApplicationController
 
       # tickets I commented on, public
       elsif params[:comments]
-        @tickets = CodeDetail.where(:pseud_id => user.pseud_ids).includes(:code_ticket).map(&:code_ticket).uniq
+        @tickets = @tickets.joins(:code_details) & CodeDetail.where(:pseud_id => user.pseud_ids)
 
       # tickets I am watching, private
       elsif params[:watching]
@@ -24,7 +24,7 @@ class CodeTicketsController < ApplicationController
           flash[:error] = "Sorry, you don't have permission"
           redirect_back_or_default
         else
-          @tickets = CodeWatcher.where(:email => user.email).includes(:code_ticket).map(&:code_ticket).uniq
+          @tickets = @tickets.joins(:code_notifications) & CodeNotification.where(:email => user.email)
         end
       end
 
@@ -37,11 +37,11 @@ class CodeTicketsController < ApplicationController
     if !current_user
       @details = @ticket.code_details.where(:private => false)
       render :show_guest
-    elsif current_user.is_support_volunteer?
+    elsif current_user.support_volunteer
       @ticket.code_details.build # create a new empty response template
       render :show_volunteer
     else # logged in as non-support volunteer
-      if !@ticket.pseud_id # not being worked or closed by support
+      if !@ticket.pseud_id # if support took it, it's not longer open for comment
         @ticket.code_details.build # create a new empty response template
       end
       render :show_user
@@ -50,7 +50,7 @@ class CodeTicketsController < ApplicationController
   end
 
   def new
-    if current_user.is_support_volunteer?
+    if current_user.support_volunteer
       @ticket = CodeTicket.new
       @ticket.code_details.build
     else
@@ -60,7 +60,7 @@ class CodeTicketsController < ApplicationController
   end
 
   def create
-    if current_user.is_support_volunteer?
+    if current_user.support_volunteer
       @ticket = CodeTicket.new(params[:code_ticket])
       if @ticket.save
         flash[:notice] = "Code ticket created"

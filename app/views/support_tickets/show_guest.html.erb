@@ -4,9 +4,7 @@
       <dd><%= link_to @ticket.user.login, @ticket.user %>
   <% end %>
   <dt><%= "Status" %>:</dt>
-    <dd><%= @ticket.pseud_id ? (@ticket.resolved? ? "Closed" : "Being worked") + " by support volunteer " + @ticket.pseud.name : "Open" %></dd>
-  <dt><%= "Category" %>:</dt>
-    <dd><%= @ticket.category || "Uncategorized" %></dd>
+    <dd><%= @ticket.status_line %></dd>
   <dt><%= "Summary" %>:</dt>
     <dd><%= raw @ticket.summary %></dd>
   <% @details.each do |detail| %>

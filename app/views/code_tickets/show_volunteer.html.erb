@@ -11,15 +11,7 @@
   </p>
   <dl>
     <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.pseud_id ? (@ticket.resolved? ? "Closed by " : "Being worked by ") + @ticket.pseud.name : "Open" %></dd>
-    <dt><%= "Category" %>:</dt>
-      <dd><%= @ticket.category || "Uncategorized" %></dd>
-    <dt><%= t.label :category %>:</dt>
-      <dd>
-        <%= t.radio_button :category, 'Bug' %><%= t.label :category, 'Bug', :value => 'bug' %>
-        <%= t.radio_button :category, 'Irritant' %><%= t.label :category, 'Irritant', :value => 'irritant' %>
-        <%= t.radio_button :category, 'Feature' %><%= t.label :category, 'Feature', :value => 'feature' %>
-      </dd>
+      <dd><%= @ticket.status_line %></dd>
     <dt><%= "Votes" %>:</dt>
       <dd><%= @ticket.vote_count %></dd>
     <% unless @ticket.resolved %>

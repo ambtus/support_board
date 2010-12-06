@@ -8,12 +8,20 @@
 <% end %>
 <ul>
   <li><%= link_to "Open a New Support Ticket", new_support_ticket_path %>
-  <li><%= link_to "Open Support Tickets", support_tickets_path %>
-  <li><%= link_to "Support tickets requiring Admin attention", support_tickets_path(:admin => true) %>
-  <li><%= link_to "Open Code Tickets", code_tickets_path %>
+  <li><%= link_to "Comments", support_tickets_path(:only => "comment") %>
   <li><%= link_to "Archive FAQ", archive_faqs_path %></li>
   <li><%= link_to "Known Issues", known_issues_path %></li>
   <li><%= link_to "Coming Soon", admin_posts_path(:coming_soon=>true) %></li>
   <li><%= link_to "Release Notes", admin_posts_path(:release_notes=>true) %></li>
-  <li><%= link_to "Claimed Support Tickets", support_tickets_path(:claimed => true) %>
+  <% if current_user %>
+    <li><%= link_to "Open Support Tickets", support_tickets_path %>
+    <li><%= link_to "Open Code Tickets", code_tickets_path %>
+  <% end %>
+  <% if current_user.try(:support_volunteer) %>
+    <li><%= link_to "Support tickets requiring Admin attention", support_tickets_path(:only => "admin") %>
+    <li><%= link_to "Claimed Support Tickets", support_tickets_path(:only => "claimed") %>
+    <li><%= link_to "Spam Support Tickets", support_tickets_path(:only => "spam") %>
+    <li><%= link_to "Resolved Support Tickets", support_tickets_path(:only => "resolved") %>
+    <li><%= link_to "Resolved Code Tickets", code_tickets_path(:only => "resolved") %>
+  <% end %>
 </ul>

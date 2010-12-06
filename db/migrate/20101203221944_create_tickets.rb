@@ -14,11 +14,14 @@ class CreateTickets < ActiveRecord::Migration
       t.string :ip_address
       t.boolean :approved, :default => false, :null => false
       t.integer :pseud_id
-      t.string :category
+      t.boolean :question, :default => false
       t.integer :archive_faq_id
+      t.boolean :problem, :default => false
       t.integer :code_ticket_id
-      t.integer :resolved, :default => false
+      t.boolean :admin, :default => false
       t.boolean :admin_resolved, :default => false
+      t.boolean :comment, :default => false
+      t.integer :resolved, :default => false
 
       t.timestamps
     end
@@ -33,7 +36,7 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
-    create_table :support_watchers do |t|
+    create_table :support_notifications do |t|
       t.integer :support_ticket_id
       t.boolean :public_watcher, :default => false
       t.string :email
@@ -51,7 +54,6 @@ class CreateTickets < ActiveRecord::Migration
       t.string :archive_revision
       t.string :user_agent
       t.integer :pseud_id
-      t.string :category
       t.boolean :resolved, :default => false
       t.integer :admin_post_id
       t.integer :known_issue_id
@@ -78,7 +80,7 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
-    create_table :code_watchers do |t|
+    create_table :code_notifications do |t|
       t.integer :code_ticket_id
       t.string :email
 
@@ -93,11 +95,11 @@ class CreateTickets < ActiveRecord::Migration
   def self.down
     drop_table :support_tickets
     drop_table :support_details
-    drop_table :support_watchers
+    drop_table :support_notifications
     drop_table :code_tickets
     drop_table :code_details
     drop_table :code_votes
-    drop_table :code_watchers
+    drop_table :code_notifications
     remove_column :pseuds, :support_volunteer
     remove_column :archive_faqs, :user_id
     remove_column :archive_faqs, :posted

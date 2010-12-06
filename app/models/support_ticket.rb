@@ -4,7 +4,7 @@ class SupportTicket < ActiveRecord::Base
   belongs_to :pseud  # the pseud of the user who is working on the ticket
   belongs_to :archive_faq  # for 'Question' tickets
   belongs_to :code_ticket  # for 'Problem' and 'Suggestion' tickets. automatic +1 vote
-  has_many :support_watchers  # a bunch of email addresses for update notifications
+  has_many :support_notifications  # a bunch of email addresses for update notifications
   has_many :support_details  # like comments, except non-threaded and with extra attributes
 
   # don't save new empty details
@@ -23,21 +23,66 @@ class SupportTicket < ActiveRecord::Base
     "Support Ticket #" + self.id.to_s
   end
 
-  # RESOLUTION stuff
+  def comment_name(current_user)
+    if self.email
+      "A guest"
+    elsif !self.display_user_name
+      "A user"
+    else
+      self.user.login
+    end
+  end
+
+  # STATUS/RESOLUTION stuff
+
+  def status_line
+    if self.pseud
+      if self.admin_resolved
+        "Resolved by support admin"
+      elsif self.code_ticket
+        "Linked to Code Ticket"
+      elsif self.archive_faq
+        "Linked to FAQ"
+      elsif self.comment
+        "Linked to Comments"
+      else
+        "In progress"
+      end
+    elsif resolved?
+      "Owner resolved"
+    else
+      "Open"
+    end
+  end
+
+  # marking something as a comment resolves it, which means there needs to be a pseud associated with the resolution
+  def mark_as_comment!(pseud)
+    return false unless pseud.support_volunteer
+    self.comment = true
+    self.pseud = pseud
+    self.save
+  end
+
+  def mark_as_ticket!(pseud)
+    return false unless pseud.support_volunteer
+    self.comment = false
+    self.pseud = nil
+    self.save
+  end
 
   attr_accessor :updated_resolved
 
   # support tickets can be owner resolved (the owner accepts one or more answers),
-  # support resolved (the support person has linked to a FAQ or a ticket),
-  # or handed off to an admin who can mark it resolved
+  # support resolved (support has linked it to a FAQ or a ticket or marked it a comment),
+  # or an admin can mark it resolved
   after_save :update_resolved
   def update_resolved
+    Rails.logger.debug "running update_resolved after save"
     return if updated_resolved # already updated, don't check and save again
     old = self.resolved
-    Rails.logger.debug self.resolved.class
     owner_resolved = (self.support_details.resolved.count > 0)
 
-    support_resolved = (self.archive_faq || self.code_ticket)
+    support_resolved = (self.archive_faq || self.code_ticket || self.comment)
 
     self.resolved = owner_resolved || support_resolved || self.admin_resolved
     new = self.resolved
@@ -47,7 +92,7 @@ class SupportTicket < ActiveRecord::Base
     self.save unless old == new
   end
 
-  # NOTIFICATION stuff
+ # NOTIFICATION stuff
 
   attr_accessor :turn_off_notifications
   attr_accessor :turn_on_notifications
@@ -58,7 +103,7 @@ class SupportTicket < ActiveRecord::Base
     # unless they've asked you not too
     return true if turn_off_notifications == "1"
     # otherwise, add the email supplied in the ticket, or the email of the user who opened it
-    self.support_watchers.create(:email => self.email || self.user.email)
+    self.support_notifications.create(:email => self.email || self.user.email)
   end
 
   # run from controller after update
@@ -67,25 +112,25 @@ class SupportTicket < ActiveRecord::Base
     # the email of the user editing the ticket. if there is no current_user, it must be the guest owner
     email_address = current_user ? current_user.email : self.email
     # are they already watching?
-    watcher = self.support_watchers.where(:email => email_address).first
+    watcher = self.support_notifications.where(:email => email_address).first
     # if they are, and they want to stop, remove the watcher
     watcher.destroy if (watcher && self.turn_off_notifications == "1")
     # if they aren't, and they want to start, add a watcher.
     if !watcher && self.turn_on_notifications == "1"
       # mark the watcher as a public watcher if not the owner or a support volunteer
       public = true
-      public = !current_user.try(:is_support_volunteer?) # support volunteers
+      public = !current_user.try(:support_volunteer) # support volunteers
       public = false if self.email # guest owners
       public = false if self.user && self.user == current_user # user owner
-      self.support_watchers.create(:email => email_address, :public_watcher => public)
+      self.support_notifications.create(:email => email_address, :public_watcher => public)
     end
 
     # if the ticket has been made private remove all watchers who aren't support volunteers or owners
-    self.support_watchers.where(:public_watcher => true).delete_all if self.private?
+    self.support_notifications.where(:public_watcher => true).delete_all if self.private?
   end
 
   def mail_to
-    self.support_watchers.map(&:email).uniq
+    self.support_notifications.map(&:email).uniq
   end
 
   # used in view to determine whether to offer to turn on or off notifications
@@ -95,7 +140,7 @@ class SupportTicket < ActiveRecord::Base
     # because other non-logged-in users aren't offered the choice
     email_address = current_user ? current_user.email : self.email
     # if there's no watcher with that email, this will be nil which acts as false
-    self.support_watchers.where(:email => email_address).first
+    self.support_notifications.where(:email => email_address).first
   end
 
   before_save :check_if_changed
@@ -113,7 +158,7 @@ class SupportTicket < ActiveRecord::Base
     return true unless self.send_notifications
 
     # don't try to send email if there's no-one to send it to
-    return true if self.support_watchers.count < 1
+    return true if self.support_notifications.count < 1
 
     # don't send email when something is spam
     return true unless self.approved

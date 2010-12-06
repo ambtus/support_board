@@ -1,18 +1,35 @@
 Feature: the support board as seen by guests
 
-Scenario: guests can browse public tickets but not update them. they can't access private tickets even with a direct link.
-
-  Given the following support tickets exist
-    | summary                           | private | email         | id |
-    | private support ticket            | true    | guest@ao3.org | 1  |
-    | publicly visible support ticket   | false   | guest@ao3.org | 2  |
+Scenario: what guests should (not) see
   Given I am on the home page
   When I follow "Support Board"
-    And I follow "Open Support Tickets"
-  Then I should not see "Support Ticket #1"
-  When I follow "Support Ticket #2"
+  Then I should see "Open a New Support Ticket"
+    And I should see "Comments"
+    And I should see "FAQ"
+    And I should see "Known Issues"
+    And I should see "Coming Soon"
+    And I should see "Release Notes"
+  # since they can't comment on them
+  But I should not see "Open Support Tickets"
+    And I should not see "Open Code Tickets"
+  # since they aren't volunteers
+  But I should not see "Admin attention"
+    And I should not see "Claimed"
+    And I should not see "Spam"
+    And I should not see "Resolved"
+
+Scenario: guests can view public tickets but not comment on them.
+  Given the following support tickets exist
+    | summary                           |
+    | publicly visible support ticket   |
+  When I go to the first support ticket page
   Then I should see "publicly visible support ticket"
     But I should not see "Add details"
+
+Scenario: guests can't access private tickets even with a direct link.
+  Given the following support tickets exist
+    | summary                           | private |
+    | private support ticket            | true    |
   When I go to the first support ticket page
   Then I should see "Sorry, you don't have permission"
 
@@ -34,45 +51,81 @@ Scenario: guests can create a support ticket with a valid email address which is
   When I follow "Open a New Support Ticket"
   When I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
-    And I fill in "Details" with "For example, it took a minute for this page to render"
   When I press "Create Support ticket"
   Then I should see "Support ticket created"
-    And I should see "Category: Uncategorized"
-    And I should see "Summary: Archive is very slow"
-    And I should see "Ticket owner wrote: For example"
+    And I should see "Archive is very slow"
   But I should not see "guest@ao3.org"
     And I should not see "Display my user name"
 
-  # guests should receive 1 initial notification (skip the update notification if the first update is by the owner)
-  And 1 email should be delivered to "guest@ao3.org"
-    And all emails have been delivered
+Scenario: guests can create a support ticket with initial details. the byline for guests is always generic
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+    And I fill in "Details" with "For example, it took a minute for this page to render"
+  When I press "Create Support ticket"
+    And I should see "Ticket owner wrote: For example"
 
-  # guests can continue to make other changes (persistent authorization)
+Scenario: guests should receive email notification
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+  When I press "Create Support ticket"
+  Then 1 email should be delivered to "guest@ao3.org"
+
+Scenario: guests email notifications should have a link with authentication code
+  Given the following support tickets exist
+    | email         | private | id |
+    | guest@ao3.org | false   | 1  |
+    And all emails have been delivered
+  When a support volunteer responds to support ticket 1
+  Then 1 email should be delivered to "guest@ao3.org"
+  When I click the first link in the email
+  Then I should see "Add details"
+
+Scenario: guests can continue to make other changes (persistent authorization)
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+  When I press "Create Support ticket"
+    And I fill in "Add details" with "For example, it took a minute for this page to render"
+    And I press "Update Support ticket"
+  Then I should see "Ticket owner wrote: For example"
   When I fill in "Add details" with "Never mind, I just found out my whole network is slow"
     And I press "Update Support ticket"
-  Then I should see "Support ticket updated"
-    And I should see "Never mind"
-  And 1 email should be delivered to "guest@ao3.org"
+  Then I should see "Ticket owner wrote: Never mind"
 
-  # guests can come back to the ticket later (session persistent authorization)
+Scenario: guests still have access later in the same session
+  Given I am on the home page
   When I follow "Open a New Support Ticket"
-    And I am on the homepage
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+    And I press "Create Support ticket"
+  When I am on the homepage
   And I follow "Support Board"
-  And I follow "Open Support Tickets"
-  And I follow "Support Ticket"
+  And I follow "Comments"
+  When I go to the page for the first support ticket
     Then I should see "Add details"
 
 Scenario: guests can create private support tickets
   Given I am on the home page
   When I follow "Open a New Support Ticket"
   When I fill in "Email" with "guest@ao3.org"
-    And I fill in "Summary" with "Why are there no results when I search for wattersports?"
-    And I check "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"
+    And I fill in "Summary" with "Confidential query"
+    And I check "Private"
   When I press "Create Support ticket"
   Then I should see "Support ticket created"
-    And I should see "Summary: Why are there no results when I search for wattersports?"
     And I should see "Access: Private"
-    And 1 email should be delivered to "guest@ao3.org"
+  When I am logged in as "helpful"
+    And I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should not see "Support Ticket #"
+  When I am logged in as support volunteer "oracle"
+    And I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should see "Support Ticket #"
 
 Scenario: guests can create support tickets with no initial notifications
   Given I am on the home page
@@ -136,76 +189,131 @@ Scenario: if there are no tickets, the guest should be told
   Then 0 emails should be delivered
     And I should see "Sorry, no support tickets found for guest@ao3.org"
 
-Scenario: guests email notifications should have a link with authentication code
-  Given the following support tickets exist
-    | email         | private |
-    | guest@ao3.org | false   |
-    And all emails have been delivered
-  When a support volunteer responds to support ticket 1
-  Then 1 email should be delivered to "guest@ao3.org"
-    And all emails have been delivered
-
-  # email notifications should have a link with authentication code
-  When I click the first link in the email
-  Then I should see "Add details"
-
-  # guests can make their support tickets private when they came in through an authorized link
-  When I check "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"
-
-  # guests can resolve support tickets when they came in through an authorized link
-  And I check "This answer resolves my issue"
-
-  When I press "Update Support ticket"
+Scenario: guests can make their support tickets private
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+    And I check "Private"
+  When I press "Create Support ticket"
   Then I should see "Access: Private"
-    And I should see "Status: Resolved"
+  When I am logged in as "helpful"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should not see "Support Ticket #"
+  When I am logged in as support volunteer "oracle"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should see "Support Ticket #"
 
-  # but they can't make them public again
-  But I should not see "Ticket will only be visible to official Support volunteers"
+Scenario: guests can't make their private support tickets public
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+    And I check "Private"
+  When I press "Create Support ticket"
+  Then I should see "Access: Private"
+    But I should not see "Private. (Ticket will only be visible"
 
-  # but they can unresolve them
+Scenario: guests can make their public support tickets private, even to people who already commented who should no longer get email
+  Given the following support tickets exist
+    | email         | id |
+    | guest@ao3.org | 1  |
+    And all emails have been delivered
+  When I am logged in as "helpful"
+    And I am on the first support ticket page
+    And I fill in "Add details" with "Have you tried..."
+    And I press "Update Support ticket"
+  Then 1 email should be delivered to "guest@ao3.org"
+  When I am logged out
+    And I click the first link in the email
+    And I check "Private"
+    And I press "Update Support ticket"
+  When I am logged in as "helpful"
+    And I am on the first support ticket page
+  Then I should see "Sorry, you don't have permission"
+  When all emails have been delivered
+    And a support volunteer responds to support ticket 1
+  Then 1 email should be delivered to "guest@ao3.org"
+  And 0 emails should be delivered to "helpful@ao3.org"
+
+Scenario: email to others shouldn't include the authorization
+  Given a support ticket exists
+    And all emails have been delivered
+  When I am logged in as "helpful"
+    And I am on the first support ticket page
+    And I check "Turn on notifications"
+    And I press "Update Support ticket"
+  When I am logged out
+    And a user responds to support ticket 1
+  Then 1 email should be delivered to "helpful@ao3.org"
+  When I click the first link in the email
+  Then I should see "wrote"
+    But I should not see "This answer resolves my issue"
+
+Scenario: guests can (un)resolve their own support tickets
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+  When I press "Create Support ticket"
+    And I fill in "Add details" with "Never mind"
+    And I press "Update Support ticket"
+  Then I should see "Ticket owner wrote: Never mind"
+  When I check "This answer resolves my issue"
+    And I press "Update Support ticket"
+  Then I should see "Status: Owner resolved"
+    And I should see "Answered by Ticket owner: Never mind"
   When I uncheck "This answer resolves my issue"
    And I press "Update Support ticket"
   Then I should see "Status: Open"
+  When a user responds to support ticket 1
+    And I reload the page
+  When I check "support_ticket_support_details_attributes_1_resolved_ticket"
+    And I press "Update Support ticket"
+  Then I should see "Status: Owner resolved"
+    And I should see "Answered by someone: blah blah"
+  When I uncheck "support_ticket_support_details_attributes_1_resolved_ticket"
+   And I press "Update Support ticket"
+  Then I should see "Status: Open"
+    And I should see "someone wrote: blah blah"
+  When a support volunteer responds to support ticket 1
+    And I reload the page
+  When I check "support_ticket_support_details_attributes_2_resolved_ticket"
+    And I press "Update Support ticket"
+  Then I should see "Status: Owner resolved"
+    And I should see "Answered by Support volunteer somevolunteer: foo bar"
+  When I uncheck "support_ticket_support_details_attributes_2_resolved_ticket"
+   And I press "Update Support ticket"
+  Then I should see "Status: Open"
+    And I should see "Support volunteer somevolunteer wrote: foo bar"
 
-Scenario: can view code tickets as a guest, but not vote or respond
-  Given the following activated support volunteer exists
-    | login    | id |
-    | oracle   | 1  |
-  And the following code tickets exist
-    | summary                        | category | id |
-    | something that could be better | Irritant | 1  |
-    | something that is  broken      | Bug      | 2  |
-    | something on the horizon       | Feature  | 3  |
-  And "oracle" takes code ticket 1
-  And "oracle" resolves code ticket 1
-  And "oracle" takes code ticket 2
-  Given I am logged out
-  When I follow "Support Board"
-    And I follow "Open Code Tickets"
-  Then I should not see "Code Ticket #1"
-    But I should see "Code Ticket #2"
-    And I should see "something that is broken"
-    And I should see "something on the horizon"
+Scenario: guests can view open code tickets, but not vote or respond
+  Given a code ticket exists with id: 1
   When I am on the first code ticket page
-    Then I should see "Status: Closed by oracle"
+  Then I should see "Status: Open"
     And I should see "Votes: 0"
-    And I should not see "Vote up"
+  But I should not see "Vote up"
     And I should not see "Add details"
-  When I follow "Support Board"
-    And I follow "Open Code Tickets"
-    And I follow "Code Ticket #2"
-  Then I should see "Category: Bug"
-    And I should see "something that is broken"
-    And I should see "Status: Being worked by oracle"
+
+Scenario: guests can view in progress code tickets, but not vote or respond
+  Given a code ticket exists with id: 1
+    And an activated support volunteer exists with login "oracle"
+  When "oracle" takes code ticket 1
+    And I am on the first code ticket page
+  Then I should see "Status: In progress"
     And I should see "Votes: 0"
-    But I should not see "Add details"
-    And I should not see "Vote up"
-  When I follow "Support Board"
-    And I follow "Open Code Tickets"
-    And I follow "Code Ticket #3"
- Then I should see "Category: Feature"
-    And I should see "something on the horizon"
+  But I should not see "Vote up"
+    And I should not see "Add details"
+
+Scenario: guests can view closed code tickets, but not vote or respond
+  Given a code ticket exists with id: 1
+    And an activated support volunteer exists with login "oracle"
+  When "oracle" takes code ticket 1
+    And "oracle" resolves code ticket 1
+  When I am on the first code ticket page
+  Then I should see "Status: Closed"
     And I should see "Votes: 0"
-    And I should see "Status: Open"
-    But I should not see "Vote up"
+  But I should not see "Vote up"
     And I should not see "Add details"

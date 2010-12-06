@@ -1,3 +1,23 @@
+Given /^an activated support volunteer exists with login "([^"]*)"$/ do |login|
+  # " reset quotes for color
+  user = User.find_by_login(login)
+  unless user
+    user = Factory.create(:user, :login => login)
+    user.activate
+    user.support_volunteer = '1'
+    user.pseuds.create(:name => "#{login}(SV)", :support_volunteer => true)
+  end
+end
+
+Given /the following activated support volunteers? exists?/ do |table|
+  table.hashes.each do |hash|
+    user = Factory.create(:user, hash)
+    user.activate
+    user.support_volunteer = '1'
+    user.pseuds.create(:name => "#{user.login}(SV)", :support_volunteer => true)
+  end
+end
+
 Given /^I am logged in as support volunteer "([^"]*)"$/ do |login|
   # " reset quotes for color
   visit logout_path
@@ -10,58 +30,31 @@ Given /^I am logged in as support volunteer "([^"]*)"$/ do |login|
   assert UserSession.find
 end
 
-Given /^an activated support volunteer exists with login "([^"]*)"$/ do |login|
-  # " reset quotes for color
-  user = User.find_by_login(login)
-  user = Factory.create(:user, :login => login) unless user
-  user.activate
-  user.support_volunteer = '1'
-  user.pseuds.create(:name => "#{login}(SV)", :support_volunteer => true)
-  assert user.is_support_volunteer?
-  assert user.support_pseud
-end
-
-Given /the following activated support volunteers? exists?/ do |table|
-  table.hashes.each do |hash|
-    user = Factory.create(:user, hash)
-    user.activate
-    user.support_volunteer = '1'
-    user.pseuds.create(:name => "#{user.login}(SV)", :support_volunteer => true)
-  end
-end
-
-When /^a support volunteer responds to support ticket (\d+)$/ do |number|
+Given /^a user responds to support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
-  user = Factory.create(:user)
-  user.activate
-  user.support_volunteer = '1'
-  user.pseuds.create(:support_volunteer => true, :name => "#{user.login}(SV)")
-  ticket.support_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
-  ticket.save
-  ticket.send_update_notifications
-end
-
-When /^a support volunteer responds to code ticket (\d+)$/ do |number|
-  ticket = CodeTicket.all[number.to_i - 1]
-  user = Factory.create(:user)
-  user.activate
-  user.support_volunteer = '1'
-  user.pseuds.create(:support_volunteer => true, :name => "foo")
-  ticket.code_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
-  ticket.save
-  ticket.send_update_notifications
-end
-
-When /^a user responds to support ticket (\d+)$/ do |number|
-  ticket = SupportTicket.all[number.to_i - 1]
-  user = Factory.create(:user)
+  user = User.find_by_login("someone")
+  user = Factory.create(:user, :login => "someone") unless user
   user.activate
   ticket.support_details.build(:pseud => user.default_pseud, :content => "blah blah")
   ticket.save
   ticket.send_update_notifications
 end
 
-When /^"([^"]*)" responds to support ticket (\d+)$/ do |login, number|
+Given /^a support volunteer responds to support ticket (\d+)$/ do |number|
+  ticket = SupportTicket.all[number.to_i - 1]
+  user = User.find_by_login("somevolunteer")
+  unless user
+    user = Factory.create(:user, :login => "somevolunteer")
+    user.activate
+    user.support_volunteer = '1'
+    user.default_pseud.update_attribute(:support_volunteer, true)
+  end
+  ticket.support_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
+  ticket.save
+  ticket.send_update_notifications
+end
+
+Given /^"([^"]*)" responds to support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
   user = User.find_by_login(login)
@@ -74,7 +67,7 @@ Given /^"([^"]*)" watches support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
   user = User.find_by_login(login)
-  ticket.support_watchers.create(:email => user.email, :public_watcher => true)
+  ticket.support_notifications.create(:email => user.email, :public_watcher => true)
 end
 
 Given /^"([^"]*)" accepts a response to support ticket (\d+)$/ do |login, number|
@@ -92,8 +85,27 @@ Given /^"([^"]*)" takes support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
   user = User.find_by_login(login)
-  assert user.is_support_volunteer?
+  assert user.support_volunteer
   ticket.pseud = user.support_pseud
+  ticket.save
+  ticket.send_update_notifications
+end
+
+Given /^"([^"]*)" categorizes support ticket (\d+) as Comment$/ do |login, number|
+  # " reset quotes for color
+  ticket = SupportTicket.all[number.to_i - 1]
+  user = User.find_by_login(login)
+  assert user.support_volunteer
+  ticket.mark_as_comment!(user.support_pseud)
+end
+
+Given /^a support volunteer responds to code ticket (\d+)$/ do |number|
+  ticket = CodeTicket.all[number.to_i - 1]
+  user = Factory.create(:user)
+  user.activate
+  user.support_volunteer = '1'
+  user.pseuds.create(:support_volunteer => true, :name => "foo")
+  ticket.code_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
   ticket.save
   ticket.send_update_notifications
 end
@@ -102,10 +114,9 @@ Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
   user = User.find_by_login(login)
-  assert user.is_support_volunteer?
-  ticket.pseud = user.support_pseud
-  ticket.save
-  ticket.send_update_notifications
+  assert user.support_volunteer
+  ticket.send_steal_notification(user.support_pseud) if ticket.pseud_id
+  ticket.update_attribute(:pseud_id, user.support_pseud.id)
 end
 
 Given /^"([^"]*)" resolves code ticket (\d+)$/ do |login, number|
@@ -138,6 +149,6 @@ Given /^"([^"]*)" watches code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
   user = User.find_by_login(login)
-  ticket.code_watchers.create(:email => user.email)
+  ticket.code_notifications.create(:email => user.email)
 end
 

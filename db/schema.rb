@@ -58,6 +58,13 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  create_table "code_notifications", :force => true do |t|
+    t.integer  "code_ticket_id"
+    t.string   "email"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "code_tickets", :force => true do |t|
     t.string   "summary"
     t.integer  "summary_sanitizer_version", :limit => 2, :default => 0,     :null => false
@@ -65,7 +72,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "archive_revision"
     t.string   "user_agent"
     t.integer  "pseud_id"
-    t.string   "category"
     t.boolean  "resolved",                               :default => false
     t.integer  "admin_post_id"
     t.integer  "known_issue_id"
@@ -77,13 +83,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "code_ticket_id"
     t.integer  "user_id"
     t.integer  "vote",           :limit => 1
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "code_watchers", :force => true do |t|
-    t.integer  "code_ticket_id"
-    t.string   "email"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -134,6 +133,14 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  create_table "support_notifications", :force => true do |t|
+    t.integer  "support_ticket_id"
+    t.boolean  "public_watcher",    :default => false
+    t.string   "email"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "support_tickets", :force => true do |t|
     t.integer  "user_id"
     t.string   "email"
@@ -148,19 +155,14 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "ip_address"
     t.boolean  "approved",                               :default => false, :null => false
     t.integer  "pseud_id"
-    t.string   "category"
+    t.boolean  "question",                               :default => false
     t.integer  "archive_faq_id"
+    t.boolean  "problem",                                :default => false
     t.integer  "code_ticket_id"
-    t.integer  "resolved",                               :default => 0
+    t.boolean  "admin",                                  :default => false
     t.boolean  "admin_resolved",                         :default => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "support_watchers", :force => true do |t|
-    t.integer  "support_ticket_id"
-    t.boolean  "public_watcher",    :default => false
-    t.string   "email"
+    t.boolean  "comment",                                :default => false
+    t.integer  "resolved",                               :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

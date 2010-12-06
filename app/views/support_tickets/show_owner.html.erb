@@ -29,9 +29,7 @@
     <dt><%= "Access" %>:</dt>
       <dd><%= @ticket.private? ? "Private" : "Public" %>
     <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.resolved? ? "Resolved" : @ticket.pseud_id ? "Being worked on by support volunteer " + @ticket.pseud.name : "Open" %>
-    <dt><%= "Category" %>:</dt>
-      <dd><%= @ticket.category || "Uncategorized" %>
+      <dd><%= @ticket.status_line %>
     <dt><%= "Summary" %>:</dt>
       <dd><%= raw @ticket.summary %></dd>
 
@@ -44,7 +42,11 @@
         <dt><%= d.label :content, "Add details" %>:</dt>
           <dd><%= d.text_area :content %>
       <% elsif !d.object.private? %>
-        <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
+        <% if d.object.resolved_ticket? %>
+          <dt><%= "Answered by" %> <%= d.object.byline %>:</dt>
+        <% else %>
+          <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
+        <% end %>
           <dd><%= raw d.object.content %></dd>
         <dt>&nbsp;</dt>
           <dd><%= d.check_box :resolved_ticket %> <%= d.label :resolved_ticket, "This answer resolves my issue" %></dd>
