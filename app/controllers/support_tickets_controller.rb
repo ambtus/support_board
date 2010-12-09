@@ -49,9 +49,15 @@ class SupportTicketsController < ApplicationController
         @tickets = @tickets.where(:admin => true)
       when "comment"
         @tickets = @tickets.where(:comment => true)
+        # render a more friendly index page
         render :comment_index and return
+      when "waiting"
+        @tickets = @tickets.where("code_ticket_id is NOT NULL")
+        # render now, because we add not resolved later
+        render :index and return
       when "spam"
         @tickets = @tickets.where(:approved => false)
+        # render now, because we add not spam later
         render :index and return
       end
 
@@ -153,6 +159,13 @@ class SupportTicketsController < ApplicationController
         @ticket.mark_as_ticket!(pseud)
       when "Needs Admin Attention"
         @ticket.update_attribute(:admin, true)
+      when "Remove Code ticket link"
+        @ticket.update_attribute(:code_ticket_id, nil)
+        @ticket.update_attribute(:pseud_id, pseud.id)
+      when "Link to Code ticket"
+        @ticket.update_attribute(:code_ticket_id, params[:support_ticket][:code_ticket_id])
+        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.send_update_notifications
       end
       redirect_to @ticket and return
     end

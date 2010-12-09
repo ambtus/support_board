@@ -36,17 +36,18 @@ class SupportTicket < ActiveRecord::Base
   # STATUS/RESOLUTION stuff
 
   def status_line
-    if self.pseud
+    if self.pseud_id
+      name = self.pseud.name
       if self.admin_resolved
-        "Resolved by support admin"
-      elsif self.code_ticket
-        "Linked to Code Ticket"
+        "Resolved by support admin #{name}"
+      elsif self.code_ticket_id
+        "Linked to #{self.code_ticket.name} by #{name}"
       elsif self.archive_faq
-        "Linked to FAQ"
+        "Linked to FAQ by #{name}"
       elsif self.comment
-        "Linked to Comments"
+        "Linked to Comments by #{name}"
       else
-        "In progress"
+        "In progress by #{name}"
       end
     elsif resolved?
       "Owner resolved"
