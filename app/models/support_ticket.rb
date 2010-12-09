@@ -42,8 +42,8 @@ class SupportTicket < ActiveRecord::Base
         "Resolved by support admin #{name}"
       elsif self.code_ticket_id
         "Linked to #{self.code_ticket.name} by #{name}"
-      elsif self.archive_faq
-        "Linked to FAQ by #{name}"
+      elsif self.archive_faq_id
+        "Linked to FAQ #{self.archive_faq.name} by #{name}"
       elsif self.comment
         "Linked to Comments by #{name}"
       else

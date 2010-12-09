@@ -125,6 +125,24 @@ Scenario: support volunteers can open a new code ticket and link to it in one st
   Then I should see "Support Ticket #1"
 
 Scenario: support volunteers can link a support ticket to an existing FAQ
+  Given an archive faq exists with id: 1, title: "some information"
+    And a support ticket exists with id: 1
+  When I am logged in as support volunteer "oracle"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+    And I follow "Support Ticket #1"
+    And I select "#1: some information" from "FAQ"
+    And I press "Link to FAQ"
+  Then 1 emails should be delivered to "guest@ao3.org"
+    And I should see "Status: Linked to FAQ #1: some information by oracle"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should not see "Support Ticket #1"
+  When I follow "Support Board"
+    And I follow "Support Tickets linked to FAQs"
+    And I follow "Support Ticket #1"
+    And I press "Remove link to FAQ"
+    Then I should see "Status: In progress"
 
 Scenario: support volunteers can create a new (draft) FAQ and link to it in one step (with some of the information pre-filled)
 

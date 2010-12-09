@@ -16,6 +16,14 @@
       <%= t.submit "Link to Code ticket" %>
       <%= t.submit "Create new Code ticket" %>
     <% end %>
+    <dt><%= t.label :archive_faq_id, "FAQ" %>:</dt>
+      <dd><%= t.select :archive_faq_id, ArchiveFaq.order(:position).collect {|p| [ p.name, p.id ] }, :selected => @ticket.archive_faq_id %></dd>
+    <% if @ticket.archive_faq_id? %>
+      <%= t.submit "Remove link to FAQ" %>
+    <% else %>
+      <%= t.submit "Link to FAQ" %>
+      <%= t.submit "Create new FAQ" %>
+    <% end %>
   </p>
   <p>
     <% if @ticket.being_watched?(current_user) %>

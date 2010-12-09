@@ -29,7 +29,12 @@ dada = CodeTicket.create(:summary => "repeal DADA")
 # support tickets
 SupportTicket.create(:summary => "some problem", :email => "guest@ao3.org", :problem => true)
 SupportTicket.create(:summary => "a personal problem", :email => "guest@ao3.org", :private => true)
-SupportTicket.create(:summary => "where's the salt?", :user_id => dean.id, :question => true)
+SupportTicket.create(:summary => "where's the salt?", :user_id => dean.id)
 SupportTicket.create(:summary => "repeal DADA", :user_id => john.id, :private =>true, :code_ticket_id => dada.id)
 SupportTicket.create(:summary => "what's my password?", :user_id => john.id, :private =>true, :display_user_name => true)
 
+# faqs
+ArchiveFaq.create(:title => "where to find salt", :position => 1, :posted => true)
+ArchiveFaq.create(:title => "why we don't have enough ZPMs", :position => 2, :posted => true)
+ArchiveFaq.create(:title => "what's DADA?", :position => 3, :posted => true)
+ArchiveFaq.create(:title => "how to recover your password", :posted => false)

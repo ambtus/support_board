@@ -25,3 +25,8 @@ end
 Factory.define :code_ticket do |f|
   f.sequence(:summary) { |n| "code ticket #{n}" }
 end
+
+Factory.define :archive_faq do |f|
+  f.sequence(:title) { |n| "faq #{n}" }
+  f.sequence(:position) { |n| n }
+end

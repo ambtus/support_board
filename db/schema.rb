@@ -37,11 +37,12 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "admin_id"
     t.string   "title"
     t.text     "content"
-    t.integer  "position",   :default => 1
+    t.integer  "position",                               :default => 1
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
     t.boolean  "posted"
+    t.integer  "content_sanitizer_version", :limit => 2, :default => 0, :null => false
   end
 
   create_table "code_details", :force => true do |t|

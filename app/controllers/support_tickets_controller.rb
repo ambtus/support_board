@@ -55,7 +55,11 @@ class SupportTicketsController < ApplicationController
         @tickets = @tickets.where("code_ticket_id is NOT NULL")
         # render now, because we add not resolved later
         render :index and return
-      when "spam"
+       when "answered"
+        @tickets = @tickets.where("archive_faq_id is NOT NULL")
+        # render now, because we add not resolved later
+        render :index and return
+     when "spam"
         @tickets = @tickets.where(:approved => false)
         # render now, because we add not spam later
         render :index and return
@@ -177,6 +181,20 @@ class SupportTicketsController < ApplicationController
         @ticket.update_attribute(:pseud_id, pseud.id)
         @ticket.send_update_notifications
         redirect_to edit_code_ticket_path(@code_ticket) and return
+      when "Remove link to FAQ"
+        @ticket.update_attribute(:archive_faq_id, nil)
+        @ticket.update_attribute(:pseud_id, pseud.id)
+      when "Link to FAQ"
+        @faq = ArchiveFaq.find(params[:support_ticket][:archive_faq_id])
+        @ticket.update_attribute(:archive_faq_id, @faq.id)
+        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.send_update_notifications
+      when "Create new FAQ"
+        @faq = ArchiveFaq.create(:title => @ticket.summary)
+        @ticket.update_attribute(:archive_faq_id, @faq.id)
+        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.send_update_notifications
+        redirect_to edit_archive_faq_path(@faq) and return
       end
       redirect_to @ticket and return
     end

@@ -46,6 +46,7 @@ class CreateTickets < ActiveRecord::Migration
     add_column :pseuds, :support_volunteer, :boolean
     add_column :archive_faqs, :user_id, :integer
     add_column :archive_faqs, :posted, :boolean
+    add_column :archive_faqs, :content_sanitizer_version, :integer, :limit => 2, :default => 0, :null => false
 
     create_table :code_tickets do |t|
       t.string :summary
@@ -104,6 +105,7 @@ class CreateTickets < ActiveRecord::Migration
     remove_column :pseuds, :support_volunteer
     remove_column :archive_faqs, :user_id
     remove_column :archive_faqs, :posted
+    remove_column :archive_faqs, :content_sanitizer_version
     remove_column :admin_posts, :user_id
     remove_column :admin_posts, :posted
     remove_column :known_issues, :user_id
