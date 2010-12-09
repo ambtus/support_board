@@ -89,6 +89,17 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  create_table "faq_details", :force => true do |t|
+    t.integer  "archive_faq_id"
+    t.integer  "pseud_id"
+    t.boolean  "support_response",                       :default => false
+    t.string   "content"
+    t.boolean  "private",                                :default => false
+    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "known_issues", :force => true do |t|
     t.integer  "admin_id"
     t.string   "title"

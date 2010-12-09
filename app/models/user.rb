@@ -40,4 +40,14 @@ class User < ActiveRecord::Base
     set_role('support_volunteer', should_be_support_volunteer == '1')
   end
 
+  # Is this user an authorized support admin?
+  def support_admin
+    has_role?(:support_admin)
+  end
+
+  # Set support admin role for this user and log change
+  def support_admin=(should_be_support_admin)
+    set_role('support_admin', should_be_support_admin == '1')
+  end
+
 end

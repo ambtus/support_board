@@ -190,7 +190,7 @@ class SupportTicketsController < ApplicationController
         @ticket.update_attribute(:pseud_id, pseud.id)
         @ticket.send_update_notifications
       when "Create new FAQ"
-        @faq = ArchiveFaq.create(:title => @ticket.summary)
+        @faq = ArchiveFaq.create
         @ticket.update_attribute(:archive_faq_id, @faq.id)
         @ticket.update_attribute(:pseud_id, pseud.id)
         @ticket.send_update_notifications

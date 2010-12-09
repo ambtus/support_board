@@ -124,17 +124,17 @@ Scenario: support volunteers can open a new code ticket and link to it in one st
     And I follow "Support Tickets waiting for Code changes"
   Then I should see "Support Ticket #1"
 
-Scenario: support volunteers can link a support ticket to an existing FAQ
-  Given an archive faq exists with id: 1, title: "some information"
+Scenario: support volunteers can link a support ticket to an existing draft FAQ
+  Given an archive faq exists with position: 1, title: "some question", posted: false
     And a support ticket exists with id: 1
   When I am logged in as support volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
-    And I select "#1: some information" from "FAQ"
+    And I select "1: some question" from "FAQ"
     And I press "Link to FAQ"
   Then 1 emails should be delivered to "guest@ao3.org"
-    And I should see "Status: Linked to FAQ #1: some information by oracle"
+    And I should see "Status: Linked to FAQ 1: some question by oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
@@ -143,7 +143,74 @@ Scenario: support volunteers can link a support ticket to an existing FAQ
     And I follow "Support Ticket #1"
     And I press "Remove link to FAQ"
     Then I should see "Status: In progress"
+  When I follow "Support Board"
+    And I follow "Frequently Asked Questions"
+    Then I should not see "1: some question"
 
-Scenario: support volunteers can create a new (draft) FAQ and link to it in one step (with some of the information pre-filled)
+Scenario: support volunteers can link a support ticket to an existing posted FAQ
+  Given an archive faq exists with position: 1, title: "some question", posted: true
+    And a support ticket exists with id: 1
+  When I am logged in as support volunteer "oracle"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+    And I follow "Support Ticket #1"
+    And I select "1: some question" from "FAQ"
+    And I press "Link to FAQ"
+  Then 1 emails should be delivered to "guest@ao3.org"
+    And I should see "Status: Linked to FAQ 1: some question by oracle"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should not see "Support Ticket #1"
+  When I follow "Support Board"
+    And I follow "Support Tickets linked to FAQs"
+    And I follow "Support Ticket #1"
+    And I press "Remove link to FAQ"
+    Then I should see "Status: In progress"
+  When I follow "Support Board"
+    And I follow "Frequently Asked Questions"
+    Then I should see "1: some question"
 
-Scenario: when a draft FAQ is posted, the attached support tickets will get marked resolved. (??)
+Scenario: support volunteers can create a new (draft) FAQ and link to it in one step
+  Given a support ticket exists with id: 1, summary: "some question"
+  When I am logged in as support volunteer "oracle"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+    And I follow "Support Ticket #1"
+    And I press "Create new FAQ"
+  Then 1 emails should be delivered to "guest@ao3.org"
+    And I should not see "some question"
+  When I fill in "Title" with "New question"
+    And I press "Update Archive faq"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should not see "Support Ticket #1"
+  When I follow "Support Board"
+    And I follow "Support Tickets linked to FAQs"
+    And I follow "Support Ticket #1"
+  Then I should see "Status: Linked to FAQ 1: New question by oracle"
+  When I press "Remove link to FAQ"
+    Then I should see "Status: In progress"
+  When I follow "Support Board"
+    And I follow "Frequently Asked Questions"
+    Then I should not see "1: New question"
+
+Scenario: draft FAQs don't show up on the archive faq index page
+
+Scenario: draft FAQs can be commented on by any logged in user, and any guest who comes linked from their own support ticket
+
+Scenario: FAQs can be posted by support admins
+
+Scenario: when a draft FAQ is marked posted, the comments are no longer visible.
+
+Scenario: the owner of a ticket can "unaccept" a FAQ link which removes its vote and marks the ticket as unanswered
+
+Scenario: anyone reading a FAQ can mark it as "this answered my question" (a FAQ vote)
+
+Scenario: a support ticket link to a FAQ is a FAQ vote.
+
+Scenario: FAQs can be sorted by votes
+
+Scenario: code tickets can be sorted by votes
+
+Scenario: support volunteers can send email to another volunteer asking them to take a ticket
+

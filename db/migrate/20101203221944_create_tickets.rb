@@ -48,6 +48,17 @@ class CreateTickets < ActiveRecord::Migration
     add_column :archive_faqs, :posted, :boolean
     add_column :archive_faqs, :content_sanitizer_version, :integer, :limit => 2, :default => 0, :null => false
 
+    create_table :faq_details do |t|
+      t.integer :archive_faq_id
+      t.integer :pseud_id
+      t.boolean :support_response, :default => false
+      t.string :content
+      t.boolean :private, :default => false
+      t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
+
+      t.timestamps
+    end
+
     create_table :code_tickets do |t|
       t.string :summary
       t.integer :summary_sanitizer_version, :limit => 2, :default => 0, :null => false

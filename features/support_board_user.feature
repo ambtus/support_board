@@ -5,7 +5,7 @@ Scenario: what users should (not) see
   When I follow "Support Board"
   Then I should see "Open a New Support Ticket"
     And I should see "Comments"
-    And I should see "FAQ"
+    And I should see "Frequently Asked Questions"
     And I should see "Known Issues"
     And I should see "Coming Soon"
     And I should see "Release Notes"

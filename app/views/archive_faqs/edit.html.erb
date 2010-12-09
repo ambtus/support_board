@@ -1,0 +1,28 @@
+<%= form_for(@faq) do |f| %>
+  <% if current_user.support_admin %>
+    <p class="submit"><%= f.submit (@faq.posted ? "Unpost" : "Post") %></p>
+  <% end %>
+    <dt><%= f.label :position %>:</dt>
+      <dd><%= f.text_field :position, :size => 4 %></dd>
+    <dt><%= f.label :title %>:</dt>
+      <dd><%= f.text_field :title %></dd>
+    <dt><%= f.label :content %>:</dt>
+      <dd><%= f.text_area :content %></dd>
+
+    <%= f.fields_for :faq_details do |d| %>
+      <% if d.object.new_record? %>
+        <dt><%= d.label :pseud_id, "Pseud" %>:</dt>
+          <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }, :selected => current_user.support_pseud.id %></dd>
+        <dt><%= d.label :content, "Add comments (will be hidden once posted)" %>:</dt>
+          <dd><%= d.text_area :content %></dd>
+      <% else %>
+       <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
+         <dd><%= raw d.object.content %></dd>
+      <% end %>
+    <% end %>
+
+ </dl>
+  <p class="submit">
+    <%= f.submit %>
+  </p>
+<% end %>
