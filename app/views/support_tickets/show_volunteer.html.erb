@@ -10,7 +10,12 @@
     <% end %>
     <dt><%= t.label :code_ticket_id, "Code Ticket" %>:</dt>
       <dd><%= t.select :code_ticket_id, CodeTicket.where(:resolved => false).collect {|p| [ p.name, p.id ] }, :selected => @ticket.code_ticket_id %></dd>
-    <%= t.submit (@ticket.code_ticket_id? ? "Remove Code ticket link" : "Link to Code ticket") %>
+    <% if @ticket.code_ticket_id? %>
+      <%= t.submit "Remove link to Code ticket" %>
+    <% else %>
+      <%= t.submit "Link to Code ticket" %>
+      <%= t.submit "Create new Code ticket" %>
+    <% end %>
   </p>
   <p>
     <% if @ticket.being_watched?(current_user) %>

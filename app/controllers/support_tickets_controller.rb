@@ -159,13 +159,24 @@ class SupportTicketsController < ApplicationController
         @ticket.mark_as_ticket!(pseud)
       when "Needs Admin Attention"
         @ticket.update_attribute(:admin, true)
-      when "Remove Code ticket link"
+      when "Remove link to Code ticket"
         @ticket.update_attribute(:code_ticket_id, nil)
         @ticket.update_attribute(:pseud_id, pseud.id)
+        CodeVote.where(:support_ticket_id => @ticket.id).delete_all
       when "Link to Code ticket"
-        @ticket.update_attribute(:code_ticket_id, params[:support_ticket][:code_ticket_id])
+        @code_ticket = CodeTicket.find(params[:support_ticket][:code_ticket_id])
+        @ticket.update_attribute(:code_ticket_id, @code_ticket)
+        CodeVote.create(:code_ticket_id => @code_ticket.id, :support_ticket_id => @ticket.id, :vote => 2)
         @ticket.update_attribute(:pseud_id, pseud.id)
         @ticket.send_update_notifications
+        redirect_to @code_ticket and return
+      when "Create new Code ticket"
+        @code_ticket = CodeTicket.create(:summary => @ticket.summary)
+        CodeVote.create(:code_ticket_id => @code_ticket.id, :support_ticket_id => @ticket.id, :vote => 2)
+        @ticket.update_attribute(:code_ticket_id, @code_ticket.id)
+        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.send_update_notifications
+        redirect_to edit_code_ticket_path(@code_ticket) and return
       end
       redirect_to @ticket and return
     end

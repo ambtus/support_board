@@ -76,6 +76,7 @@ class CreateTickets < ActiveRecord::Migration
     create_table :code_votes do |t|
       t.integer :code_ticket_id
       t.integer :user_id
+      t.integer :support_ticket_id
       t.integer :vote, :limit => 1
 
       t.timestamps

@@ -82,7 +82,8 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   create_table "code_votes", :force => true do |t|
     t.integer  "code_ticket_id"
     t.integer  "user_id"
-    t.integer  "vote",           :limit => 1
+    t.integer  "support_ticket_id"
+    t.integer  "vote",              :limit => 1
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -84,15 +84,45 @@ Scenario: support volunteers can link a support ticket to an existing code ticke
     And I select "Code Ticket #1" from "Code Ticket"
     And I press "Link to Code ticket"
   Then 1 emails should be delivered to "guest@ao3.org"
+    And I should see "Votes: 2"
+    And I should see "Related Support tickets"
+  When I follow "Support Ticket #1"
+  Then I should see "Status: Linked to Code Ticket #1"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
   When I follow "Support Board"
     And I follow "Support Tickets waiting for Code changes"
-    And I follow "#1"
-  Then I should see "Status: Linked to Code Ticket #1"
+    And I follow "Support Ticket #1"
+    And I press "Remove link to Code ticket"
+  When I am on the first code ticket page
+  Then I should see "Votes: 0"
+    And I should not see "Support Ticket #1"
+  When I am on the first support ticket page
+    Then I should see "Status: In progress"
 
-Scenario: support volunteers can open a new code ticket and link to it in one step (with most of the information pre-filled in)
+Scenario: support volunteers can open a new code ticket and link to it in one step (with the summary pre-filled in but editable)
+  Given a support ticket exists with id: 1, summary: "something is broken"
+  When I am logged in as support volunteer "oracle"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+    And I follow "Support Ticket #1"
+    And I press "Create new Code ticket"
+  Then 1 emails should be delivered to "guest@ao3.org"
+    And I should see "Votes: 2"
+  When I fill in "Summary" with "something major is broken"
+    And I fill in "Add details" with "there's more information in Support Ticket #1"
+    And I press "Update Code ticket"
+  Then I should see "Summary: something major is broken"
+    And I should see "Support volunteer oracle(SV) wrote: there's more information"
+  When I follow "Support Ticket #1"
+  Then I should see "Status: Linked to Code Ticket #"
+  When I follow "Support Board"
+    And I follow "Open Support Tickets"
+  Then I should not see "Support Ticket #1"
+  When I follow "Support Board"
+    And I follow "Support Tickets waiting for Code changes"
+  Then I should see "Support Ticket #1"
 
 Scenario: support volunteers can link a support ticket to an existing FAQ
 

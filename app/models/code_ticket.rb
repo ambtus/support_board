@@ -6,6 +6,7 @@ class CodeTicket < ActiveRecord::Base
   has_many :code_votes # for prioritizing (lots of votes = high priority)
   has_many :code_notifications  # a bunch of email addresses for update notifications
   has_many :code_details  # like comments, except non-threaded and with extra attributes
+  has_many :support_tickets
 
   # don't save new empty details
   accepts_nested_attributes_for :code_details, :reject_if => proc { |attributes|

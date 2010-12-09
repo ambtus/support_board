@@ -21,8 +21,8 @@
         </dd>
     <% end %>
 
-    <dt><%= "Summary" %>:</dt>
-      <dd><%= raw @ticket.summary %></dd>
+    <dt><%= t.label :summary %>:</dt>
+      <dd><%= t.text_field :summary %></dd>
 
     <%= t.fields_for :code_details do |d| %>
       <% if d.object.new_record? %>

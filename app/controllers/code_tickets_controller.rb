@@ -77,8 +77,18 @@ class CodeTicketsController < ApplicationController
         render :new
       end
     else
-      flash[:notice] = "Sorry, only volunteers can open code tickets. Please open a support ticket instead"
+      flash[:notice] = "Sorry, only support volunteers can open code tickets. Please open a support ticket instead"
       redirect_to new_support_ticket_path and return
+    end
+  end
+
+  def edit
+    @ticket = CodeTicket.find(params[:id])
+    if current_user.support_volunteer
+      @ticket.code_details.build # create a new empty response template
+    else
+      flash[:notice] = "Sorry, only support volunteers can edit code tickets"
+      redirect_to @ticket and return
     end
   end
 
