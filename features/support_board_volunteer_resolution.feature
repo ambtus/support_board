@@ -194,11 +194,7 @@ Scenario: support volunteers can create a new (draft) FAQ and link to it in one 
     And I follow "Frequently Asked Questions"
     Then I should not see "1: New question"
 
-Scenario: draft FAQs don't show up on the archive faq index page
-
 Scenario: draft FAQs can be commented on by any logged in user, and any guest who comes linked from their own support ticket
-
-Scenario: FAQs can be posted by support admins
 
 Scenario: when a draft FAQ is marked posted, the comments are no longer visible.
 

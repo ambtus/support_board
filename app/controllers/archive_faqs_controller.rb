@@ -19,11 +19,11 @@ class ArchiveFaqsController < ApplicationController
     if current_user.try(:support_admin)
       case params[:commit]
       when "Post"
-        @faq.update_attribute(:pseud_id, current_user.support_pseud.id)
+        @faq.update_attribute(:user_id, current_user.id)
         @faq.update_attribute(:posted, true)
         redirect_to @faq and return
       when "Unpost"
-        @faq.update_attribute(:pseud_id, current_user.support_pseud.id)
+        @faq.update_attribute(:user_id, current_user.id)
         @faq.update_attribute(:posted, false)
       end
     elsif current_user.try(:support_volunteer)

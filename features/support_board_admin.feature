@@ -16,3 +16,26 @@ Scenario: support admin's should see the same thing that support volunteers see
     And I should see "Spam"
     And I should see "Resolved"
 
+Scenario: support admins can post drafts which will show up on the FAQ page
+  Given an archive faq exists with position: 1, title: "some question", posted: false
+  When I am logged in as support admin "incharge"
+  When I follow "Support Board"
+    And I follow "Frequently Asked Questions"
+  Then I should not see "1: some question"
+    And I am on the first archive faq page
+  And I press "Post"
+  When I follow "Support Board"
+    And I follow "Frequently Asked Questions"
+  Then I should see "1: some question"
+
+Scenario: support admins can unpost drafts which will be removed from the FAQ page
+  Given an archive faq exists with position: 1, title: "some question", posted: true
+  When I am logged in as support admin "incharge"
+  When I follow "Support Board"
+    And I follow "Frequently Asked Questions"
+  Then I should see "1: some question"
+    And I am on the first archive faq page
+  And I press "Unpost"
+  When I follow "Support Board"
+    And I follow "Frequently Asked Questions"
+  Then I should not see "1: some question"
