@@ -152,3 +152,25 @@ Given /^"([^"]*)" watches code ticket (\d+)$/ do |login, number|
   ticket.code_notifications.create(:email => user.email)
 end
 
+Given /^an activated support admin exists with login "([^"]*)"$/ do |login|
+  # " reset quotes for color
+  user = User.find_by_login(login)
+  unless user
+    user = Factory.create(:user, :login => login)
+    user.activate
+    user.support_admin = '1'
+    user.pseuds.create(:name => "#{login}(SV)", :support_volunteer => true)
+  end
+end
+
+Given /^I am logged in as support admin "([^"]*)"$/ do |login|
+  # " reset quotes for color
+  visit logout_path
+  Given %{an activated support admin exists with login "#{login}"}
+  visit root_path
+  fill_in "User name", :with => login
+  fill_in "Password", :with => "secret"
+  check "Remember me"
+  click_button "Log in"
+  assert UserSession.find
+end

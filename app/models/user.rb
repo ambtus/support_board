@@ -48,6 +48,9 @@ class User < ActiveRecord::Base
   # Set support admin role for this user and log change
   def support_admin=(should_be_support_admin)
     set_role('support_admin', should_be_support_admin == '1')
+    # if adding as a support admin, add as a support volunteer as well
+    # but don't remove the support volunteer role if removing the admin role
+    set_role('support_volunteer', should_be_support_admin == '1') if should_be_support_admin == '1'
   end
 
 end
