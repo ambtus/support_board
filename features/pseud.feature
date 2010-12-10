@@ -1,13 +1,18 @@
 Feature: User's have pseuds (aliases or AKAs)
 
 Scenario: default pseuds
-  Given an activated user exists with login "sam"
+  Given a user exists with login: "sam"
   When I am on sam's user page
-  Then I should see "sam's pseuds"
-  When I follow "sam"
+    And I follow "sam's pseuds"
+  Then I should see "sam (default pseud)"
 
-Scenario: support volunteer pseud
-  Given an activated support volunteer exists with login "sam"
+Scenario: volunteer pseud
+  Given a volunteer exists with login: "sam"
   When I am on sam's user page
-  Then I should see "sam's pseuds"
-  When I follow "sam(SV)"
+    And I follow "sam's pseuds"
+  Then I should see "sam (default pseud) (support pseud)"
+  When "sam" has a support pseud "oracle"
+    And I reload the page
+  Then I should see "sam (default pseud)"
+  Then I should see "oracle (support pseud)"
+    But I should not see "sam (default pseud) (support pseud)"

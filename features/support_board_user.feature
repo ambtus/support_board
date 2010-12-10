@@ -488,4 +488,4 @@ Scenario: users should get a badge for every response they leave which resolves 
   And "confused" accepts a response to support ticket 1
   And "confused" accepts a response to support ticket 3
   When I am on helper's user page
-    Then I should see "helper has had 2 support ticket comments accepted"
+    Then I should see "(2 accepted)"

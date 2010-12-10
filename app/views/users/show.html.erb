@@ -1,18 +1,35 @@
 <h1><%= @user.login %>'s page</h1>
-<h2><%= @user.login %>'s pseuds</h2>
-<% @user.pseuds.each do |pseud| %>
-  <%= link_to pseud.name, [@user, pseud] %>
-<% end %>
-<h2><%= link_to "Support tickets opened by #{@user.login}", user_support_tickets_path(@user) %></h2>
-<h2><%= link_to "Support tickets commented on by #{@user.login}", user_support_tickets_path(@user, :comments => true) %></h2>
-<% if @user.support_volunteer %>
-  <h2><%= link_to "Support tickets claimed by #{@user.login}", pseud_support_tickets_path(@user.support_pseud) %></h2>
-<% end %>
-<p><%= @user.login %> has had <%= SupportDetail.where(:resolved_ticket => true).where(:pseud_id => @user.pseud_ids).count
- %> support ticket comments accepted</p>
+<ul>
+<li>
+  <%= link_to "#{@user.login}'s pseuds", user_pseuds_path(@user) %>
+</li>
+<li>
+  <%= link_to "Support tickets opened by #{@user.login}",
+                user_support_tickets_path(@user) %>
+</li>
+<li>
+  <%= link_to "Support tickets commented on by #{@user.login}",
+              user_support_tickets_path(@user, :comments => true) %>
+  <% if @accepted > 0 %>
+   (<%= @accepted %> accepted)
+  <% end %>
+</li>
 <% if @user == current_user %>
-  <h2><%= link_to "Support tickets I am watching", user_support_tickets_path(@user, :watching => true) %></h2>
-  <h2><%= link_to "Code tickets I am watching", user_code_tickets_path(@user, :watching => true) %></h2>
+  <li>
+    <%= link_to "Support tickets I am watching",
+                user_support_tickets_path(@user, :watching => true) %>
+  </li>
+  <li>
+    <%= link_to "Code tickets I am watching",
+                user_code_tickets_path(@user, :watching => true) %>
+  </li>
 <% end %>
-<h2><%= link_to "Code tickets voted up by #{@user.login}", user_code_tickets_path(@user, :votes => true) %></h2>
-<h2><%= link_to "Code tickets commented on by #{@user.login}", user_code_tickets_path(@user, :comments => true) %></h2>
+<li>
+  <%= link_to "Code tickets voted up by #{@user.login}",
+              user_code_tickets_path(@user, :votes => true) %>
+</li>
+<li>
+  <%= link_to "Code tickets commented on by #{@user.login}",
+              user_code_tickets_path(@user, :comments => true) %>
+</li>
+</ul>

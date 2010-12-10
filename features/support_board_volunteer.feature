@@ -47,17 +47,23 @@ Scenario: support board volunteers can steal owned tickets.
     And "oracle" takes support ticket 1
   Given I am logged in as support volunteer "hermione"
   When I am on oracle's user page
-    And I follow "Support tickets claimed by oracle"
+    And I follow "oracle's pseuds"
+    And I follow "oracle(SV)"
+    And I follow "Support tickets"
     And I follow "Support Ticket #1"
     When I press "Take"
   Then 1 email should be delivered to "oracle@ao3.org"
     And the email should contain "has been stolen by"
     And the email should contain "hermione"
   When I am on oracle's user page
-    And I follow "Support tickets claimed by oracle"
+    And I follow "oracle's pseuds"
+    And I follow "oracle(SV)"
+    And I follow "Support tickets"
   Then I should not see "Support Ticket #1"
   When I am on hermione's user page
-    And I follow "Support tickets claimed by hermione"
+    And I follow "hermione's pseuds"
+    And I follow "hermione(SV)"
+    And I follow "Support tickets"
   Then I should see "Support Ticket #1"
 
 Scenario: support board volunteers can comment on owned tickets.
@@ -72,7 +78,9 @@ Scenario: support board volunteers can comment on owned tickets.
     And I follow "Claimed Support Tickets"
     Then I should see "Support Ticket #1"
   When I am on oracle's user page
-    And I follow "Support tickets claimed by oracle"
+    And I follow "oracle's pseuds"
+    And I follow "oracle(SV)"
+    And I follow "Support tickets"
     And I follow "Support Ticket #1"
   Then I should see "Status: In progress"
     And I should see "Add details"
@@ -133,7 +141,9 @@ Scenario: working support tickets should be available from the user page
     And "oracle" takes support ticket 3
     And "oracle" takes support ticket 4
   When I am on oracle's user page
-    And I follow "Support tickets claimed by oracle"
+    And I follow "oracle's pseuds"
+    And I follow "oracle(SV)"
+    And I follow "Support tickets"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
     But I should see "Support Ticket #3"
@@ -146,30 +156,40 @@ Scenario: working support tickets should be available from the user page
     And I should see "Support Ticket #4"
   When I am logged in as support volunteer "oracle"
     And I am on oracle's user page
-    And I follow "Support tickets claimed by oracle"
+    And I follow "oracle's pseuds"
+    And I follow "oracle(SV)"
+    And I follow "Support tickets"
     And I follow "Support Ticket #4"
     And I press "Untake"
   When I am on oracle's user page
-    And I follow "Support tickets claimed by oracle"
+    And I follow "oracle's pseuds"
+    And I follow "oracle(SV)"
+    And I follow "Support tickets"
   Then I should not see "Support Ticket #1"
     And I should not see "Support Ticket #2"
     But I should see "Support Ticket #3"
     And I should not see "Support Ticket #4"
   When I am logged in as "troubled"
     And I am on oracle's user page
-    And I follow "Support tickets claimed by oracle"
+    And I follow "oracle's pseuds"
+    And I follow "oracle(SV)"
+    And I follow "Support tickets"
     And I follow "Support Ticket #3"
     And I check "Private"
     And I press "Update Support ticket"
   When I am on oracle's user page
-    And I follow "Support tickets claimed by oracle"
+    And I follow "oracle's pseuds"
+    And I follow "oracle(SV)"
+    And I follow "Support tickets"
   Then I should not see "Support Ticket #1"
     And I should not see "Support Ticket #2"
     And I should not see "Support Ticket #3"
     And I should not see "Support Ticket #4"
   When I am logged in as support volunteer "hermione"
     And I am on oracle's user page
-    And I follow "Support tickets claimed by oracle"
+    And I follow "oracle's pseuds"
+    And I follow "oracle(SV)"
+    And I follow "Support tickets"
     Then I should see "Support Ticket #3"
 
 Scenario: visibility on the comment board

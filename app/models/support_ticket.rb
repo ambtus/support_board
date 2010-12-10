@@ -39,7 +39,7 @@ class SupportTicket < ActiveRecord::Base
     if self.pseud_id
       name = self.pseud.name
       if self.admin_resolved
-        "Resolved by support admin #{name}"
+        "Resolved by #{self.admin.login}"
       elsif self.code_ticket_id
         "Linked to #{self.code_ticket.name} by #{name}"
       elsif self.archive_faq_id

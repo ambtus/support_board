@@ -30,6 +30,14 @@ Given /^I am logged in as support volunteer "([^"]*)"$/ do |login|
   assert UserSession.find
 end
 
+Given /^"([^"]*)" has a support pseud "([^"]*)"$/ do |login, name|
+  user = User.find_by_login(login)
+  assert user.support_volunteer
+  Factory.create(:pseud, :user_id => user.id, :name => name, :support_volunteer => true)
+end
+
+# user actions on tickets
+
 Given /^a user responds to support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
   user = User.find_by_login("someone")
@@ -119,11 +127,12 @@ Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
   ticket.update_attribute(:pseud_id, user.support_pseud.id)
 end
 
+# TODO - replace this with one of the resolution methods to be determined
 Given /^"([^"]*)" resolves code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
   user = User.find_by_login(login)
-  assert ticket.pseud == user.support_pseud
+  assert user.support_volunteer
   ticket.resolved = true
   ticket.save
   ticket.send_update_notifications

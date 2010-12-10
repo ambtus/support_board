@@ -37,7 +37,17 @@ class User < ActiveRecord::Base
 
   # Set support volunteer role for this user and log change
   def support_volunteer=(should_be_support_volunteer)
-    set_role('support_volunteer', should_be_support_volunteer == '1')
+    case should_be_support_volunteer
+    when "1"
+      set_role('support_volunteer', true)
+      # set the default pseud as support volunteer designated
+      self.default_pseud.update_attribute(:support_volunteer, true)
+    else
+      set_role('support_volunteer', false)
+      # remove the default pseud as support volunteer designated
+      # note, this won't change previous details from "Support volunteer X said" to "X said"
+      self.support_pseud.update_attribute(:support_volunteer, false)
+    end
   end
 
   # Is this user an authorized support admin?
@@ -50,6 +60,7 @@ class User < ActiveRecord::Base
     set_role('support_admin', should_be_support_admin == '1')
     # if adding as a support admin, add as a support volunteer as well
     # but don't remove the support volunteer role if removing the admin role
+    # if you want to do that as well, it needs to be done in a separate step
     set_role('support_volunteer', should_be_support_admin == '1') if should_be_support_admin == '1'
   end
 
