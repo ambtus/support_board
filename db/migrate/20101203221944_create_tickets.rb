@@ -59,6 +59,14 @@ class CreateTickets < ActiveRecord::Migration
       t.timestamps
     end
 
+    create_table :faq_votes do |t|
+      t.integer :archive_faq_id
+      t.integer :support_ticket_id
+      t.integer :vote, :limit => 1, :default => 1
+
+      t.timestamps
+    end
+
     create_table :code_tickets do |t|
       t.string :summary
       t.integer :summary_sanitizer_version, :limit => 2, :default => 0, :null => false
@@ -89,7 +97,7 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :code_ticket_id
       t.integer :user_id
       t.integer :support_ticket_id
-      t.integer :vote, :limit => 1
+      t.integer :vote, :limit => 1, :default => 1
 
       t.timestamps
     end

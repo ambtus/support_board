@@ -156,8 +156,9 @@ Scenario: volunteers can link a support ticket to an existing posted FAQ
     And I select "1: some question" from "FAQ"
     And I press "Link to FAQ"
   Then I should see "Status: Linked to FAQ by oracle"
-    And I should see "1: some question"
     And 1 email should be delivered to "guest@ao3.org"
+  When I follow "1: some question"
+  Then I should see "Votes: 1"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
@@ -169,7 +170,8 @@ Scenario: volunteers can link a support ticket to an existing posted FAQ
     And I should not see "1: some question" within "a"
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"
-    Then I should see "1: some question"
+    And I follow "1: some question"
+  Then I should see "Votes: 0"
 
 Scenario: volunteers can create a new (draft) FAQ and link to it in one step
   Given a support ticket exists with id: 1, summary: "some question"
@@ -195,13 +197,6 @@ Scenario: volunteers can create a new (draft) FAQ and link to it in one step
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"
     Then I should not see "1: New question"
-
-
-Scenario: the owner of a ticket can "unaccept" a FAQ link which removes its vote and marks the ticket as unanswered
-
-Scenario: anyone reading a FAQ can mark it as "this answered my question" (a FAQ vote)
-
-Scenario: a support ticket link to a FAQ is a FAQ vote.
 
 Scenario: FAQs can be sorted by votes
 

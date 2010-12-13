@@ -3,6 +3,7 @@ class SupportTicket < ActiveRecord::Base
   belongs_to :user   # the user who opened the ticket
   belongs_to :pseud  # the pseud of the user who is working on the ticket
   belongs_to :archive_faq  # for 'Question' tickets
+  has_one :faq_vote
   belongs_to :code_ticket  # for 'Problem' and 'Suggestion' tickets. automatic +1 vote
   has_many :support_notifications  # a bunch of email addresses for update notifications
   has_many :support_details  # like comments, except non-threaded and with extra attributes
@@ -80,10 +81,20 @@ class SupportTicket < ActiveRecord::Base
   def update_resolved
     Rails.logger.debug "running update_resolved after save"
     return if updated_resolved # already updated, don't check and save again
+
+    # linked or unlinked to an archive faq: update the faq votes accordingly.
+    if self.archive_faq_id_changed?
+      if archive_faq_id
+        FaqVote.create(:archive_faq_id => archive_faq.id, :support_ticket_id => self.id)
+      else
+        FaqVote.where(:support_ticket_id => self.id).first.destroy
+      end
+    end
+
     old = self.resolved
     owner_resolved = (self.support_details.resolved.count > 0)
 
-    support_resolved = (self.archive_faq || self.code_ticket || self.comment)
+    support_resolved = (self.archive_faq_id || self.code_ticket_id || self.comment)
 
     self.resolved = owner_resolved || support_resolved || self.admin_resolved
     new = self.resolved

@@ -14,7 +14,7 @@ class ArchiveFaqsController < ApplicationController
     if @faq.posted?
       render :show_posted
     else
-      if session[:authentication_code]
+      if !current_user && session[:authentication_code]
         @faq.faq_details.build # create a new empty response template
         render :show_owner
       elsif !current_user # not logged in, can't comment
@@ -42,7 +42,9 @@ class ArchiveFaqsController < ApplicationController
 
   def update
     @faq = ArchiveFaq.find(params[:id])
-    if current_user.try(:support_admin)
+    if params[:commit] == "This FAQ answered my question"
+      FaqVote.create(:archive_faq_id => @faq.id)
+    elsif current_user.try(:support_admin)
       case params[:commit]
       when "Post"
         @faq.update_attribute(:user_id, current_user.id)

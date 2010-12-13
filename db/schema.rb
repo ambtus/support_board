@@ -84,7 +84,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "code_ticket_id"
     t.integer  "user_id"
     t.integer  "support_ticket_id"
-    t.integer  "vote",              :limit => 1
+    t.integer  "vote",              :limit => 1, :default => 1
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -96,6 +96,14 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "content"
     t.boolean  "private",                                :default => false
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "faq_votes", :force => true do |t|
+    t.integer  "archive_faq_id"
+    t.integer  "support_ticket_id"
+    t.integer  "vote",              :limit => 1, :default => 1
     t.datetime "created_at"
     t.datetime "updated_at"
   end
