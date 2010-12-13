@@ -1,0 +1,21 @@
+<%= form_for(@faq) do |f| %>
+  <% if current_user.try(:support_admin) %>
+    <p class="submit"><%= f.submit "Post" %></p>
+  <% end %>
+    <%= link_to "Edit title or content", edit_archive_faq_path(@faq) %>
+  <p><%= @faq.title %></p>
+  <%= raw @faq.content %>
+
+  <%= f.fields_for :faq_details do |d| %>
+    <% if d.object.new_record? %>
+      <dt><%= d.label :pseud_id, "Pseud (Will be visible). If you don't use your support pseud, this comment will not be marked official" %>:</dt>
+        <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }, :selected => current_user.support_pseud.id %></dd>
+      <dt><%= d.label :content, "Add comment" %>:</dt>
+        <dd><%= d.text_area :content %></dd>
+    <% else %>
+      <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
+        <dd><%= raw d.object.content %></dd>
+    <% end %>
+  <% end %>
+  <p class="submit"><%= f.submit %></p>
+<% end %>

@@ -1,10 +1,35 @@
 class ArchiveFaqsController < ApplicationController
   def index
-    @faqs = ArchiveFaq.where(:posted => true).order(:position)
+    @faqs = ArchiveFaq.order(:position)
+    if params[:unposted]
+      @faqs = @faqs.where(:posted => false)
+    else
+      @faqs = @faqs.where(:posted => true)
+    end
   end
+
   def show
     @faq = ArchiveFaq.find(params[:id])
+    # don't show details if posted
+    if @faq.posted?
+      render :show_posted
+    else
+      if session[:authentication_code]
+        @faq.faq_details.build # create a new empty response template
+        render :show_owner
+      elsif !current_user # not logged in, can't comment
+        @details = @faq.faq_details.where(:private => false)
+        render :show_guest
+      elsif current_user.support_volunteer
+        @faq.faq_details.build # create a new empty response template
+        render :show_volunteer
+      else # logged in as non-support volunteer
+        @faq.faq_details.build # create a new empty response template
+        render :show_user
+      end
+    end
   end
+
   def edit
     @faq = ArchiveFaq.find(params[:id])
     if current_user.support_volunteer
@@ -14,6 +39,7 @@ class ArchiveFaqsController < ApplicationController
       redirect_to @faq and return
     end
   end
+
   def update
     @faq = ArchiveFaq.find(params[:id])
     if current_user.try(:support_admin)
@@ -34,7 +60,8 @@ class ArchiveFaqsController < ApplicationController
         render :edit and return
       end
     elsif current_user || session[:authentication_code]
-      @faq.update_attribute(:faq_details, params[:archive_faq][:faq_details])
+      # TODO only update faq_details
+      @faq.update_attributes(params[:archive_faq])
       if @faq.save
         flash[:notice] = "Comments added"
       else

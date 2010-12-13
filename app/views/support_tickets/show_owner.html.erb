@@ -21,6 +21,10 @@
       <%= t.label :display_user_name, "Display my user name" %>
     </p>
   <% end %>
+  <% if @ticket.archive_faq_id? %>
+      <%= t.check_box :archive_faq_id, {}, @ticket.archive_faq_id, "" %>
+      <%= t.label :archive_faq_id, "linked to FAQ" %>
+  <% end %>
   <dl>
     <% if @ticket.display_user_name %>
       <dt><%= "User" %>:</dt>
@@ -30,6 +34,10 @@
       <dd><%= @ticket.private? ? "Private" : "Public" %>
     <dt><%= "Status" %>:</dt>
       <dd><%= @ticket.status_line %>
+          <% if @ticket.archive_faq_id %>
+            <%= link_to @ticket.archive_faq.name, @ticket.archive_faq %>
+          <% end %>
+      </dd>
     <dt><%= "Summary" %>:</dt>
       <dd><%= raw @ticket.summary %></dd>
 

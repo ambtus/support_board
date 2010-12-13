@@ -1,0 +1,7 @@
+<% if current_user.try(:support_admin) %>
+  <%= form_for(@faq) do |f| %>
+    <p class="submit"><%= f.submit "Unpost" %></p>
+  <% end %>
+<% end %>
+<p><%= @faq.title %></p>
+<%= raw @faq.content %></dd>

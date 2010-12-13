@@ -29,7 +29,7 @@ Factory.define :code_ticket do |code_ticket|
 end
 
 Factory.define :archive_faq do |archive_faq|
-  archive_faq.sequence(:title) { |n| "faq #{n}" }
+  archive_faq.title { |a| "faq #{a.position}" }
   archive_faq.after_build { |archive_faq| archive_faq.user_id = Factory.create(:volunteer)}
 end
 

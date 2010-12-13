@@ -45,7 +45,7 @@ class CreateTickets < ActiveRecord::Migration
     end
     add_column :pseuds, :support_volunteer, :boolean
     add_column :archive_faqs, :user_id, :integer
-    add_column :archive_faqs, :posted, :boolean
+    add_column :archive_faqs, :posted, :boolean, :default => false
     add_column :archive_faqs, :content_sanitizer_version, :integer, :limit => 2, :default => 0, :null => false
 
     create_table :faq_details do |t|

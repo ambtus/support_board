@@ -349,3 +349,57 @@ Scenario: guests can view closed code tickets, but not vote or respond
     And I should see "Votes: 0"
   But I should not see "Vote up"
     And I should not see "Add details"
+
+Scenario: guests can view posted FAQs, but not comment
+  Given an archive faq exists with posted: true
+  When I am on the first archive faq page
+  Then I should see "faq 1"
+    But I should not see "Add comment"
+
+Scenario: guests can view draft FAQs, but not comment
+  Given an archive faq exists with posted: false
+  When I am on the first archive faq page
+  Then I should see "faq 1"
+    But I should not see "Add comment"
+
+Scenario: guests can comment on a draft FAQ when following a link from their own support ticket
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+    And I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+  When I press "Create Support ticket"
+  When a volunteer creates a faq from support ticket 1
+    And I reload the page
+  Then I should see "Status: Linked to FAQ by oracle"
+  When I follow "1: faq 1"
+    And I fill in "Add comment" with "this sounds good"
+    And I press "Update Archive faq"
+  Then I should see "Support ticket owner wrote: this sounds good"
+
+Scenario: guests can't comment on a posted FAQ when following a link from their own support ticket
+  Given an archive faq exists with posted: true, position: 1
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+    And I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+  When I press "Create Support ticket"
+  When a volunteer links support ticket 1 to faq 1
+    And I reload the page
+  Then I should see "Status: Linked to FAQ by oracle"
+  When I follow "1: faq 1"
+    Then I should not see "Add comment"
+
+Scenario: guests can remove a link to a FAQ if they don't think it resolves their ticket
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+    And I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+  When I press "Create Support ticket"
+  When a volunteer creates a faq from support ticket 1
+    And I reload the page
+  Then I should see "Status: Linked to FAQ by oracle"
+    And I should see "1: faq 1"
+  When I uncheck "linked to FAQ"
+    And I press "Update Support ticket"
+  Then I should see "Status: In progress"
+    And I should not see "1: faq 1"

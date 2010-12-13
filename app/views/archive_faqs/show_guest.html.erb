@@ -1,0 +1,7 @@
+<p><%= @faq.title %></p>
+<%= raw @faq.content %></dd>
+
+<% @details.each do |d| %>
+  <dt><%= d.byline %> <%= "wrote" %>:</dt>
+    <dd><%= raw d.content %></dd>
+<% end %>

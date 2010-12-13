@@ -42,7 +42,7 @@ Given /^a user responds to support ticket (\d+)$/ do |number|
   ticket.send_update_notifications
 end
 
-# volunteer actions on tickets
+# generic volunteer actions on tickets
 
 Given /^a volunteer responds to support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
@@ -54,6 +54,26 @@ Given /^a volunteer responds to support ticket (\d+)$/ do |number|
   assert user.support_volunteer
   ticket.support_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
   ticket.save
+  ticket.send_update_notifications
+end
+
+When /^a volunteer creates a faq from support ticket (\d+)$/ do |number|
+  ticket = SupportTicket.all[number.to_i - 1]
+  Given %{a volunteer exists with login: "oracle"}
+  user = User.find_by_login("oracle")
+  faq = Factory.create(:archive_faq)
+  ticket.update_attribute(:archive_faq_id, faq.id)
+  ticket.update_attribute(:pseud_id, user.support_pseud.id)
+  ticket.send_update_notifications
+end
+
+When /^a volunteer links support ticket (\d+) to faq (\d+)$/ do |arg1, arg2|
+  ticket = SupportTicket.all[arg1.to_i - 1]
+  faq = ArchiveFaq.find_by_position(arg2.to_i)
+  Given %{a volunteer exists with login: "oracle"}
+  user = User.find_by_login("oracle")
+  ticket.update_attribute(:archive_faq_id, faq.id)
+  ticket.update_attribute(:pseud_id, user.support_pseud.id)
   ticket.send_update_notifications
 end
 

@@ -61,7 +61,7 @@ class User < ActiveRecord::Base
     # if adding as a support admin, add as a support volunteer as well
     # but don't remove the support volunteer role if removing the admin role
     # if you want to do that as well, it needs to be done in a separate step
-    set_role('support_volunteer', should_be_support_admin == '1') if should_be_support_admin == '1'
+    self.support_volunteer = '1' if should_be_support_admin == '1'
   end
 
 end

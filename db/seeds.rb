@@ -21,6 +21,11 @@ rodney = User.create(:login => "rodney", :email => "rodney@ao3.org",
 rodney.support_volunteer = "1"
 rodney.pseuds.create(:name => "3Phds", :support_volunteer => true)
 
+# support admin
+bofh = User.create(:login => "bofh", :email => "bofh@ao3.org",
+  :password => "secret", :password_confirmation => "secret")
+bofh.support_admin = "1"
+
 # code tickets
 CodeTicket.create(:summary => "save the world", :pseud_id => sam.support_pseud.id)
 CodeTicket.create(:summary => "build a zpm", :pseud_id => rodney.support_pseud.id)
@@ -34,7 +39,10 @@ SupportTicket.create(:summary => "repeal DADA", :user_id => john.id, :private =>
 SupportTicket.create(:summary => "what's my password?", :user_id => john.id, :private =>true, :display_user_name => true)
 
 # faqs
-ArchiveFaq.create(:title => "where to find salt", :position => 1, :posted => true)
-ArchiveFaq.create(:title => "why we don't have enough ZPMs", :position => 2, :posted => true)
-ArchiveFaq.create(:title => "what's DADA?", :position => 3, :posted => true)
-ArchiveFaq.create(:title => "how to recover your password", :posted => false)
+faq1 = ArchiveFaq.create(:title => "where to find salt", :position => 1, :posted => true)
+faq1.update_attribute(:posted, true)
+faq2 = ArchiveFaq.create(:title => "why we don't have enough ZPMs", :position => 2, :posted => true)
+faq2.update_attribute(:posted, true)
+faq3 =ArchiveFaq.create(:title => "what's DADA?", :position => 3, :posted => true)
+faq3.update_attribute(:posted, true)
+ArchiveFaq.create(:title => "how to recover your password")

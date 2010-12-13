@@ -41,8 +41,8 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
-    t.boolean  "posted"
-    t.integer  "content_sanitizer_version", :limit => 2, :default => 0, :null => false
+    t.boolean  "posted",                                 :default => false
+    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
   end
 
   create_table "code_details", :force => true do |t|

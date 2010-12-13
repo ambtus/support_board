@@ -1,0 +1,15 @@
+<%= form_for(@faq) do |f| %>
+  <p><%= @faq.title %></p>
+  <%= raw @faq.content %></dd>
+
+  <%= f.fields_for :faq_details do |d| %>
+    <% if d.object.new_record? %>
+      <dt><%= d.label :content, "Add comment" %>:</dt>
+        <dd><%= d.text_area :content %></dd>
+    <% else %>
+      <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
+        <dd><%= raw d.object.content %></dd>
+    <% end %>
+  <% end %>
+  <p class="submit"><%= f.submit %></p>
+<% end %>

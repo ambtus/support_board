@@ -48,7 +48,11 @@
     <dt><%= "Access" %>:</dt>
       <dd><%= @ticket.private? ? "Private" : "Public" %>
     <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.status_line %></dd>
+      <dd><%= @ticket.status_line %>
+          <% if @ticket.archive_faq_id %>
+            <%= link_to @ticket.archive_faq.name, @ticket.archive_faq %>
+          <% end %>
+      </dd>
     <dt><%= "Summary" %>:</dt>
       <dd><%= raw @ticket.summary %></dd>
 

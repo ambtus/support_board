@@ -22,8 +22,8 @@ Scenario: support admins can post drafts which will show up on the FAQ page
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"
   Then I should not see "1: some question"
-    And I am on the first archive faq page
-  And I press "Post"
+  When I am on the first archive faq page
+    And I press "Post"
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"
   Then I should see "1: some question"
