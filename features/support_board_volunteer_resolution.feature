@@ -1,11 +1,11 @@
-Feature: the various ways support volunteers can resolve support tickets
+Feature: the various ways volunteers can resolve support tickets
 
-Scenario: support volunteers can mark a support ticket spam/ham
+Scenario: volunteers can mark a support ticket spam/ham
   Given the following support tickets exist
     | summary       | id |
     | buy viagra    | 1  |
     And all emails have been delivered
-  When I am logged in as support volunteer "oracle"
+  When I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -24,26 +24,24 @@ Scenario: support volunteers can mark a support ticket spam/ham
     And I follow "Spam"
   Then I should not see "Support Ticket #1"
 
-Scenario: support volunteers can not mark a user opened support ticket spam
-  Given the following activated user exists
-    | login     | id |
-    | troubled  | 1  |
+Scenario: volunteers can not mark a user opened support ticket spam
+  Given a user exists with login: "troubled", id: 1
   And the following support tickets exist
     | id | summary       | user_id |
     | 1  | buy viagra    | 1       |
-  When I am logged in as support volunteer "oracle"
+  When I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
   # FIXME this doesn't fail when the code is wrong: can't "see" submit labels
   Then I should not see "Spam"
 
-Scenario: support volunteers can mark a support ticket for an Admin to resolve
+Scenario: volunteers can mark a support ticket for an Admin to resolve
   Given the following support tickets exist
     | summary       | id |
     | needs admin   | 1  |
     | question      | 2  |
-  When I am logged in as support volunteer "oracle"
+  When I am logged in as volunteer "oracle"
     And I go to the first support ticket page
     And I press "Needs Admin Attention"
   When I follow "Support Board"
@@ -51,9 +49,9 @@ Scenario: support volunteers can mark a support ticket for an Admin to resolve
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
 
-Scenario: support volunteers can mark a support ticket as a Comment (don't require any work)
+Scenario: volunteers can mark a support ticket as a Comment (don't require any work)
   Given a support ticket exists with id: 1
-  When I am logged in as support volunteer "oracle"
+  When I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -74,10 +72,10 @@ Scenario: support volunteers can mark a support ticket as a Comment (don't requi
     And I follow "Open Support Tickets"
   Then I should see "Support Ticket #1"
 
-Scenario: support volunteers can link a support ticket to an existing code ticket
+Scenario: volunteers can link a support ticket to an existing code ticket
   Given a support ticket exists with id: 1
     And a code ticket exists with id: 1
-  When I am logged in as support volunteer "oracle"
+  When I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -101,9 +99,9 @@ Scenario: support volunteers can link a support ticket to an existing code ticke
   When I am on the first support ticket page
     Then I should see "Status: In progress"
 
-Scenario: support volunteers can open a new code ticket and link to it in one step (with the summary pre-filled in but editable)
+Scenario: volunteers can open a new code ticket and link to it in one step (with the summary pre-filled in but editable)
   Given a support ticket exists with id: 1, summary: "something is broken"
-  When I am logged in as support volunteer "oracle"
+  When I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -114,7 +112,7 @@ Scenario: support volunteers can open a new code ticket and link to it in one st
     And I fill in "Add details" with "there's more information in Support Ticket #1"
     And I press "Update Code ticket"
   Then I should see "Summary: something major is broken"
-    And I should see "Support volunteer oracle(SV) wrote: there's more information"
+    And I should see "volunteer oracle wrote: there's more information"
   When I follow "Support Ticket #1"
   Then I should see "Status: Linked to Code Ticket #"
   When I follow "Support Board"
@@ -124,10 +122,10 @@ Scenario: support volunteers can open a new code ticket and link to it in one st
     And I follow "Support Tickets waiting for Code changes"
   Then I should see "Support Ticket #1"
 
-Scenario: support volunteers can link a support ticket to an existing draft FAQ
+Scenario: volunteers can link a support ticket to an existing draft FAQ
   Given an archive faq exists with position: 1, title: "some question", posted: false
     And a support ticket exists with id: 1
-  When I am logged in as support volunteer "oracle"
+  When I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -147,10 +145,10 @@ Scenario: support volunteers can link a support ticket to an existing draft FAQ
     And I follow "Frequently Asked Questions"
     Then I should not see "1: some question"
 
-Scenario: support volunteers can link a support ticket to an existing posted FAQ
+Scenario: volunteers can link a support ticket to an existing posted FAQ
   Given an archive faq exists with position: 1, title: "some question", posted: true
     And a support ticket exists with id: 1
-  When I am logged in as support volunteer "oracle"
+  When I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -170,9 +168,9 @@ Scenario: support volunteers can link a support ticket to an existing posted FAQ
     And I follow "Frequently Asked Questions"
     Then I should see "1: some question"
 
-Scenario: support volunteers can create a new (draft) FAQ and link to it in one step
+Scenario: volunteers can create a new (draft) FAQ and link to it in one step
   Given a support ticket exists with id: 1, summary: "some question"
-  When I am logged in as support volunteer "oracle"
+  When I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -208,5 +206,5 @@ Scenario: FAQs can be sorted by votes
 
 Scenario: code tickets can be sorted by votes
 
-Scenario: support volunteers can send email to another volunteer asking them to take a ticket
+Scenario: volunteers can send email to another volunteer asking them to take a ticket
 

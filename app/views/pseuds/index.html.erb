@@ -1,5 +1,5 @@
 <h2><%= @user.login %>'s pseuds</h2>
-<ul>
+<ul class="pseuds">
 <% @user.pseuds.each do |pseud| %>
   <li>
   <%= link_to pseud.name, [@user, pseud] %>

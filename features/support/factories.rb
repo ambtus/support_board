@@ -6,6 +6,7 @@ Factory.define :admin do |admin|
 end
 
 Factory.define :user do |user|
+  user.sequence(:id) { |n| n }
   user.sequence(:login) { |n| "testuser#{n}" }
   user.password "secret"
   user.password_confirmation { |u| u.password }
@@ -18,6 +19,7 @@ Factory.define :pseud do |pseud|
 end
 
 Factory.define :support_ticket do |support_ticket|
+  support_ticket.sequence(:id) { |n| n }
   support_ticket.sequence(:summary) { |n| "support ticket #{n}" }
   support_ticket.email { |u| "guest@ao3.org" unless u.user_id }
 end

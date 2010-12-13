@@ -1,27 +1,21 @@
-Given /^an activated support volunteer exists with login "([^"]*)"$/ do |login|
-  # " reset quotes for color
-  user = User.find_by_login(login)
-  unless user
-    user = Factory.create(:user, :login => login)
-    user.activate
-    user.support_volunteer = '1'
-    user.pseuds.create(:name => "#{login}(SV)", :support_volunteer => true)
-  end
-end
+# creating and logging in as volunteers and admins
 
-Given /the following activated support volunteers? exists?/ do |table|
-  table.hashes.each do |hash|
-    user = Factory.create(:user, hash)
-    user.activate
-    user.support_volunteer = '1'
-    user.pseuds.create(:name => "#{user.login}(SV)", :support_volunteer => true)
-  end
-end
-
-Given /^I am logged in as support volunteer "([^"]*)"$/ do |login|
+Given /^I am logged in as volunteer "([^"]*)"$/ do |login|
   # " reset quotes for color
   visit logout_path
-  Given %{an activated support volunteer exists with login "#{login}"}
+  Given %{a volunteer exists with login: "#{login}"}
+  visit root_path
+  fill_in "User name", :with => login
+  fill_in "Password", :with => "secret"
+  check "Remember me"
+  click_button "Log in"
+  assert UserSession.find
+end
+
+Given /^I am logged in as support admin "([^"]*)"$/ do |login|
+  # " reset quotes for color
+  visit logout_path
+  Given %{a support admin exists with login: "#{login}"}
   visit root_path
   fill_in "User name", :with => login
   fill_in "Password", :with => "secret"
@@ -48,24 +42,36 @@ Given /^a user responds to support ticket (\d+)$/ do |number|
   ticket.send_update_notifications
 end
 
-Given /^a support volunteer responds to support ticket (\d+)$/ do |number|
+# volunteer actions on tickets
+
+Given /^a volunteer responds to support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
-  user = User.find_by_login("somevolunteer")
+  user = User.find_by_login("oracle")
   unless user
-    user = Factory.create(:user, :login => "somevolunteer")
-    user.activate
-    user.support_volunteer = '1'
-    user.default_pseud.update_attribute(:support_volunteer, true)
+    Given %{a volunteer exists with login: "oracle"}
+    user = User.find_by_login("oracle")
   end
+  assert user.support_volunteer
   ticket.support_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
   ticket.save
   ticket.send_update_notifications
 end
 
+Given /^a volunteer responds to code ticket (\d+)$/ do |number|
+  ticket = CodeTicket.all[number.to_i - 1]
+  Given %{a volunteer exists with login: "oracle"}
+  user = User.find_by_login("oracle")
+  ticket.code_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
+  ticket.save
+  ticket.send_update_notifications
+end
+
+# named user actions on tickets. assert that they have access
+
 Given /^"([^"]*)" responds to support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
+  assert user = User.find_by_login(login)
   ticket.support_details.build(:pseud => user.default_pseud, :content => "blah blah")
   ticket.save
   ticket.send_update_notifications
@@ -74,7 +80,7 @@ end
 Given /^"([^"]*)" watches support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
+  assert user = User.find_by_login(login)
   ticket.support_notifications.create(:email => user.email, :public_watcher => true)
 end
 
@@ -107,17 +113,6 @@ Given /^"([^"]*)" categorizes support ticket (\d+) as Comment$/ do |login, numbe
   ticket.mark_as_comment!(user.support_pseud)
 end
 
-Given /^a support volunteer responds to code ticket (\d+)$/ do |number|
-  ticket = CodeTicket.all[number.to_i - 1]
-  user = Factory.create(:user)
-  user.activate
-  user.support_volunteer = '1'
-  user.pseuds.create(:support_volunteer => true, :name => "foo")
-  ticket.code_details.build(:pseud => user.support_pseud, :support_response => true, :content => "foo bar")
-  ticket.save
-  ticket.send_update_notifications
-end
-
 Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
@@ -141,14 +136,14 @@ end
 Given /^"([^"]*)" votes up code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
+  assert user = User.find_by_login(login)
   ticket.code_votes.create(:user_id => user.id, :vote => 1)
 end
 
 Given /^"([^"]*)" comments on code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
+  assert user = User.find_by_login(login)
   ticket.code_details.build(:pseud => user.default_pseud, :content => "blah blah")
   ticket.save
   ticket.send_update_notifications
@@ -157,29 +152,7 @@ end
 Given /^"([^"]*)" watches code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
+  assert user = User.find_by_login(login)
   ticket.code_notifications.create(:email => user.email)
 end
 
-Given /^an activated support admin exists with login "([^"]*)"$/ do |login|
-  # " reset quotes for color
-  user = User.find_by_login(login)
-  unless user
-    user = Factory.create(:user, :login => login)
-    user.activate
-    user.support_admin = '1'
-    user.pseuds.create(:name => "#{login}(SV)", :support_volunteer => true)
-  end
-end
-
-Given /^I am logged in as support admin "([^"]*)"$/ do |login|
-  # " reset quotes for color
-  visit logout_path
-  Given %{an activated support admin exists with login "#{login}"}
-  visit root_path
-  fill_in "User name", :with => login
-  fill_in "Password", :with => "secret"
-  check "Remember me"
-  click_button "Log in"
-  assert UserSession.find
-end

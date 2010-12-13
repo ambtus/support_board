@@ -18,9 +18,7 @@ Scenario: what users should (not) see
     And I should not see "Resolved"
 
 Scenario: users can't access private tickets even with a direct link
-  Given the following support tickets exist
-    | summary                           | private | id |
-    | private support ticket            | true    |  1 |
+  Given a support ticket exists with private: true
   Given I am logged in as "troubled"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
@@ -37,31 +35,27 @@ Scenario: users can (un)monitor public tickets
     And I check "Turn on notifications"
     And I press "Update Support ticket"
   Then 0 email should be delivered to "troubled@ao3.org"
-  When a support volunteer responds to support ticket 1
+  When a volunteer responds to support ticket 1
   Then 1 email should be delivered to "troubled@ao3.org"
     And all emails have been delivered
   When I check "Turn off notifications"
     And I press "Update Support ticket"
-  When a support volunteer responds to support ticket 1
+  When a volunteer responds to support ticket 1
   Then 0 emails should be delivered to "troubled@ao3.org"
 
 Scenario: users can comment on unowned tickets and those comments can be chosen as resolutions
-  Given the following activated user exists
-    | login    | password | id |
-    | confused | secret   | 1  |
-  Given the following support tickets exist
-    | summary                           | user_id  | id |
-    | publicly visible support ticket   | 1        | 1  |
+  Given a user exists with login: "troubled", id: 1
+  Given a support ticket exist with id: 1, user_id: 1
   Given I am logged in as "helper"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
-  When I fill in "Add details" with "I think you just need to go to your profile and click..."
+  When I fill in "Add details" with "I think you ..."
     And I press "Update Support ticket"
   Then I should see "Support ticket updated"
     And I should see "helper wrote: I think you"
   When I am logged out
-    And I am logged in as "confused"
+    And I am logged in as "troubled"
   When I go to the first support ticket page
   Then I should see "Status: Open"
   When I check "This answer resolves my issue"
@@ -73,42 +67,36 @@ Scenario: users can comment on unowned tickets and those comments can be chosen 
   Then I should not see "Support Ticket #1"
 
 Scenario: users can comment on unowned tickets with any pseud, with the default pseud selected automatically
-  Given the following activated user exists
-    | login     | id |
-    | helper    | 1  |
-    | confused  | 2  |
-  Given the following pseuds exist
-    | user_id | name    | is_default |
-    | 1       | alfa    |            |
-    | 1       | charlie | true       |
+  Given a user exists with login: "helper", id: 1
+    And a user exists with login: "troubled", id: 2
+    And a pseud exists with user_id: 1, name: "alfa"
+    And a pseud exists with user_id: 1, name: "charlie", is_default: true
   Given I am logged in as "troubled"
-  Given the following support tickets exist
-    | summary                           | user_id  | id |
-    | publicly visible support ticket   | 2        | 1  |
+  Given a support ticket exists with user_id: 2
   Given I am logged in as "helper"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
-  When I fill in "Add details" with "I think you just need to go to your profile and click..."
+  When I fill in "Add details" with "I think you ..."
     And I press "Update Support ticket"
   Then I should see "Support ticket updated"
     And I should see "charlie wrote: I think you"
-  When I fill in "Add details" with "Or you could..."
+  When I fill in "Add details" with "Or you could ..."
     And I select "alfa" from "Pseud"
     And I press "Update Support ticket"
   Then I should see "Support ticket updated"
     And I should see "charlie wrote: I think you"
-    And I should see "alfa wrote: Or you could..."
-  When I fill in "Add details" with "Or perhaps..."
+    And I should see "alfa wrote: Or you could"
+  When I fill in "Add details" with "Or perhaps ..."
     And I press "Update Support ticket"
   Then I should see "Support ticket updated"
     And I should see "charlie wrote: I think you"
-    And I should see "alfa wrote: Or you could..."
+    And I should see "alfa wrote: Or you could"
     And I should see "charlie wrote: Or perhaps"
 
 Scenario: users cannot comment on owned tickets.
   Given a support ticket exists with id: 1
-  Given I am logged in as support volunteer "oracle"
+  Given I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
@@ -150,7 +138,7 @@ Scenario: users should receive 1 initial notification and 1 for additional updat
     And I should see "Ticket owner wrote: Never mind"
   And 1 email should be delivered to "troubled@ao3.org"
     And all emails have been delivered
-  When a support volunteer responds to support ticket 1
+  When a volunteer responds to support ticket 1
   Then 1 email should be delivered to "troubled@ao3.org"
     And all emails have been delivered
   When a user responds to support ticket 1
@@ -168,15 +156,9 @@ Scenario: users can create private support tickets
     And 1 email should be delivered to "troubled@ao3.org"
 
 Scenario: private user support tickets should be private and can't be made public
-  Given the following activated user exists
-    | login     | id |
-    | troubled  | 1  |
-  And the following activated support volunteer exists
-    | login    |
-    | oracle   |
-  And the following support tickets exist
-    | summary      | private | user_id |
-    | embarrassing | true    | 1       |
+  Given a user exists with login: "troubled", id: 1
+  And a volunteer exists with login: "oracle"
+  And a support ticket exists with summary: "embarrassing", private: true, user_id: 1
   When I am logged out
     And I go to the first support ticket page
   Then I should see "Sorry, you don't have permission"
@@ -206,9 +188,7 @@ Scenario: users can choose to have their name displayed during creation, when th
     And I should see "troubled wrote: For example"
 
 Scenario: if their name is displayed during creation they can use any pseud for details, with the default pseud defaulted
-  Given the following activated user exists
-    | login     | id |
-    | troubled  | 1  |
+  Given a user exists with login: "troubled", id: 1
   Given the following pseuds exist
     | user_id | name    | is_default |
     | 1       | alfa    |            |
@@ -257,13 +237,11 @@ Scenario: users can (un)hide their name after creation
     And I should see "troubled wrote: For example"
 
 Scenario: user's tickets should be available from their user page
-  Given the following activated user exists
+  Given the following users exist
     | login     | id |
     | troubled  | 1  |
     | tricksy   | 2  |
-  And the following activated support volunteer exists
-    | login    | id |
-    | oracle   | 3  |
+  And a volunteer exists with login: "oracle", id: 3
   And the following support tickets exist
     | summary                      | id | private | display_user_name | user_id | email         |
     | publicly ticket without name | 1  | false   | false             | 1       |               |
@@ -308,16 +286,10 @@ Scenario: users can create support tickets with no notifications
   Then 0 emails should be delivered to "troubled@ao3.org"
 
 Scenario: users can turn notifications on and off their own and other tickets. notifications shouldn't trigger email.
-  Given the following activated users exist
-    | login     | id |
-    | troubled  | 1  |
-    | tricksy   | 2  |
-  And the following activated support volunteer exists
-    | login    | id |
-    | oracle   | 3  |
-  And the following support tickets exist
-    | summary                    | private| user_id | turn_off_notifications |
-    | public ticket by tricksy   | false  | 2       | 1                      |
+  Given a user exists with login: "troubled"
+    And a user exists with login: "tricksy"
+  And a volunteer exist with login: "oracle"
+  And a support ticket exists with user_id: 2, turn_off_notifications: "1"
   Then 0 emails should be delivered
   When I am logged in as "troubled"
   When I go to the first support ticket page
@@ -348,11 +320,11 @@ Scenario: users can turn notifications on and off their own and other tickets. n
     And 1 emails should be delivered to "tricksy@ao3.org"
 
 Scenario: Making a ticket private should remove notifications from non-owner/non-volunteer
-  Given the following activated users exist
+  Given the following users exist
     | login     | id |
     | troubled  | 1  |
     | tricksy   | 2  |
-  And the following activated support volunteer exists
+  And the following volunteers exist
     | login    | id |
     | oracle   | 3  |
   And the following support tickets exist
@@ -381,7 +353,7 @@ Scenario: Making a ticket private should remove notifications from non-owner/non
   When I go to the first support ticket page
     Then I should not see "public ticket by tricksy"
     But I should see "Sorry, you don't have permission"
-  When a support volunteer responds to support ticket 1
+  When a volunteer responds to support ticket 1
     Then 1 emails should be delivered to "tricksy@ao3.org"
     But 0 emails should be delivered to "troubled@ao3.org"
 
@@ -403,12 +375,12 @@ Scenario: users can (un)resolve their support tickets
     And I fill in "Add details" with "Router fixed, archive still slow"
     And I press "Update Support ticket"
   Then I should see "Status: Open"
-  When a support volunteer responds to support ticket 1
+  When a volunteer responds to support ticket 1
     And I reload the page
   When I check "support_ticket_support_details_attributes_2_resolved_ticket"
     And I press "Update Support ticket"
   Then I should see "Status: Owner resolved"
-    And I should see "Answered by Support volunteer"
+    And I should see "Answered by Support volunteer oracle"
 
 Scenario: users can answer their support tickets with visible names
   Given I am logged in as "troubled"
@@ -426,14 +398,14 @@ Scenario: users can answer their support tickets with visible names
     And I should see "Answered by troubled: Never mind"
 
 Scenario: link to support tickets they've commented on, publicly visible
-  Given the following activated users exist
+  Given the following users exist
     | login     | id |
     | helper    | 1  |
-    | confused  | 2  |
+    | troubled  | 2  |
     | tricksy   | 3  |
   And the following support tickets exist
     | summary                      | id | user_id | email         |
-    | public ticket by confused    | 1  | 2       |               |
+    | public ticket by troubled    | 1  | 2       |               |
     | public ticket by tricksy     | 2  | 3       |               |
     | public ticket by helper      | 3  | 1       |               |
     | public ticket by a guest     | 4  |         | guest@ao3.org |
@@ -447,14 +419,14 @@ Scenario: link to support tickets they've commented on, publicly visible
     And I should not see "Support Ticket #3"
 
 Scenario: links to support tickets they're watching, private
-  Given the following activated users exist
+  Given the following users exist
     | login     | id |
     | helper    | 1  |
-    | confused  | 2  |
+    | troubled  | 2  |
     | tricksy   | 3  |
   And the following support tickets exist
     | summary                      | id | user_id | email         |
-    | public ticket by confused    | 1  | 2       |               |
+    | public ticket by troubled    | 1  | 2       |               |
     | public ticket by tricksy     | 2  | 3       |               |
     | public ticket by helper      | 3  | 1       |               |
     | public ticket by a guest     | 4  |         | guest@ao3.org |
@@ -471,10 +443,10 @@ Scenario: links to support tickets they're watching, private
     But I should not see "Support Ticket #4"
 
 Scenario: users should get a badge for every response they leave which resolves a support ticket.
-  Given the following activated users exist
+  Given the following users exist
     | login     | id |
     | helper    | 1  |
-    | confused  | 2  |
+    | troubled  | 2  |
   And the following support tickets exist
     | id | summary | user_id |
     | 1  | easy    | 2       |
@@ -485,7 +457,7 @@ Scenario: users should get a badge for every response they leave which resolves 
   And "helper" responds to support ticket 2
   And "helper" responds to support ticket 3
   And "helper" responds to support ticket 4
-  And "confused" accepts a response to support ticket 1
-  And "confused" accepts a response to support ticket 3
+  And "troubled" accepts a response to support ticket 1
+  And "troubled" accepts a response to support ticket 3
   When I am on helper's user page
     Then I should see "(2 accepted)"

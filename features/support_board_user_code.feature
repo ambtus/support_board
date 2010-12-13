@@ -1,7 +1,7 @@
 Feature: the support board as seen by logged in users for code tickets
 
 Scenario: can view code tickets, vote on not-resolved tickets, and respond to not-worked tickets
-  Given the following activated support volunteer exists
+  Given the following volunteers exist
     | login    | id |
     | oracle   | 1  |
   And the following code tickets exist
@@ -43,6 +43,7 @@ Scenario: can view code tickets, vote on not-resolved tickets, and respond to no
 
 Scenario: users can (un)monitor open code tickets
   Given a code ticket exists with id: 1
+  And a volunteer exists with login: "oracle"
   And I am logged in as "curious"
   When I follow "Support Board"
     And I follow "Open Code Tickets"
@@ -50,39 +51,38 @@ Scenario: users can (un)monitor open code tickets
     And I check "Turn on notifications"
     And I press "Update Code ticket"
   Then 0 email should be delivered to "curious@ao3.org"
-  When a support volunteer responds to code ticket 1
+  When "oracle" comments on code ticket 1
   Then 1 email should be delivered to "curious@ao3.org"
   When I click the first link in the email
-  Then I should see "foo bar"
+  Then I should see "Support volunteer oracle wrote: blah blah"
   When I am logged in as "curious"
     And I am on the first code ticket page
   When I check "Turn off notifications"
     And I press "Update Code ticket"
     And all emails have been delivered
-  When a support volunteer responds to code ticket 1
+  When "oracle" comments on code ticket 1
   Then 0 emails should be delivered to "curious@ao3.org"
 
 Scenario: users can (un)monitor worked code tickets
   Given a code ticket exists with id: 1
-    And the following activated support volunteer exists
-    | login    | id |
-    | oracle   | 1  |
-    And "oracle" takes code ticket 1
-  When I am logged in as "curious"
+    And a volunteer exists with login: "oracle"
+  When "oracle" takes code ticket 1
+    And I am logged in as "curious"
     And I am on the first code ticket page
   When I check "Turn on notifications"
     And I press "Update Code ticket"
   Then 0 email should be delivered to "curious@ao3.org"
-  When a support volunteer responds to code ticket 1
+  When I am logged out
+  When "oracle" comments on code ticket 1
   Then 1 email should be delivered to "curious@ao3.org"
-  When I click the first link in the email
+    And I click the first link in the email
   Then I should see "In progress"
-  When I am logged in as "curious"
+    And I am logged in as "curious"
     And I am on the first code ticket page
   When I check "Turn off notifications"
     And I press "Update Code ticket"
     And all emails have been delivered
-  When a support volunteer responds to code ticket 1
+  When "oracle" comments on code ticket 1
   Then 0 emails should be delivered to "curious@ao3.org"
 
 Scenario: users can (un)vote for open code tickets
@@ -100,7 +100,7 @@ Scenario: users can (un)vote for open code tickets
 
 Scenario: users can (un)vote for worked code tickets
   Given a code ticket exists with id: 1
-    And the following activated support volunteer exists
+    And the following volunteers exist
     | login    | id |
     | oracle   | 1  |
   And "oracle" takes code ticket 1
@@ -117,7 +117,7 @@ Scenario: users can (un)vote for worked code tickets
 
 Scenario: users can't vote for closed code tickets
   Given a code ticket exists with id: 1
-    And the following activated support volunteer exists
+    And the following volunteers exist
     | login    | id |
     | oracle   | 1  |
   And "oracle" takes code ticket 1
@@ -128,7 +128,7 @@ Scenario: users can't vote for closed code tickets
 
 Scenario: users can't unvote for closed code tickets
   Given a code ticket exists with id: 1
-    And the following activated support volunteer exists
+    And the following volunteers exist
     | login    | id |
     | oracle   | 1  |
   And "oracle" takes code ticket 1
@@ -152,7 +152,7 @@ Scenario: users can comment on open code tickets, but not closed code tickets
     And I fill in "Add details" with "Have you tried ..."
     And I press "Update Code ticket"
   Then I should see "curious wrote: Have you tried"
-  When the following activated support volunteer exists
+  When the following volunteers exist
     | login    | id |
     | oracle   | 1  |
   When "oracle" takes code ticket 1
