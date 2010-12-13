@@ -196,8 +196,6 @@ Scenario: volunteers can create a new (draft) FAQ and link to it in one step
     And I follow "Frequently Asked Questions"
     Then I should not see "1: New question"
 
-Scenario: draft FAQs can be commented on by any logged in user, and any guest who comes linked from their own support ticket
-
 Scenario: when a draft FAQ is marked posted, the comments are no longer visible.
 
 Scenario: the owner of a ticket can "unaccept" a FAQ link which removes its vote and marks the ticket as unanswered
