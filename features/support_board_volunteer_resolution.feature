@@ -1,9 +1,7 @@
 Feature: the various ways volunteers can resolve support tickets
 
 Scenario: volunteers can mark a support ticket spam/ham
-  Given the following support tickets exist
-    | summary       | id |
-    | buy viagra    | 1  |
+  Given a support ticket exists with summary: "buy viagra", id: 1
     And all emails have been delivered
   When I am logged in as volunteer "oracle"
   When I follow "Support Board"
@@ -26,9 +24,7 @@ Scenario: volunteers can mark a support ticket spam/ham
 
 Scenario: volunteers can not mark a user opened support ticket spam
   Given a user exists with login: "troubled", id: 1
-  And the following support tickets exist
-    | id | summary       | user_id |
-    | 1  | buy viagra    | 1       |
+    And a support ticket exists with summary: "buy viagra", id: 1, user_id: 1
   When I am logged in as volunteer "oracle"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
@@ -198,9 +194,11 @@ Scenario: volunteers can create a new (draft) FAQ and link to it in one step
     And I follow "Frequently Asked Questions"
     Then I should not see "1: New question"
 
+Scenario: volunteers can send email to another volunteer asking them to take a ticket
+
+
 Scenario: FAQs can be sorted by votes
 
 Scenario: code tickets can be sorted by votes
 
-Scenario: volunteers can send email to another volunteer asking them to take a ticket
 

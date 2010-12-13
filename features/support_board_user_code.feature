@@ -100,9 +100,7 @@ Scenario: users can (un)vote for open code tickets
 
 Scenario: users can (un)vote for worked code tickets
   Given a code ticket exists with id: 1
-    And the following volunteers exist
-    | login    | id |
-    | oracle   | 1  |
+    And a volunteer exists with login: "oracle", id: 1
   And "oracle" takes code ticket 1
   And I am logged in as "curious"
   When I follow "Support Board"
@@ -117,9 +115,7 @@ Scenario: users can (un)vote for worked code tickets
 
 Scenario: users can't vote for closed code tickets
   Given a code ticket exists with id: 1
-    And the following volunteers exist
-    | login    | id |
-    | oracle   | 1  |
+    And a volunteer exists with login: "oracle", id: 1
   And "oracle" takes code ticket 1
   And "oracle" resolves code ticket 1
   And I am logged in as "curious"
@@ -128,9 +124,7 @@ Scenario: users can't vote for closed code tickets
 
 Scenario: users can't unvote for closed code tickets
   Given a code ticket exists with id: 1
-    And the following volunteers exist
-    | login    | id |
-    | oracle   | 1  |
+    And a volunteer exists with login: "oracle", id: 1
   And "oracle" takes code ticket 1
   And I am logged in as "curious"
   When I follow "Support Board"
@@ -152,18 +146,14 @@ Scenario: users can comment on open code tickets, but not closed code tickets
     And I fill in "Add details" with "Have you tried ..."
     And I press "Update Code ticket"
   Then I should see "curious wrote: Have you tried"
-  When the following volunteers exist
-    | login    | id |
-    | oracle   | 1  |
-  When "oracle" takes code ticket 1
+  When a volunteer exists with login: "oracle", id: 1
+    And "oracle" takes code ticket 1
   And I am logged in as "curious"
   When I am on the first code ticket page
   Then I should not see "Add details"
 
 Scenario: link to code tickets they've voted on, public
-  Given the following activated users exist
-    | login     | id |
-    | helper    | 1  |
+  Given a user exists with login: "helper", id: 1
   And the following code tickets exist
     | summary                        | id |
     | something that could be better | 1  |
@@ -178,9 +168,7 @@ Scenario: link to code tickets they've voted on, public
     But I should not see "Code Ticket #2"
 
 Scenario: link to code tickets they've commented on, public
-  Given the following activated users exist
-    | login     | id |
-    | helper    | 1  |
+  Given a user exists with login: "helper", id: 1
   And the following code tickets exist
     | summary                        | id |
     | something that could be better | 1  |
@@ -195,9 +183,7 @@ Scenario: link to code tickets they've commented on, public
     But I should not see "Code Ticket #2"
 
 Scenario: links to code tickets they're watching, private
-  Given the following activated users exist
-    | login     | id |
-    | helper    | 1  |
+  Given a user exists with login: "helper", id: 1
   And the following code tickets exist
     | summary                        | id |
     | something that could be better | 1  |
