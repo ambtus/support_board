@@ -195,7 +195,21 @@ Scenario: volunteers can create a new (draft) FAQ and link to it in one step
     Then I should not see "1: New question"
 
 Scenario: volunteers can send email to another volunteer asking them to take a ticket
-
+  Given a support ticket exists
+    And a volunteer exists with login: "oracle", id: 1
+    And a volunteer exists with login: "hermione", id: 2
+    And all emails have been delivered
+  When I am logged in as "oracle"
+    And I am on the first support ticket page
+    Then I should see "Status: Open"
+  When I select "hermione" from "Support Volunteers"
+    And I press "Send request to take"
+  Then 1 email should be delivered to "hermione@ao3.org"
+    And the email should contain "Please consider taking"
+    And the email should contain "Support Ticket #1"
+    And the email should contain "Thank you, oracle"
+  When I click the first link in the email
+  Then I should see "Status: Open"
 
 Scenario: FAQs can be sorted by votes
 

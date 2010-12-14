@@ -1,6 +1,10 @@
 <%= form_for(@ticket) do |t| %>
   <p class="submit">
     <%= t.submit (@ticket.pseud == current_user.support_pseud ? "Untake" : "Take") %>
+    <%= label_tag :pseud_id, "Support Volunteers" %>:
+       <%= select_tag :pseud_id, options_for_select(Pseud.where(:support_volunteer => true).collect {|p| [ p.name, p.id ] }) %>
+    <%= t.submit "Send request to take" %>
+    <br \>
     <% unless @ticket.user %>
       <%= t.submit (@ticket.approved? ? "Spam" : "Ham") %>
     <% end %>

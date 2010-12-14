@@ -153,6 +153,8 @@ class SupportTicketsController < ApplicationController
         @ticket.update_attribute(:pseud_id, pseud.id)
       when "Untake"
         @ticket.update_attribute(:pseud_id, nil)
+      when "Send request to take"
+        SupportTicketMailer.request_to_take(@ticket, Pseud.find(params[:pseud_id]).user, current_user).deliver
       when "Ham"
         @ticket.mark_as_ham!
       when "Spam"

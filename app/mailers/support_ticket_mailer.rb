@@ -48,4 +48,15 @@ class SupportTicketMailer < ActionMailer::Base
     )
   end
 
+  def request_to_take(ticket, user, requestor)
+    @ticket = ticket
+    @url = support_ticket_url(@ticket)
+    @requestor = requestor
+    @details = (@ticket.support_details.count > 0) ? @ticket.support_details : []
+    mail(
+      :to => user.email,
+      :subject => "[AO3] Please take #{ticket.name}"
+    )
+  end
+
 end

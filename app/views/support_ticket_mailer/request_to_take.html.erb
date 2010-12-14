@@ -1,0 +1,11 @@
+<p>Please consider taking <%= link_to(@ticket.name, @url) %>
+<%=raw @ticket.summary %>
+<% @details.each do |detail| %>
+  <% if detail.resolved_ticket? %>
+    <dt>Answered by <%= detail.byline %>:</dt>
+  <% else %>
+    <dt><%= detail.byline %> wrote:</dt>
+  <% end %>
+      <dd><%= raw detail.content %></dd>
+<% end %>
+<p>Thank you, <%= @requestor.support_pseud.name %>
