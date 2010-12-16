@@ -19,6 +19,8 @@ class SupportTicket < ActiveRecord::Base
   validates_presence_of :summary
   validates_length_of :summary, :maximum=> 140 # tweet length!
 
+  attr_protected :admin_resolved
+
   # used in lists
   def name
     "Support Ticket #" + self.id.to_s
@@ -40,7 +42,7 @@ class SupportTicket < ActiveRecord::Base
     if self.pseud_id
       name = self.pseud.name
       if self.admin_resolved
-        "Resolved by #{self.admin.login}"
+        "Resolved by #{name}"
       elsif self.code_ticket_id
         "Linked to #{self.code_ticket.name} by #{name}"
       elsif self.archive_faq_id

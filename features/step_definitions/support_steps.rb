@@ -16,6 +16,8 @@ Given /^I am logged in as support admin "([^"]*)"$/ do |login|
   # " reset quotes for color
   visit logout_path
   Given %{a support admin exists with login: "#{login}"}
+  user = User.find_by_login(login)
+  assert user.support_admin
   visit root_path
   fill_in "User name", :with => login
   fill_in "Password", :with => "secret"

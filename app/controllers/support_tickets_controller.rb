@@ -59,9 +59,13 @@ class SupportTicketsController < ApplicationController
         @tickets = @tickets.where("archive_faq_id is NOT NULL")
         # render now, because we add not resolved later
         render :index and return
-     when "spam"
+       when "spam"
         @tickets = @tickets.where(:approved => false)
         # render now, because we add not spam later
+        render :index and return
+       when "resolved"
+        @tickets = @tickets.where(:resolved => true)
+        # render now, because we add not not resolved later
         render :index and return
       end
 
@@ -165,6 +169,20 @@ class SupportTicketsController < ApplicationController
         @ticket.mark_as_ticket!(pseud)
       when "Needs Admin Attention"
         @ticket.update_attribute(:admin, true)
+      when "Admin Resolved"
+        if current_user.support_admin
+          @ticket.update_attribute(:admin_resolved, true)
+          @ticket.update_attribute(:pseud_id, pseud.id)
+        else
+          flash[:error] = "Sorry, you have to have the support admin role"
+        end
+      when "Unresolve"
+        if current_user.support_admin
+          @ticket.update_attribute(:admin_resolved, false)
+          @ticket.update_attribute(:pseud_id, pseud.id)
+        else
+          flash[:error] = "Sorry, you have to have the support admin role"
+        end
       when "Remove link to Code ticket"
         @ticket.update_attribute(:code_ticket_id, nil)
         @ticket.update_attribute(:pseud_id, pseud.id)

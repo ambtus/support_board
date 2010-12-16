@@ -211,6 +211,7 @@ Scenario: volunteers can send email to another volunteer asking them to take a t
   When I click the first link in the email
   Then I should see "Status: Open"
 
+# TODO
 Scenario: FAQs can be sorted by votes
 
 Scenario: code tickets can be sorted by votes

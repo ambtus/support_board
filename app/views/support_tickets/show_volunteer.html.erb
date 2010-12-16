@@ -12,6 +12,9 @@
     <% unless @ticket.admin %>
       <%= t.submit "Needs Admin Attention" %>
     <% end %>
+    <% if current_user.support_admin %>
+      <%= t.submit (@ticket.admin_resolved? ? "Unresolve" : "Admin Resolved") %>
+    <% end %>
     <dt><%= t.label :code_ticket_id, "Code Ticket" %>:</dt>
       <dd><%= t.select :code_ticket_id, CodeTicket.where(:resolved => false).collect {|p| [ p.name, p.id ] }, :selected => @ticket.code_ticket_id %></dd>
     <% if @ticket.code_ticket_id? %>
