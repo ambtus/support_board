@@ -11,10 +11,15 @@ class SupportTicketsController < ApplicationController
       @tickets = @tickets.where(:private => false)
     end
 
-    # support volunteer's working tickets
+    # support volunteer's tickets
     if params[:pseud_id]
       pseud = Pseud.find_by_name(params[:pseud_id])
       @tickets = @tickets.where(:pseud_id => pseud.id)
+      if params[:only] == "resolved"
+        @tickets = @tickets.where(:resolved => true)
+        # render now, because we add not not resolved later
+        render :index and return
+      end
 
     # tickets associated with a user
     elsif params[:user_id]

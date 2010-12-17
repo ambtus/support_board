@@ -1,16 +1,20 @@
 <h1>Welcome!</h1>
 <h2>users</h2>
 <ul>
-  <li><%= link_to "dean", User.find_by_login("dean") %></li>
-  <li><%= link_to "john", User.find_by_login("john") %></li>
+  <% @users.each do |user| %>
+    <li><%= link_to user.login, user %></li>
+  <% end %>
 </ul>
 <h2>volunteers</h2>
 <ul>
-  <li><%= link_to "sam", User.find_by_login("sam") %></li>
-  <li><%= link_to "rodney", User.find_by_login("rodney") %></li>
+  <% @volunteers.each do |user| %>
+    <li><%= link_to user.login, user %></li>
+  <% end %>
 </ul>
-<h2>support admin</h2>
+<h2>support admins</h2>
 <ul>
-  <li><%= link_to "bofh", User.find_by_login("bofh") %></li>
+  <% @support_admins.each do |user| %>
+    <li><%= link_to user.login, user %></li>
+  <% end %>
 </ul>
 all passwords are "secret"

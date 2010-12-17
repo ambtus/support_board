@@ -1,6 +1,6 @@
 <% if @pseud.support_volunteer %>
-  <li>
-    <%= link_to "Support tickets",
-                pseud_support_tickets_path(@pseud) %>
-  </li>
+  <%= link_to "Support tickets in progress",
+              pseud_support_tickets_path(@pseud) %>
+  <%= link_to "Resolved support tickets",
+              pseud_support_tickets_path(@pseud, :only => "resolved") %>
 <% end %>
