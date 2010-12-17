@@ -212,5 +212,9 @@ Scenario: volunteers can send email to another volunteer asking them to take a t
   Then I should see "Status: Open"
 
 # TODO
+Scenario: changing your designated support pseud should move all your claimed support Tickets
+Scenario: changing your designated support pseud should move all your claimed code Tickets
+
+# TODO
 Scenario: FAQs can be sorted by votes
 
