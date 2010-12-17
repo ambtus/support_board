@@ -14,7 +14,7 @@ Scenario: what guests should (not) see
     And I should not see "Open Code Tickets"
   # since they aren't volunteers
   But I should not see "Admin attention"
-    And I should not see "Claimed"
+    And I should not see "in progress"
     And I should not see "Spam"
     And I should not see "Resolved"
 

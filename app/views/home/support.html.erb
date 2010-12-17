@@ -19,13 +19,12 @@
   <% end %>
   <% if current_user.try(:support_volunteer) %>
     <li><%= link_to "Support tickets requiring Admin attention", support_tickets_path(:only => "admin") %>
-    <li><%= link_to "Claimed Support Tickets", support_tickets_path(:only => "claimed") %>
-    <li><%= link_to "Support tickets requiring Admin attention", support_tickets_path(:only => "admin") %>
-    <li><%= link_to "Spam Support Tickets", support_tickets_path(:only => "spam") %>
+    <li><%= link_to "Support Tickets in progress", support_tickets_path(:only => "claimed") %>
     <li><%= link_to "Support Tickets waiting for Code changes", support_tickets_path(:only => "waiting") %>
     <li><%= link_to "Support Tickets linked to FAQs", support_tickets_path(:only => "answered") %>
     <li><%= link_to "Unposted FAQs", archive_faqs_path(:unposted => true) %></li>
     <li><%= link_to "Resolved Support Tickets", support_tickets_path(:only => "resolved") %>
     <li><%= link_to "Resolved Code Tickets", code_tickets_path(:only => "resolved") %>
+    <li><%= link_to "Spam Support Tickets", support_tickets_path(:only => "spam") %>
   <% end %>
 </ul>

@@ -12,7 +12,7 @@ Scenario: support admin's should see the same thing that support volunteers see
     And I should see "Open Support Tickets"
     And I should see "Open Code Tickets"
     And I should see "Admin attention"
-    And I should see "Claimed"
+    And I should see "in progress"
     And I should see "Spam"
     And I should see "Resolved"
 

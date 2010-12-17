@@ -12,7 +12,7 @@ Scenario: what volunteers should see
     And I should see "Open Support Tickets"
     And I should see "Open Code Tickets"
     And I should see "Admin attention"
-    And I should see "Claimed"
+    And I should see "Support Tickets in progress"
     And I should see "Spam"
     And I should see "Resolved"
 
@@ -76,7 +76,7 @@ Scenario: support board volunteers can comment on owned tickets.
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
   When I follow "Support Board"
-    And I follow "Claimed Support Tickets"
+    And I follow "Support Tickets in progress"
     Then I should see "Support Ticket #1"
   When I am on oracle's user page
     And I follow "oracle's pseuds"
