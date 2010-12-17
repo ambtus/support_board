@@ -214,6 +214,3 @@ Scenario: volunteers can send email to another volunteer asking them to take a t
 # TODO
 Scenario: FAQs can be sorted by votes
 
-Scenario: code tickets can be sorted by votes
-
-

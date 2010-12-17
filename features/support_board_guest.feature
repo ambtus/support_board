@@ -345,7 +345,7 @@ Scenario: guests can view closed code tickets, but not vote or respond
   When "oracle" takes code ticket 1
     And "oracle" resolves code ticket 1
   When I am on the first code ticket page
-  Then I should see "Status: Closed"
+  Then I should see "Status: Fixed"
     And I should see "Votes: 0"
   But I should not see "Vote up"
     And I should not see "Add details"

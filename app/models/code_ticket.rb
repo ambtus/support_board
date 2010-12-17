@@ -3,6 +3,7 @@ class CodeTicket < ActiveRecord::Base
   belongs_to :pseud  # the pseud of the user who is working on the ticket
   belongs_to :admin_post # after it's fixed
   belongs_to :known_issue # before it's fixed
+  belongs_to :code_ticket # for dupes
   has_many :code_votes # for prioritizing (lots of votes = high priority)
   has_many :code_notifications  # a bunch of email addresses for update notifications
   has_many :code_details  # like comments, except non-threaded and with extra attributes
@@ -25,14 +26,24 @@ class CodeTicket < ActiveRecord::Base
 
   def status_line
     if self.pseud
-      if resolved
-        "Closed"
+      if self.code_ticket_id
+        "Closed as dupe"
+      elsif self.code_revision
+        "Fixed"
       else
         "In progress"
       end
     else
       "Open"
     end
+  end
+
+  # code tickets can be closed as dupes or closed with a code revision
+  before_save :update_resolved
+  def update_resolved
+    Rails.logger.debug "running update_resolved before save"
+    self.resolved = self.code_ticket_id? || self.code_revision?
+    true
   end
 
   # VOTES

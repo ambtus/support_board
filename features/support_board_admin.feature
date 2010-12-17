@@ -102,3 +102,4 @@ Scenario: admin's can mark any ticket admin resolved
   When I follow "Support Board"
     And I follow "Resolved Support Tickets"
   Then I should see "Support Ticket #1"
+

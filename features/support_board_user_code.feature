@@ -1,15 +1,12 @@
 Feature: the support board as seen by logged in users for code tickets
 
 Scenario: can view code tickets, vote on not-resolved tickets, and respond to not-worked tickets
-  Given the following volunteers exist
-    | login    | id |
-    | oracle   | 1  |
+  Given a volunteer exists with login: "oracle"
   And the following code tickets exist
     | summary                        | id |
     | something that could be better | 1  |
     | something that is  broken      | 2  |
     | something on the horizon       | 3  |
-  And "oracle" takes code ticket 1
   And "oracle" resolves code ticket 1
   And "oracle" takes code ticket 2
   Given I am logged in as "curious"
@@ -20,7 +17,7 @@ Scenario: can view code tickets, vote on not-resolved tickets, and respond to no
     And I should see "something that is broken"
     And I should see "something on the horizon"
   When I am on the first code ticket page
-    Then I should see "Status: Closed"
+    Then I should see "Status: Fixed"
     And I should see "Votes: 0"
     And I should not see "Vote up"
     And I should not see "Add details"

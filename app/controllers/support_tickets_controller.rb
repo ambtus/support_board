@@ -11,18 +11,8 @@ class SupportTicketsController < ApplicationController
       @tickets = @tickets.where(:private => false)
     end
 
-    # support volunteer's tickets
-    if params[:pseud_id]
-      pseud = Pseud.find_by_name(params[:pseud_id])
-      @tickets = @tickets.where(:pseud_id => pseud.id)
-      if params[:only] == "resolved"
-        @tickets = @tickets.where(:resolved => true)
-        # render now, because we add not not resolved later
-        render :index and return
-      end
-
     # tickets associated with a user
-    elsif params[:user_id]
+    if params[:user_id]
       # tickets I commented on
       if params[:comments]
         @tickets = @tickets.joins(:support_details) & SupportDetail.where(:pseud_id => owner.pseud_ids)
@@ -34,6 +24,15 @@ class SupportTicketsController < ApplicationController
           redirect_back_or_default
         else
           @tickets = @tickets.joins(:support_notifications) & SupportNotification.where(:email => owner.email)
+        end
+
+      # support volunteer's tickets
+      elsif params[:pseud_id]
+        @tickets = @tickets.where(:pseud_id => owner.support_pseud.id)
+        if params[:only] == "resolved"
+          @tickets = @tickets.where(:resolved => true)
+          # render now, because we add not not resolved later
+          render :index and return
         end
 
       # tickets I opened

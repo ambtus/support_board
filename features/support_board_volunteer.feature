@@ -49,7 +49,7 @@ Scenario: support board volunteers can steal owned tickets.
   When I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
     And I follow "Support Ticket #1"
     When I press "Take"
   Then 1 email should be delivered to "oracle@ao3.org"
@@ -59,12 +59,12 @@ Scenario: support board volunteers can steal owned tickets.
     And I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
   Then I should not see "Support Ticket #1"
   When I am on hermione's user page
     And I follow "hermione's pseuds"
     And I follow "hermione"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
   Then I should see "Support Ticket #1"
 
 Scenario: support board volunteers can comment on owned tickets.
@@ -81,7 +81,7 @@ Scenario: support board volunteers can comment on owned tickets.
   When I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
     And I follow "Support Ticket #1"
   Then I should see "Status: In progress"
     And I should see "Add details"
@@ -147,7 +147,7 @@ Scenario: working support tickets should be available from the support pseud pag
   When I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
     But I should see "Support Ticket #3"
@@ -162,13 +162,13 @@ Scenario: working support tickets should be available from the support pseud pag
     And I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle" within ".pseuds"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
     And I follow "Support Ticket #4"
     And I press "Untake"
   When I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle" within ".pseuds"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
   Then I should not see "Support Ticket #1"
     And I should not see "Support Ticket #2"
     But I should see "Support Ticket #3"
@@ -177,14 +177,14 @@ Scenario: working support tickets should be available from the support pseud pag
     And I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle" within ".pseuds"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
     And I follow "Support Ticket #3"
     And I check "Private"
     And I press "Update Support ticket"
   When I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle" within ".pseuds"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
   Then I should not see "Support Ticket #1"
     And I should not see "Support Ticket #2"
     And I should not see "Support Ticket #3"
@@ -193,7 +193,7 @@ Scenario: working support tickets should be available from the support pseud pag
     And I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle" within ".pseuds"
-    And I follow "Support tickets in progress"
+    And I follow "Support Tickets in progress"
     Then I should see "Support Ticket #3"
 
 Scenario: closed support tickets should be available from the support pseud page
@@ -213,10 +213,54 @@ Scenario: closed support tickets should be available from the support pseud page
     And I am on oracle's user page
     And I follow "oracle's pseuds"
     And I follow "oracle"
-  When I follow "Resolved support tickets"
+  When I follow "Resolved Support Tickets"
   Then I should see "Support Ticket #1"
     And I should see "Support Ticket #2"
     But I should not see "Support Ticket #3"
+
+Scenario: pseuds don't have to be unique, but in progress tickets by pseud should be correct
+  Given a volunteer exists with login: "rodney", id: 1
+    And a volunteer exists with login: "hermione", id: 2
+  When "rodney" has a support pseud "oracle"
+    And "hermione" has a support pseud "oracle"
+    And a support ticket exists with id: 1
+    And a support ticket exists with id: 2
+  When "rodney" takes support ticket 1
+    And "hermione" takes support ticket 2
+  When I am on rodney's user page
+    And I follow "rodney's pseuds"
+    And I follow "oracle"
+    And I follow "Support Tickets in progress"
+  Then I should see "Support Ticket #1"
+    But I should not see "Support Ticket #2"
+  When I am on hermione's user page
+    And I follow "hermione's pseuds"
+    And I follow "oracle"
+    And I follow "Support Tickets in progress"
+  Then I should not see "Support Ticket #1"
+    But I should see "Support Ticket #2"
+
+Scenario: pseuds don't have to be unique, but closed tickets by pseud should be correct
+  Given a volunteer exists with login: "rodney", id: 1
+    And a volunteer exists with login: "hermione", id: 2
+  When "rodney" has a support pseud "oracle"
+    And "hermione" has a support pseud "oracle"
+    And a support ticket exists with id: 1
+    And a support ticket exists with id: 2
+  When "rodney" categorizes support ticket 1 as Comment
+    And "hermione" categorizes support ticket 2 as Comment
+  When I am on rodney's user page
+    And I follow "rodney's pseuds"
+    And I follow "oracle"
+    And I follow "Resolved Support Tickets"
+  Then I should see "Support Ticket #1"
+    But I should not see "Support Ticket #2"
+  When I am on hermione's user page
+    And I follow "hermione's pseuds"
+    And I follow "oracle"
+    And I follow "Resolved Support Tickets"
+  Then I should not see "Support Ticket #1"
+    But I should see "Support Ticket #2"
 
 Scenario: visibility on the comment board
   Given the following users exist

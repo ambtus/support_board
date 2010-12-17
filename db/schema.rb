@@ -54,7 +54,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.boolean  "private",                                :default => false
     t.boolean  "resolved_ticket",                        :default => false
     t.string   "archive_revision"
-    t.string   "code_revision"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -76,6 +75,8 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.boolean  "resolved",                               :default => false
     t.integer  "admin_post_id"
     t.integer  "known_issue_id"
+    t.string   "code_revision"
+    t.integer  "code_ticket_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

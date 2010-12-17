@@ -144,13 +144,13 @@ Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
   ticket.update_attribute(:pseud_id, user.support_pseud.id)
 end
 
-# TODO - replace this with one of the resolution methods to be determined
 Given /^"([^"]*)" resolves code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
   user = User.find_by_login(login)
   assert user.support_volunteer
-  ticket.resolved = true
+  ticket.pseud = user.support_pseud
+  ticket.code_revision = "12345"
   ticket.save
   ticket.send_update_notifications
 end

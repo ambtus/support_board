@@ -1,13 +1,13 @@
 class CodeTicketsController < ApplicationController
   def index
-    @tickets = CodeTicket.where(:resolved => false)
-
-    # support volunteer's working tickets
-    if params[:pseud_id]
-      @tickets = @tickets.where(:pseud_id => params[:pseud_id])
+    if params[:resolved]
+      @tickets = CodeTicket.where(:resolved => true)
+    else
+      @tickets = CodeTicket.where(:resolved => false)
+    end
 
     # tickets associated with a user
-    elsif params[:user_id]
+    if params[:user_id]
       user = User.find_by_login(params[:user_id])
 
       # tickets I voted on, public
@@ -26,6 +26,10 @@ class CodeTicketsController < ApplicationController
         else
           @tickets = @tickets.joins(:code_notifications) & CodeNotification.where(:email => user.email)
         end
+
+      # support volunteer's working tickets
+      elsif params[:pseud_id]
+        @tickets = @tickets.where(:pseud_id => user.support_pseud.id)
       end
 
     end
@@ -94,11 +98,17 @@ class CodeTicketsController < ApplicationController
 
   def update
     @ticket = CodeTicket.find(params[:id])
-    if current_user
-      if params[:commit] == "Take"
+    @ticket.update_attributes(params[:code_ticket])
+    if current_user.try(:support_volunteer) && params[:commit] != "Update Code ticket"
+      pseud = current_user.support_pseud
+      case params[:commit]
+      when "Take"
         @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
-        redirect_to @ticket and return
+      when "Dupe"
+        @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
       end
+      redirect_to @ticket and return
+    elsif current_user
       @ticket.update_attributes(params[:code_ticket])
       if @ticket.save
         flash[:notice] = "Code ticket updated"

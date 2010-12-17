@@ -77,6 +77,8 @@ class CreateTickets < ActiveRecord::Migration
       t.boolean :resolved, :default => false
       t.integer :admin_post_id
       t.integer :known_issue_id
+      t.string :code_revision
+      t.integer :code_ticket_id
 
       t.timestamps
     end
@@ -89,7 +91,6 @@ class CreateTickets < ActiveRecord::Migration
       t.boolean :private, :default => false
       t.boolean :resolved_ticket, :default => false
       t.string :archive_revision
-      t.string :code_revision
 
       t.timestamps
     end

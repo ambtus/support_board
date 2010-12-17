@@ -10,7 +10,11 @@
   </p>
   <dl>
     <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.status_line %></dd>
+      <dd><%= @ticket.status_line %>
+        <% if @ticket.code_ticket_id %>
+            <%= link_to @ticket.code_ticket.name, @ticket.code_ticket %>
+        <% end %>
+      </dd>
     <dt><%= "Votes" %>:</dt>
       <dd><%= @ticket.vote_count %></dd>
     <% unless @ticket.resolved %>
