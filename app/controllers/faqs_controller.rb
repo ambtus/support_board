@@ -1,6 +1,6 @@
-class ArchiveFaqsController < ApplicationController
+class FaqsController < ApplicationController
   def index
-    @faqs = ArchiveFaq.order(:position)
+    @faqs = Faq.order(:position)
     if params[:unposted]
       @faqs = @faqs.where(:posted => false)
     else
@@ -9,7 +9,7 @@ class ArchiveFaqsController < ApplicationController
   end
 
   def show
-    @faq = ArchiveFaq.find(params[:id])
+    @faq = Faq.find(params[:id])
     # don't show details if posted
     if @faq.posted?
       render :show_posted
@@ -31,7 +31,7 @@ class ArchiveFaqsController < ApplicationController
   end
 
   def edit
-    @faq = ArchiveFaq.find(params[:id])
+    @faq = Faq.find(params[:id])
     if current_user.support_volunteer
       @faq.faq_details.build # create a new empty response template
     else
@@ -41,9 +41,9 @@ class ArchiveFaqsController < ApplicationController
   end
 
   def update
-    @faq = ArchiveFaq.find(params[:id])
+    @faq = Faq.find(params[:id])
     if params[:commit] == "This FAQ answered my question"
-      FaqVote.create(:archive_faq_id => @faq.id)
+      FaqVote.create(:faq_id => @faq.id)
     elsif current_user.try(:support_admin)
       case params[:commit]
       when "Post"
@@ -55,15 +55,15 @@ class ArchiveFaqsController < ApplicationController
         @faq.update_attribute(:posted, false)
       end
     elsif current_user.try(:support_volunteer)
-      @faq.update_attributes(params[:archive_faq])
+      @faq.update_attributes(params[:faq])
       if @faq.save
-        flash[:notice] = "Archive faq updated"
+        flash[:notice] = "FAQ updated"
       else
         render :edit and return
       end
     elsif current_user || session[:authentication_code]
       # TODO only update faq_details
-      @faq.update_attributes(params[:archive_faq])
+      @faq.update_attributes(params[:faq])
       if @faq.save
         flash[:notice] = "Comments added"
       else

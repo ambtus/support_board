@@ -1,4 +1,4 @@
-class ArchiveFaq < ActiveRecord::Base
+class Faq < ActiveRecord::Base
   has_many :faq_details
   has_many :faq_votes
 

@@ -1,5 +1,5 @@
 class FaqDetail < ActiveRecord::Base
-  belongs_to :archive_faq
+  belongs_to :faq
   belongs_to :pseud
   has_many :support_tickets
 

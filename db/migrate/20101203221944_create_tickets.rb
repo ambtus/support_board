@@ -15,7 +15,7 @@ class CreateTickets < ActiveRecord::Migration
       t.boolean :approved, :default => false, :null => false
       t.integer :pseud_id
       t.boolean :question, :default => false
-      t.integer :archive_faq_id
+      t.integer :faq_id
       t.boolean :problem, :default => false
       t.integer :code_ticket_id
       t.boolean :admin, :default => false
@@ -44,12 +44,20 @@ class CreateTickets < ActiveRecord::Migration
       t.timestamps
     end
     add_column :pseuds, :support_volunteer, :boolean
-    add_column :archive_faqs, :user_id, :integer
-    add_column :archive_faqs, :posted, :boolean, :default => false
-    add_column :archive_faqs, :content_sanitizer_version, :integer, :limit => 2, :default => 0, :null => false
+
+    create_table "faqs", :force => true do |t|
+      t.string   "title"
+      t.text     "content"
+      t.integer  "position",   :default => 1
+      t.integer :user_id
+      t.boolean :posted, :default => false
+      t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
+
+      t.timestamps
+    end
 
     create_table :faq_details do |t|
-      t.integer :archive_faq_id
+      t.integer :faq_id
       t.integer :pseud_id
       t.boolean :support_response, :default => false
       t.string :content
@@ -60,7 +68,7 @@ class CreateTickets < ActiveRecord::Migration
     end
 
     create_table :faq_votes do |t|
-      t.integer :archive_faq_id
+      t.integer :faq_id
       t.integer :support_ticket_id
       t.integer :vote, :limit => 1, :default => 1
 
@@ -123,9 +131,9 @@ class CreateTickets < ActiveRecord::Migration
     drop_table :code_votes
     drop_table :code_notifications
     remove_column :pseuds, :support_volunteer
-    remove_column :archive_faqs, :user_id
-    remove_column :archive_faqs, :posted
-    remove_column :archive_faqs, :content_sanitizer_version
+    remove_column :faqs, :user_id
+    remove_column :faqs, :posted
+    remove_column :faqs, :content_sanitizer_version
     remove_column :admin_posts, :user_id
     remove_column :admin_posts, :posted
     remove_column :known_issues, :user_id

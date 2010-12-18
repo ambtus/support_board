@@ -28,9 +28,9 @@ Factory.define :code_ticket do |code_ticket|
   code_ticket.sequence(:summary) { |n| "code ticket #{n}" }
 end
 
-Factory.define :archive_faq do |archive_faq|
-  archive_faq.title { |a| "faq #{a.position}" }
-  archive_faq.after_build { |archive_faq| archive_faq.user_id = Factory.create(:volunteer)}
+Factory.define :faq do |faq|
+  faq.title { |a| "faq #{a.position}" }
+  faq.after_build { |faq| faq.user_id = Factory.create(:volunteer)}
 end
 
 Factory.define :volunteer, :parent => :user do |volunteer|

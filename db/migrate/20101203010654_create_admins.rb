@@ -18,16 +18,6 @@ class CreateAdmins < ActiveRecord::Migration
 
       t.timestamps
     end
-  end
-
-    create_table "archive_faqs", :force => true do |t|
-      t.integer  "admin_id"
-      t.string   "title"
-      t.text     "content"
-      t.integer  "position",   :default => 1
-
-      t.timestamps
-    end
 
     create_table "known_issues", :force => true do |t|
       t.integer  "admin_id"
@@ -37,9 +27,11 @@ class CreateAdmins < ActiveRecord::Migration
       t.timestamps
     end
 
+  end
+
   def self.down
+    drop_table :admins
     drop_table :admin_posts
-    drop_table :archive_faqs
     drop_table :known_issues
   end
 end

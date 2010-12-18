@@ -23,9 +23,9 @@
       <%= t.submit "Link to Code ticket" %>
       <%= t.submit "Create new Code ticket" %>
     <% end %>
-    <dt><%= t.label :archive_faq_id, "FAQ" %>:</dt>
-      <dd><%= t.select :archive_faq_id, ArchiveFaq.order(:position).collect {|p| [ p.name, p.id ] }, :selected => @ticket.archive_faq_id %></dd>
-    <% if @ticket.archive_faq_id? %>
+    <dt><%= t.label :faq_id, "FAQ" %>:</dt>
+      <dd><%= t.select :faq_id, Faq.order(:position).collect {|p| [ p.name, p.id ] }, :selected => @ticket.faq_id %></dd>
+    <% if @ticket.faq_id? %>
       <%= t.submit "Remove link to FAQ" %>
     <% else %>
       <%= t.submit "Link to FAQ" %>
@@ -56,8 +56,8 @@
       <dd><%= @ticket.private? ? "Private" : "Public" %>
     <dt><%= "Status" %>:</dt>
       <dd><%= @ticket.status_line %>
-          <% if @ticket.archive_faq_id %>
-            <%= link_to @ticket.archive_faq.name, @ticket.archive_faq %>
+          <% if @ticket.faq_id %>
+            <%= link_to @ticket.faq.name, @ticket.faq %>
           <% end %>
       </dd>
     <dt><%= "Summary" %>:</dt>

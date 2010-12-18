@@ -15,8 +15,8 @@
     <% end %>
     <dt><%= "Status" %>:</dt>
       <dd><%= @ticket.status_line %>
-          <% if @ticket.archive_faq_id %>
-            <%= link_to @ticket.archive_faq.name, @ticket.archive_faq %>
+          <% if @ticket.faq_id %>
+            <%= link_to @ticket.faq.name, @ticket.faq %>
           <% end %>
       </dd>
     <dt><%= raw "Summary" %>:</dt>

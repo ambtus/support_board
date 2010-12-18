@@ -2,7 +2,7 @@
   <% if current_user.try(:support_admin) %>
     <p class="submit"><%= f.submit "Post" %></p>
   <% end %>
-    <%= link_to "Edit title or content", edit_archive_faq_path(@faq) %>
+    <%= link_to "Edit title or content", edit_faq_path(@faq) %>
   <p><%= @faq.title %></p>
   <%= raw @faq.content %>
 

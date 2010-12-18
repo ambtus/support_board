@@ -33,18 +33,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
-  create_table "archive_faqs", :force => true do |t|
-    t.integer  "admin_id"
-    t.string   "title"
-    t.text     "content"
-    t.integer  "position",                               :default => 1
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "user_id"
-    t.boolean  "posted",                                 :default => false
-    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
-  end
-
   create_table "code_details", :force => true do |t|
     t.integer  "code_ticket_id"
     t.integer  "pseud_id"
@@ -91,7 +79,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   end
 
   create_table "faq_details", :force => true do |t|
-    t.integer  "archive_faq_id"
+    t.integer  "faq_id"
     t.integer  "pseud_id"
     t.boolean  "support_response",                       :default => false
     t.string   "content"
@@ -102,9 +90,20 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   end
 
   create_table "faq_votes", :force => true do |t|
-    t.integer  "archive_faq_id"
+    t.integer  "faq_id"
     t.integer  "support_ticket_id"
     t.integer  "vote",              :limit => 1, :default => 1
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "faqs", :force => true do |t|
+    t.string   "title"
+    t.text     "content"
+    t.integer  "position",                               :default => 1
+    t.integer  "user_id"
+    t.boolean  "posted",                                 :default => false
+    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -178,7 +177,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.boolean  "approved",                               :default => false, :null => false
     t.integer  "pseud_id"
     t.boolean  "question",                               :default => false
-    t.integer  "archive_faq_id"
+    t.integer  "faq_id"
     t.boolean  "problem",                                :default => false
     t.integer  "code_ticket_id"
     t.boolean  "admin",                                  :default => false
