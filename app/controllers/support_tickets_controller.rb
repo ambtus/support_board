@@ -175,14 +175,14 @@ class SupportTicketsController < ApplicationController
         @ticket.update_attribute(:admin, true)
       when "Admin Resolved"
         if current_user.support_admin
-          @ticket.update_attribute(:admin_resolved, true)
+          @ticket.update_attribute(:support_admin_resolved, true)
           @ticket.update_attribute(:pseud_id, pseud.id)
         else
           flash[:error] = "Sorry, you have to have the support admin role"
         end
       when "Unresolve"
         if current_user.support_admin
-          @ticket.update_attribute(:admin_resolved, false)
+          @ticket.update_attribute(:support_admin_resolved, false)
           @ticket.update_attribute(:pseud_id, pseud.id)
         else
           flash[:error] = "Sorry, you have to have the support admin role"

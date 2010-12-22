@@ -8,7 +8,6 @@ class ApplicationController < ActionController::Base
   end
 
   helper_method :current_user
-  helper_method :current_admin
   before_filter :store_location
 
   # store previous page in session to make redirecting back possible
@@ -44,15 +43,6 @@ protected
 
   def current_user
     @current_user = current_user_session && current_user_session.record
-  end
-
-  def current_admin_session
-    return @current_admin_session if defined?(@current_admin_session)
-    @current_admin_session = AdminSession.find
-  end
-
-  def current_admin
-    @current_admin = current_admin_session && current_admin_session.record
   end
 
 end

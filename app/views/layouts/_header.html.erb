@@ -1,8 +1,6 @@
 <div id=header>
   <% if current_user %>
     <%= render :partial => 'user_sessions/greeting' %>
-  <% elsif current_admin %>
-    <%= render :partial => 'admin_sessions/greeting' %>
   <% else %>
     <%= render :partial => 'user_sessions/login' %>
   <% end %>

@@ -104,6 +104,8 @@ Scenario: volunteers can close a code ticket with a revision number
 #    And I follow "Resolved Code Tickets"
 #  Then I should see "Code Ticket #1"
 
+# TODO
+Scenario: code tickets that have been committed but not yet deployed should be listed somewhere
 
 # TODO
 Scenario: code tickets can be sorted by votes

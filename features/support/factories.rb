@@ -1,10 +1,3 @@
-Factory.define :admin do |admin|
-  admin.sequence(:login) { |n| "admin-#{n}" }
-  admin.password "secret"
-  admin.password_confirmation { |a| a.password }
-  admin.email { |a| "#{a.login}@ao3.org" }
-end
-
 Factory.define :user do |user|
   user.sequence(:id) { |n| n }
   user.sequence(:login) { |n| "testuser#{n}" }

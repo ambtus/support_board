@@ -12,27 +12,6 @@
 
 ActiveRecord::Schema.define(:version => 20101203221944) do
 
-  create_table "admin_posts", :force => true do |t|
-    t.integer  "admin_id"
-    t.string   "title"
-    t.text     "content"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "user_id"
-    t.boolean  "posted"
-  end
-
-  create_table "admins", :force => true do |t|
-    t.string   "email",             :null => false
-    t.string   "login",             :null => false
-    t.datetime "activated_at"
-    t.string   "crypted_password"
-    t.string   "salt"
-    t.string   "persistence_token"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "code_details", :force => true do |t|
     t.integer  "code_ticket_id"
     t.integer  "pseud_id"
@@ -171,7 +150,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.boolean  "problem",                                :default => false
     t.integer  "code_ticket_id"
     t.boolean  "admin",                                  :default => false
-    t.boolean  "admin_resolved",                         :default => false
+    t.boolean  "support_admin_resolved",                 :default => false
     t.boolean  "comment",                                :default => false
     t.integer  "resolved",                               :default => 0
     t.integer  "summary_sanitizer_version", :limit => 2, :default => 0,     :null => false

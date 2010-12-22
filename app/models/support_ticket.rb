@@ -19,7 +19,7 @@ class SupportTicket < ActiveRecord::Base
   validates_presence_of :summary
   validates_length_of :summary, :maximum=> 140 # tweet length!
 
-  attr_protected :admin_resolved
+  attr_protected :support_admin_resolved
 
   # used in lists
   def name
@@ -41,7 +41,7 @@ class SupportTicket < ActiveRecord::Base
   def status_line
     if self.pseud_id
       name = self.pseud.name
-      if self.admin_resolved
+      if self.support_admin_resolved
         "Resolved by #{name}"
       elsif self.code_ticket_id
         "Linked to #{self.code_ticket.name} by #{name}"
@@ -98,7 +98,7 @@ class SupportTicket < ActiveRecord::Base
 
     support_resolved = (self.faq_id || self.code_ticket_id || self.comment)
 
-    self.resolved = owner_resolved || support_resolved || self.admin_resolved
+    self.resolved = owner_resolved || support_resolved || self.support_admin_resolved
     new = self.resolved
     self.updated_resolved = true # set attr_accessor so don't trigger infinite loop
     # for some very strange reason, updating 0 with 0 makes rails think the attribute

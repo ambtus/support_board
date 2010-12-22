@@ -18,7 +18,7 @@ class CreateTickets < ActiveRecord::Migration
       t.boolean :problem, :default => false
       t.integer :code_ticket_id
       t.boolean :admin, :default => false
-      t.boolean :admin_resolved, :default => false
+      t.boolean :support_admin_resolved, :default => false
       t.boolean :comment, :default => false
       t.integer :resolved, :default => false
 
@@ -117,8 +117,6 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_column :admin_posts, :user_id, :integer
-    add_column :admin_posts, :posted, :boolean
 
   end
 
@@ -132,7 +130,5 @@ class CreateTickets < ActiveRecord::Migration
     drop_table :code_votes
     drop_table :code_notifications
     remove_column :pseuds, :support_volunteer
-    remove_column :admin_posts, :user_id
-    remove_column :admin_posts, :posted
   end
 end
