@@ -72,6 +72,12 @@ Scenario: volunteers can close a code ticket as a dupe
   Then I should see "Code Ticket #2"
 
 # TODO
+Scenario: volunteers can close a code ticket as "no longer reproducible"
+
+# TODO
+Scenario: putting "closes issue #" in the commit message should close the ticket with that rev
+
+# TODO
 Scenario: closing a ticket as a dupe should move its watchers
 Scenario: closing a ticket as a dupe should move its votes
 Scenario: closing a ticket as a dupe should move its support tickets

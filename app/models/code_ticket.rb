@@ -2,7 +2,6 @@ class CodeTicket < ActiveRecord::Base
 
   belongs_to :pseud  # the pseud of the user who is working on the ticket
   belongs_to :admin_post # after it's fixed
-  belongs_to :known_issue # before it's fixed
   belongs_to :code_ticket # for dupes
   has_many :code_votes # for prioritizing (lots of votes = high priority)
   has_many :code_notifications  # a bunch of email addresses for update notifications
@@ -28,7 +27,9 @@ class CodeTicket < ActiveRecord::Base
     if self.pseud
       if self.code_ticket_id
         "Closed as dupe"
-      elsif self.code_revision
+      elsif self.deployed_rev
+        "Fixed and deployed"
+      elsif self.committed_rev
         "Fixed"
       else
         "In progress"
@@ -38,11 +39,20 @@ class CodeTicket < ActiveRecord::Base
     end
   end
 
-  # code tickets can be closed as dupes or closed with a code revision
-  before_save :update_resolved
+  attr_accessor :updated_resolved
+
+  # code tickets can be closed as dupes or closed by committing a code fix
+  after_save :update_resolved
   def update_resolved
-    Rails.logger.debug "running update_resolved before save"
-    self.resolved = self.code_ticket_id? || self.code_revision?
+    Rails.logger.debug "running update_resolved after code ticket save"
+    return if updated_resolved # already updated, don't check and save again
+    old = self.resolved
+    # for some very strange reason, updating 0 with 0 makes rails think the attribute
+    # is dirty, and it's acting as if it had changed.
+    self.resolved = self.code_ticket_id? || self.committed_rev?
+    self.updated_resolved = true # set attr_accessor so don't trigger infinite loop
+    new = self.resolved
+    self.save unless old == new
     true
   end
 

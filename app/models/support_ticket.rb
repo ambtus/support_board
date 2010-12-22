@@ -81,7 +81,7 @@ class SupportTicket < ActiveRecord::Base
   # or an admin can mark it resolved
   after_save :update_resolved
   def update_resolved
-    Rails.logger.debug "running update_resolved after save"
+    Rails.logger.debug "running update_resolved after support ticket save"
     return if updated_resolved # already updated, don't check and save again
 
     # linked or unlinked to a faq: update the faq votes accordingly.

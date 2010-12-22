@@ -17,7 +17,7 @@
       </dd>
     <dt><%= "Votes" %>:</dt>
       <dd><%= @ticket.vote_count %></dd>
-    <% unless @ticket.resolved %>
+    <% unless @ticket.resolved? %>
       <dt><%= t.label :vote_up %>:</dt>
         <dd>
           <%= t.check_box :vote_up %>

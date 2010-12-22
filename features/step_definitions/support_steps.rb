@@ -150,7 +150,7 @@ Given /^"([^"]*)" resolves code ticket (\d+)$/ do |login, number|
   user = User.find_by_login(login)
   assert user.support_volunteer
   ticket.pseud = user.support_pseud
-  ticket.code_revision = "12345"
+  ticket.committed_rev = "12345"
   ticket.save
   ticket.send_update_notifications
 end

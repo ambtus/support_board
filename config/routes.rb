@@ -17,7 +17,6 @@ SupportBoard::Application.routes.draw do
   match 'admin/logout' => 'admin_sessions#destroy'
 
   resources :faqs
-  resources :known_issues
   resources :admin_posts
   resources :support_tickets
   resources :code_tickets

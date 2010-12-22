@@ -19,19 +19,10 @@ class CreateAdmins < ActiveRecord::Migration
       t.timestamps
     end
 
-    create_table "known_issues", :force => true do |t|
-      t.integer  "admin_id"
-      t.string   "title"
-      t.text     "content"
-
-      t.timestamps
-    end
-
   end
 
   def self.down
     drop_table :admins
     drop_table :admin_posts
-    drop_table :known_issues
   end
 end

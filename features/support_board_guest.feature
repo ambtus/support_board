@@ -6,12 +6,11 @@ Scenario: what guests should (not) see
   Then I should see "Open a New Support Ticket"
     And I should see "Comments"
     And I should see "Frequently Asked Questions"
-    And I should see "Known Issues"
     And I should see "Coming Soon"
     And I should see "Release Notes"
+    And I should see "Open Code Tickets (Known Issues)"
   # since they can't comment on them
   But I should not see "Open Support Tickets"
-    And I should not see "Open Code Tickets"
   # since they aren't volunteers
   But I should not see "Admin attention"
     And I should not see "in progress"

@@ -38,10 +38,10 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "pseud_id"
     t.boolean  "support_response",                       :default => false
     t.string   "content"
-    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.boolean  "private",                                :default => false
     t.boolean  "resolved_ticket",                        :default => false
     t.string   "archive_revision"
+    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -55,16 +55,17 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
 
   create_table "code_tickets", :force => true do |t|
     t.string   "summary"
-    t.integer  "summary_sanitizer_version", :limit => 2, :default => 0,     :null => false
+    t.string   "description"
     t.string   "url"
-    t.string   "archive_revision"
-    t.string   "user_agent"
+    t.string   "reported_rev"
+    t.string   "committed_rev"
+    t.string   "deployed_rev"
+    t.string   "browser"
     t.integer  "pseud_id"
-    t.boolean  "resolved",                               :default => false
-    t.integer  "admin_post_id"
-    t.integer  "known_issue_id"
-    t.string   "code_revision"
     t.integer  "code_ticket_id"
+    t.integer  "resolved",                                   :default => 0
+    t.integer  "summary_sanitizer_version",     :limit => 2, :default => 0, :null => false
+    t.integer  "description_sanitizer_version", :limit => 2, :default => 0, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -106,16 +107,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "known_issues", :force => true do |t|
-    t.integer  "admin_id"
-    t.string   "title"
-    t.text     "content"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "user_id"
-    t.boolean  "posted"
   end
 
   create_table "pseuds", :force => true do |t|
@@ -167,7 +158,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "email"
     t.string   "authentication_code"
     t.string   "summary"
-    t.integer  "summary_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.boolean  "private",                                :default => false
     t.boolean  "display_user_name",                      :default => false
     t.string   "url"
@@ -184,6 +174,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.boolean  "admin_resolved",                         :default => false
     t.boolean  "comment",                                :default => false
     t.integer  "resolved",                               :default => 0
+    t.integer  "summary_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
