@@ -4,46 +4,38 @@ Feature: volunteers working with code tickets
 Scenario: creating a code ticket from a support ticket should enter agent url in browser
 Scenario: creating a new code ticket should have somewhere to enter the browser
 
-Scenario: pseuds don't have to be unique, but in progress tickets by pseud should be correct
+Scenario: support identities don't have to be unique, but in progress tickets should be correct
   Given a volunteer exists with login: "rodney", id: 1
     And a volunteer exists with login: "hermione", id: 2
-  When "rodney" has a support pseud "oracle"
-    And "hermione" has a support pseud "oracle"
+  When "rodney" has a support identity "oracle"
+    And "hermione" has a support identity "oracle"
     And a code ticket exists with id: 1
     And a code ticket exists with id: 2
   When "rodney" takes code ticket 1
     And "hermione" takes code ticket 2
   When I am on rodney's user page
-    And I follow "rodney's pseuds"
-    And I follow "oracle"
     And I follow "Code Tickets in progress"
   Then I should see "Code Ticket #1"
     But I should not see "Code Ticket #2"
   When I am on hermione's user page
-    And I follow "hermione's pseuds"
-    And I follow "oracle"
     And I follow "Code Tickets in progress"
   Then I should not see "Code Ticket #1"
     But I should see "Code Ticket #2"
 
-Scenario: pseuds don't have to be unique, but resolved tickets by pseud should be correct
+Scenario: identities don't have to be unique, but resolved tickets should be correct
   Given a volunteer exists with login: "rodney", id: 1
     And a volunteer exists with login: "hermione", id: 2
-  When "rodney" has a support pseud "oracle"
-    And "hermione" has a support pseud "oracle"
+  When "rodney" has a support identity "oracle"
+    And "hermione" has a support identity "oracle"
     And a code ticket exists with id: 1
     And a code ticket exists with id: 2
   When "rodney" resolves code ticket 1
     And "hermione" resolves code ticket 2
   When I am on rodney's user page
-    And I follow "rodney's pseuds"
-    And I follow "oracle"
     And I follow "Resolved Code Tickets"
   Then I should see "Code Ticket #1"
     But I should not see "Code Ticket #2"
   When I am on hermione's user page
-    And I follow "hermione's pseuds"
-    And I follow "oracle"
     And I follow "Resolved Code Tickets"
   Then I should not see "Code Ticket #1"
     But I should see "Code Ticket #2"
@@ -66,8 +58,6 @@ Scenario: volunteers can close a code ticket as a dupe
     And I follow "Resolved Code Tickets"
   Then I should see "Code Ticket #2"
   When I follow "oracle"
-    And I follow "oracle's pseuds"
-    And I follow "oracle" within ".pseuds"
     And I follow "Resolved Code Tickets"
   Then I should see "Code Ticket #2"
 
@@ -99,8 +89,6 @@ Scenario: volunteers can close a code ticket with a revision number
 #    And I follow "Resolved Code Tickets"
 #  Then I should see "Code Ticket #1"
 #  When I follow "oracle"
-#    And I follow "oracle's pseuds"
-#    And I follow "oracle" within ".pseuds"
 #    And I follow "Resolved Code Tickets"
 #  Then I should see "Code Ticket #1"
 

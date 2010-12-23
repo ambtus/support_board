@@ -6,7 +6,6 @@ Scenario: what users should (not) see
   Then I should see "Open a New Support Ticket"
     And I should see "Comments"
     And I should see "Frequently Asked Questions"
-    And I should see "Coming Soon"
     And I should see "Release Notes"
     And I should see "Open Code Tickets (Known Issues)"
     And I should see "Open Support Tickets"
@@ -64,34 +63,6 @@ Scenario: users can comment on unowned tickets and those comments can be chosen 
   When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
-
-Scenario: users can comment on unowned tickets with any pseud, with the default pseud selected automatically
-  Given a user exists with login: "helper", id: 1
-    And a user exists with login: "troubled", id: 2
-    And a pseud exists with user_id: 1, name: "alfa"
-    And a pseud exists with user_id: 1, name: "charlie", is_default: true
-  Given I am logged in as "troubled"
-  Given a support ticket exists with user_id: 2
-  Given I am logged in as "helper"
-  When I follow "Support Board"
-    And I follow "Open Support Tickets"
-    And I follow "Support Ticket #1"
-  When I fill in "Add details" with "I think you ..."
-    And I press "Update Support ticket"
-  Then I should see "Support ticket updated"
-    And I should see "charlie wrote: I think you"
-  When I fill in "Add details" with "Or you could ..."
-    And I select "alfa" from "Pseud"
-    And I press "Update Support ticket"
-  Then I should see "Support ticket updated"
-    And I should see "charlie wrote: I think you"
-    And I should see "alfa wrote: Or you could"
-  When I fill in "Add details" with "Or perhaps ..."
-    And I press "Update Support ticket"
-  Then I should see "Support ticket updated"
-    And I should see "charlie wrote: I think you"
-    And I should see "alfa wrote: Or you could"
-    And I should see "charlie wrote: Or perhaps"
 
 Scenario: users cannot comment on owned tickets.
   Given a support ticket exists with id: 1
@@ -177,7 +148,7 @@ Scenario: links to support tickets they're watching, private
   And "helper" watches support ticket 1
   And "helper" watches support ticket 2
   When I am on helper's user page
-    Then I should not see "watched"
+    Then I should not see "watch"
   When I am logged in as "helper"
     And I follow "helper"
     And I follow "Support tickets I am watching"

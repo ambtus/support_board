@@ -1,14 +1,8 @@
 Factory.define :user do |user|
-  user.sequence(:id) { |n| n }
   user.sequence(:login) { |n| "testuser#{n}" }
   user.password "secret"
   user.password_confirmation { |u| u.password }
   user.email { |u| "#{u.login}@ao3.org" }
-end
-
-Factory.define :pseud do |pseud|
-  pseud.name "my test pseud"
-  pseud.association :user
 end
 
 Factory.define :support_ticket do |support_ticket|

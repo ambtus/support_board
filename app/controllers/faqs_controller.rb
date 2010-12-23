@@ -20,8 +20,8 @@ class FaqsController < ApplicationController
       elsif !current_user # not logged in, can't comment
         @details = @faq.faq_details.where(:private => false)
         render :show_guest
-      elsif current_user.support_volunteer
-        @faq.faq_details.build # create a new empty response template
+      elsif current_user.support_volunteer?
+        @faq.faq_details.build(:support_response => true) # create a new empty response template
         render :show_volunteer
       else # logged in as non-support volunteer
         @faq.faq_details.build # create a new empty response template
@@ -32,8 +32,8 @@ class FaqsController < ApplicationController
 
   def edit
     @faq = Faq.find(params[:id])
-    if current_user.support_volunteer
-      @faq.faq_details.build # create a new empty response template
+    if current_user.support_volunteer?
+      @faq.faq_details.build(:support_response => true) # create a new empty response template
     else
       flash[:notice] = "Sorry, only support volunteers can edit faqs"
       redirect_to @faq and return
@@ -44,7 +44,7 @@ class FaqsController < ApplicationController
     @faq = Faq.find(params[:id])
     if params[:commit] == "This FAQ answered my question"
       FaqVote.create(:faq_id => @faq.id)
-    elsif current_user.try(:support_admin)
+    elsif current_user.try(:support_admin?)
       case params[:commit]
       when "Post"
         @faq.update_attribute(:user_id, current_user.id)
@@ -54,7 +54,7 @@ class FaqsController < ApplicationController
         @faq.update_attribute(:user_id, current_user.id)
         @faq.update_attribute(:posted, false)
       end
-    elsif current_user.try(:support_volunteer)
+    elsif current_user.try(:support_volunteer?)
       @faq.update_attributes(params[:faq])
       if @faq.save
         flash[:notice] = "FAQ updated"

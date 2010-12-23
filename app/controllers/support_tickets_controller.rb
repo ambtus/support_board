@@ -7,7 +7,7 @@ class SupportTicketsController < ApplicationController
     owner = params[:user_id] ? User.find_by_login(params[:user_id]) : false
 
     # if not support volunteer, and not looking at list of own tickets, rule out private tickets
-    if !current_user.try(:support_volunteer) && current_user != owner
+    if !current_user.try(:support_volunteer?) && current_user != owner
       @tickets = @tickets.where(:private => false)
     end
 
@@ -15,7 +15,7 @@ class SupportTicketsController < ApplicationController
     if params[:user_id]
       # tickets I commented on
       if params[:comments]
-        @tickets = @tickets.joins(:support_details) & SupportDetail.where(:pseud_id => owner.pseud_ids)
+        @tickets = @tickets.joins(:support_details) & SupportDetail.where(:support_identity_id => owner.support_identity_id)
 
       # tickets I am watching, private
       elsif params[:watching]
@@ -27,8 +27,8 @@ class SupportTicketsController < ApplicationController
         end
 
       # support volunteer's tickets
-      elsif params[:pseud_id]
-        @tickets = @tickets.where(:pseud_id => owner.support_pseud.id)
+      elsif params[:support]
+        @tickets = @tickets.where(:support_identity_id => owner.support_identity_id)
         if params[:only] == "resolved"
           @tickets = @tickets.where(:resolved => true)
           # render now, because we add not not resolved later
@@ -48,7 +48,7 @@ class SupportTicketsController < ApplicationController
     elsif params[:only]
       case params[:only]
       when "claimed"
-        @tickets = @tickets.where("pseud_id is NOT NULL")
+        @tickets = @tickets.where("support_identity_id is NOT NULL")
       when "admin"
         @tickets = @tickets.where(:admin => true)
       when "comment"
@@ -75,7 +75,7 @@ class SupportTicketsController < ApplicationController
 
     # default - unowned tickets
     else
-      @tickets = @tickets.where(:pseud_id => nil)
+      @tickets = @tickets.where(:support_identity_id => nil)
     end
 
     # if we haven't rendered before this, rule out closed tickets and spam
@@ -90,7 +90,7 @@ class SupportTicketsController < ApplicationController
     @ticket = SupportTicket.find(params[:id])
     is_owner = @ticket.owner?(session[:authentication_code], current_user) # is viewer owner of ticket?
 
-    if @ticket.private && (!is_owner && !current_user.try(:support_volunteer))
+    if @ticket.private && (!is_owner && !current_user.try(:support_volunteer?))
       flash[:error] = "Sorry, you don't have permission to view this ticket"
       redirect_to support_path and return
     end
@@ -102,11 +102,11 @@ class SupportTicketsController < ApplicationController
     elsif !current_user
       @details = @ticket.support_details.not_private
       render :show_guest
-    elsif current_user.support_volunteer
-      @ticket.support_details.build # create a new empty response template
+    elsif current_user.support_volunteer?
+      @ticket.support_details.build(:support_response => true) # create a new empty response template
       render :show_volunteer
     else # logged in as non-support volunteer
-      if !@ticket.pseud_id # if support took it, it's not longer open for comment
+      if !@ticket.support_identity_id # if support took it, it's not longer open for public comment
         @ticket.support_details.build # create a new empty response template
       end
       render :show_user
@@ -153,70 +153,70 @@ class SupportTicketsController < ApplicationController
     @ticket = SupportTicket.find(params[:id])
 
     # boolean toggles for support volunteers
-    if current_user.try(:support_volunteer) && params[:commit] != "Update Support ticket"
-      pseud = current_user.support_pseud
+    if current_user.try(:support_volunteer?) && params[:commit] != "Update Support ticket"
+      support_identity = current_user.support_identity
       case params[:commit]
       when "Take"
-        @ticket.send_steal_notification(pseud) if @ticket.pseud_id
-        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.send_steal_notification(support_identity) if @ticket.support_identity_id
+        @ticket.update_attribute(:support_identity_id, support_identity.id)
       when "Untake"
-        @ticket.update_attribute(:pseud_id, nil)
+        @ticket.update_attribute(:support_identity_id, nil)
       when "Send request to take"
-        SupportTicketMailer.request_to_take(@ticket, Pseud.find(params[:pseud_id]).user, current_user).deliver
+        SupportTicketMailer.request_to_take(@ticket, SupportIdentity.find(params[:support_identity_id]).user, current_user).deliver
       when "Ham"
         @ticket.mark_as_ham!
       when "Spam"
         @ticket.mark_as_spam!
       when "Comment"
-        @ticket.mark_as_comment!(pseud)
+        @ticket.mark_as_comment!(support_identity)
       when "Needs Attention"
-        @ticket.mark_as_ticket!(pseud)
+        @ticket.mark_as_ticket!(support_identity)
       when "Needs Admin Attention"
         @ticket.update_attribute(:admin, true)
       when "Admin Resolved"
-        if current_user.support_admin
+        if current_user.support_admin?
           @ticket.update_attribute(:support_admin_resolved, true)
-          @ticket.update_attribute(:pseud_id, pseud.id)
+          @ticket.update_attribute(:support_identity_id, support_identity.id)
         else
           flash[:error] = "Sorry, you have to have the support admin role"
         end
       when "Unresolve"
-        if current_user.support_admin
+        if current_user.support_admin?
           @ticket.update_attribute(:support_admin_resolved, false)
-          @ticket.update_attribute(:pseud_id, pseud.id)
+          @ticket.update_attribute(:support_identity_id, support_identity.id)
         else
           flash[:error] = "Sorry, you have to have the support admin role"
         end
       when "Remove link to Code ticket"
         @ticket.update_attribute(:code_ticket_id, nil)
-        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.update_attribute(:support_identity_id, support_identity.id)
         CodeVote.where(:support_ticket_id => @ticket.id).delete_all
       when "Link to Code ticket"
         @code_ticket = CodeTicket.find(params[:support_ticket][:code_ticket_id])
         @ticket.update_attribute(:code_ticket_id, @code_ticket)
         CodeVote.create(:code_ticket_id => @code_ticket.id, :support_ticket_id => @ticket.id, :vote => 2)
-        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.update_attribute(:support_identity_id, support_identity.id)
         @ticket.send_update_notifications
         redirect_to @code_ticket and return
       when "Create new Code ticket"
         @code_ticket = CodeTicket.create(:summary => @ticket.summary)
         CodeVote.create(:code_ticket_id => @code_ticket.id, :support_ticket_id => @ticket.id, :vote => 2)
         @ticket.update_attribute(:code_ticket_id, @code_ticket.id)
-        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.update_attribute(:support_identity_id, support_identity.id)
         @ticket.send_update_notifications
         redirect_to edit_code_ticket_path(@code_ticket) and return
       when "Remove link to FAQ"
         @ticket.update_attribute(:faq_id, nil)
-        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.update_attribute(:support_identity_id, support_identity.id)
       when "Link to FAQ"
         @faq = Faq.find(params[:support_ticket][:faq_id])
         @ticket.update_attribute(:faq_id, @faq.id)
-        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.update_attribute(:support_identity_id, support_identity.id)
         @ticket.send_update_notifications
       when "Create new FAQ"
         @faq = Faq.create
         @ticket.update_attribute(:faq_id, @faq.id)
-        @ticket.update_attribute(:pseud_id, pseud.id)
+        @ticket.update_attribute(:support_identity_id, support_identity.id)
         @ticket.send_update_notifications
         redirect_to edit_faq_path(@faq) and return
       end

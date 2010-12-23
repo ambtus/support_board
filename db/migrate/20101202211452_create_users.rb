@@ -11,14 +11,6 @@ class CreateUsers < ActiveRecord::Migration
       t.timestamps
     end
 
-    create_table "pseuds" do |t|
-      t.integer  "user_id"
-      t.string   "name",       :null => false
-      t.boolean  "is_default", :default => false
-
-      t.timestamps
-    end
-
     create_table "roles" do |t|
       t.string   "name",              :limit => 40
       t.string   "authorizable_type", :limit => 40
@@ -38,7 +30,7 @@ class CreateUsers < ActiveRecord::Migration
 
  def self.down
     drop_table :users
-    drop_table :pseuds
     drop_table :roles
+    drop_table :roles_users
   end
 end

@@ -1,35 +1,52 @@
 <h1><%= @user.login %>'s page</h1>
+<% if @user.support_identity_id %>
 <ul>
-<li>
-  <%= link_to "#{@user.login}'s pseuds", user_pseuds_path(@user) %>
-</li>
-<li>
-  <%= link_to "Support tickets opened by #{@user.login}",
+  <li>
+    <%= link_to "Support tickets opened by #{@user.login}",
                 user_support_tickets_path(@user) %>
-</li>
-<li>
-  <%= link_to "Support tickets commented on by #{@user.login}",
-              user_support_tickets_path(@user, :comments => true) %>
-  <% if @accepted > 0 %>
-   (<%= @accepted %> accepted)
+  </li>
+  <li>
+    <%= link_to "Support tickets commented on by #{@user.login}",
+                user_support_tickets_path(@user, :comments => true) %>
+    <% if @accepted > 0 %>
+     (<%= @accepted %> accepted)
+    <% end %>
+  </li>
+  <% if @user == current_user %>
+    <li>
+      <%= link_to "Support tickets I am watching",
+                  user_support_tickets_path(@user, :watching => true) %>
+    </li>
+    <li>
+      <%= link_to "Code tickets I am watching",
+                  user_code_tickets_path(@user, :watching => true) %>
+    </li>
   <% end %>
-</li>
-<% if @user == current_user %>
   <li>
-    <%= link_to "Support tickets I am watching",
-                user_support_tickets_path(@user, :watching => true) %>
+    <%= link_to "Code tickets voted up by #{@user.login}",
+                user_code_tickets_path(@user, :votes => true) %>
   </li>
   <li>
-    <%= link_to "Code tickets I am watching",
-                user_code_tickets_path(@user, :watching => true) %>
+    <%= link_to "Code tickets commented on by #{@user.login}",
+                user_code_tickets_path(@user, :comments => true) %>
   </li>
-<% end %>
-<li>
-  <%= link_to "Code tickets voted up by #{@user.login}",
-              user_code_tickets_path(@user, :votes => true) %>
-</li>
-<li>
-  <%= link_to "Code tickets commented on by #{@user.login}",
-              user_code_tickets_path(@user, :comments => true) %>
-</li>
+  <% if @user.support_identity.official %>
+    <li>
+      <%= link_to "Support Tickets in progress",
+                  user_support_tickets_path(@user, :support => true) %>
+    </li>
+    <li>
+      <%= link_to "Resolved Support Tickets",
+                  user_support_tickets_path(@user, :support => true, :only => "resolved") %>
+    </li>
+  <li>
+    <%= link_to "Code Tickets in progress",
+                user_code_tickets_path(@user, :support => true) %>
+    </li>
+  <li>
+    <%= link_to "Resolved Code Tickets",
+                user_code_tickets_path(@user, :support => true, :resolved => true) %>
+    </li>
+  <% end %>
 </ul>
+<% end %>

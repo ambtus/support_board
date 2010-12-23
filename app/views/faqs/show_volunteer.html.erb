@@ -1,5 +1,5 @@
 <%= form_for(@faq) do |f| %>
-  <% if current_user.try(:support_admin) %>
+  <% if current_user.try(:support_admin?) %>
     <p class="submit"><%= f.submit "Post" %></p>
   <% end %>
     <%= link_to "Edit title or content", edit_faq_path(@faq) %>
@@ -8,8 +8,9 @@
 
   <%= f.fields_for :faq_details do |d| %>
     <% if d.object.new_record? %>
-      <dt><%= d.label :pseud_id, "Pseud (Will be visible). If you don't use your support pseud, this comment will not be marked official" %>:</dt>
-        <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }, :selected => current_user.support_pseud.id %></dd>
+      <%= d.hidden_field :support_identity_id, :value => current_user.support_identity.id %>
+      <dt><%= d.label :support_response, "Answer officially?" %>:</dt>
+        <dd><%= d.check_box :support_response %></dd>
       <dt><%= d.label :content, "Add comment" %>:</dt>
         <dd><%= d.text_area :content %></dd>
     <% else %>

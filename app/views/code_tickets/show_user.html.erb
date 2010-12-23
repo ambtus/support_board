@@ -29,8 +29,7 @@
 
     <%= t.fields_for :code_details do |d| %>
       <% if d.object.new_record? %>
-        <dt><%= d.label :pseud_id, "Pseud (Will be visible)" %>:</dt>
-          <dd><%= d.select :pseud_id, current_user.pseuds.collect {|p| [ p.name, p.id ] }, :selected => current_user.default_pseud.id %></dd>
+        <%= d.hidden_field :support_identity_id, :value => current_user.support_identity.id %>
         <dt><%= d.label :content, "Add details" %>:</dt>
           <dd><%= d.text_area :content %></dd>
       <% elsif !d.object.private? %>

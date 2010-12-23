@@ -16,7 +16,7 @@ class CodeTicketsController < ApplicationController
 
       # tickets I commented on, public
       elsif params[:comments]
-        @tickets = @tickets.joins(:code_details) & CodeDetail.where(:pseud_id => user.pseud_ids)
+        @tickets = @tickets.joins(:code_details) & CodeDetail.where(:support_identity_id => user.support_identity_id)
 
       # tickets I am watching, private
       elsif params[:watching]
@@ -28,8 +28,8 @@ class CodeTicketsController < ApplicationController
         end
 
       # support volunteer's working tickets
-      elsif params[:pseud_id]
-        @tickets = @tickets.where(:pseud_id => user.support_pseud.id)
+      elsif params[:support]
+        @tickets = @tickets.where(:support_identity_id => user.support_identity_id)
       end
 
     end
@@ -41,11 +41,11 @@ class CodeTicketsController < ApplicationController
     if !current_user
       @details = @ticket.code_details.where(:private => false)
       render :show_guest
-    elsif current_user.support_volunteer
-      @ticket.code_details.build # create a new empty response template
+    elsif current_user.support_volunteer?
+      @ticket.code_details.build(:support_response => true) # create a new empty response template
       render :show_volunteer
     else # logged in as non-support volunteer
-      if !@ticket.pseud_id # if support took it, it's not longer open for comment
+      if !@ticket.support_identity_id # if support took it, it's not longer open for comment
         @ticket.code_details.build # create a new empty response template
       end
       render :show_user
@@ -54,9 +54,9 @@ class CodeTicketsController < ApplicationController
   end
 
   def new
-    if current_user.support_volunteer
+    if current_user.support_volunteer?
       @ticket = CodeTicket.new
-      @ticket.code_details.build
+      @ticket.code_details.build(:support_response => true)
     else
       flash[:notice] = "Sorry, only volunteers can open code tickets. Please open a support ticket instead"
       redirect_to new_support_ticket_path and return
@@ -64,7 +64,7 @@ class CodeTicketsController < ApplicationController
   end
 
   def create
-    if current_user.support_volunteer
+    if current_user.support_volunteer?
       @ticket = CodeTicket.new(params[:code_ticket])
       if @ticket.save
         flash[:notice] = "Code ticket created"
@@ -88,8 +88,8 @@ class CodeTicketsController < ApplicationController
 
   def edit
     @ticket = CodeTicket.find(params[:id])
-    if current_user.support_volunteer
-      @ticket.code_details.build # create a new empty response template
+    if current_user.support_volunteer?
+      @ticket.code_details.build(:support_response => true) # create a new empty response template
     else
       flash[:notice] = "Sorry, only support volunteers can edit code tickets"
       redirect_to @ticket and return
@@ -99,13 +99,13 @@ class CodeTicketsController < ApplicationController
   def update
     @ticket = CodeTicket.find(params[:id])
     @ticket.update_attributes(params[:code_ticket])
-    if current_user.try(:support_volunteer) && params[:commit] != "Update Code ticket"
-      pseud = current_user.support_pseud
+    if current_user.try(:support_volunteer?) && params[:commit] != "Update Code ticket"
+      support_identity = current_user.support_identity
       case params[:commit]
       when "Take"
-        @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
+        @ticket.update_attribute(:support_identity_id, current_user.support_identity_id)
       when "Dupe"
-        @ticket.update_attribute(:pseud_id, current_user.support_pseud.id)
+        @ticket.update_attribute(:support_identity_id, current_user.support_identity_id)
       end
       redirect_to @ticket and return
     elsif current_user

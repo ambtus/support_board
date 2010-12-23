@@ -14,7 +14,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
 
   create_table "code_details", :force => true do |t|
     t.integer  "code_ticket_id"
-    t.integer  "pseud_id"
+    t.integer  "support_identity_id"
     t.boolean  "support_response",                       :default => false
     t.string   "content"
     t.boolean  "private",                                :default => false
@@ -40,7 +40,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "committed_rev"
     t.string   "deployed_rev"
     t.string   "browser"
-    t.integer  "pseud_id"
+    t.integer  "support_identity_id"
     t.integer  "code_ticket_id"
     t.integer  "resolved",                                   :default => 0
     t.integer  "summary_sanitizer_version",     :limit => 2, :default => 0, :null => false
@@ -58,9 +58,20 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  create_table "deploy_notes", :force => true do |t|
+    t.string   "version"
+    t.text     "content"
+    t.string   "deployed_rev"
+    t.integer  "support_identity_id"
+    t.boolean  "posted",                                 :default => false
+    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "faq_details", :force => true do |t|
     t.integer  "faq_id"
-    t.integer  "pseud_id"
+    t.integer  "support_identity_id"
     t.boolean  "support_response",                       :default => false
     t.string   "content"
     t.boolean  "private",                                :default => false
@@ -88,15 +99,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
-  create_table "pseuds", :force => true do |t|
-    t.integer  "user_id"
-    t.string   "name",                                 :null => false
-    t.boolean  "is_default",        :default => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.boolean  "support_volunteer"
-  end
-
   create_table "roles", :force => true do |t|
     t.string   "name",              :limit => 40
     t.string   "authorizable_type", :limit => 40
@@ -114,12 +116,19 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
 
   create_table "support_details", :force => true do |t|
     t.integer  "support_ticket_id"
-    t.integer  "pseud_id"
+    t.integer  "support_identity_id"
     t.boolean  "support_response",                       :default => false
     t.string   "content"
     t.boolean  "private",                                :default => false
     t.boolean  "resolved_ticket",                        :default => false
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "support_identities", :force => true do |t|
+    t.string   "name",                          :null => false
+    t.boolean  "official",   :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -144,7 +153,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "user_agent"
     t.string   "ip_address"
     t.boolean  "approved",                               :default => false, :null => false
-    t.integer  "pseud_id"
+    t.integer  "support_identity_id"
     t.boolean  "question",                               :default => false
     t.integer  "faq_id"
     t.boolean  "problem",                                :default => false
@@ -159,14 +168,15 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   end
 
   create_table "users", :force => true do |t|
-    t.string   "email",             :null => false
-    t.string   "login",             :null => false
+    t.string   "email",               :null => false
+    t.string   "login",               :null => false
     t.datetime "activated_at"
     t.string   "crypted_password"
     t.string   "salt"
     t.string   "persistence_token"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "support_identity_id"
   end
 
 end

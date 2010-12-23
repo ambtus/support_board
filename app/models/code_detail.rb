@@ -1,16 +1,9 @@
 class CodeDetail < ActiveRecord::Base
   belongs_to :code_ticket
-  belongs_to :pseud
+  belongs_to :support_identity
 
   def byline
     prefix = self.support_response? ? "Support volunteer " : ""
-    prefix + self.pseud.name
+    prefix + self.support_identity.name
   end
-
-  before_create :check_for_support
-  def check_for_support
-    self.support_response = true if self.pseud.try(:support_volunteer)
-    return true
-  end
-
 end

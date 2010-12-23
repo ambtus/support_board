@@ -43,7 +43,7 @@ class SupportTicketMailer < ActionMailer::Base
     @url = support_ticket_url(@ticket)
     @details = (@ticket.support_details.count > 0) ? @ticket.support_details : []
     mail(
-      :to => @ticket.pseud.user.email,
+      :to => @ticket.support_identity.user.email,
       :subject => "[AO3] Stolen #{ticket.name}"
     )
   end

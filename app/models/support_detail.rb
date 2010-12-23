@@ -1,29 +1,23 @@
 class SupportDetail < ActiveRecord::Base
   belongs_to :support_ticket
-  belongs_to :pseud
+  belongs_to :support_identity
 
   scope :not_private, where(:private => false)
   scope :resolved, where(:resolved_ticket => true)
 
   def by_owner?
-    return true if self.pseud_id.blank?  # only owners can add details without being logged in
+    return true if self.support_identity.blank?  # only owners can add details without being logged in
     return false if !self.support_ticket.user # the ticket was opened by a guest but is being commented on by a user
-    self.support_ticket.user.pseuds.include?(self.pseud) # was the ticket opened and commented on by the same user?
+    self.support_ticket.user.support_identity == self.support_identity # was the ticket opened and commented on by the same user?
   end
 
   def byline
     if by_owner?
-      (self.support_ticket.display_user_name? && self.pseud) ? self.pseud.name : "Ticket owner"
+      (self.support_ticket.display_user_name? && self.support_identity_id) ? self.support_identity.name : "Ticket owner"
     else
       prefix = self.support_response? ? "Support volunteer " : ""
-      prefix + self.pseud.name
+      prefix + self.support_identity.name
     end
-  end
-
-  before_create :check_for_support
-  def check_for_support
-    self.support_response = true if self.pseud.try(:support_volunteer)
-    return true
   end
 
   # SANITIZER stuff

@@ -9,24 +9,24 @@
 # users
 dean = User.create(:login => "dean", :email => "dean@ao3.org",
   :password => "secret", :password_confirmation => "secret")
+dean.support_identity
 john = User.create(:login => "john", :email => "john@ao3.org",
   :password => "secret", :password_confirmation => "secret")
+john.support_identity
 jim = User.create(:login => "jim", :email => "jim@ao3.org",
   :password => "secret", :password_confirmation => "secret")
+jim.support_identity
 
 # support volunteers
 sam = User.create(:login => "sam", :email => "sam@ao3.org",
   :password => "secret", :password_confirmation => "secret")
 sam.support_volunteer = "1"
-sam.pseuds.create(:name => "sammy", :support_volunteer => true)
 rodney = User.create(:login => "rodney", :email => "rodney@ao3.org",
   :password => "secret", :password_confirmation => "secret")
 rodney.support_volunteer = "1"
-rodney.pseuds.create(:name => "3Phds", :support_volunteer => true)
 blair = User.create(:login => "blair", :email => "blair@ao3.org",
   :password => "secret", :password_confirmation => "secret")
 blair.support_volunteer = "1"
-blair.pseuds.create(:name => "guide", :support_volunteer => true)
 
 # support admin
 rodney.support_admin = "1"
@@ -35,9 +35,9 @@ bofh = User.create(:login => "bofh", :email => "bofh@ao3.org",
 bofh.support_admin = "1"
 
 # code tickets
-CodeTicket.create(:summary => "save the world", :pseud_id => sam.support_pseud.id)
-CodeTicket.create(:summary => "build a zpm", :pseud_id => rodney.support_pseud.id)
-CodeTicket.create(:summary => "find a sentinel", :pseud_id => blair.support_pseud.id)
+CodeTicket.create(:summary => "save the world", :support_identity_id => sam.support_identity_id)
+CodeTicket.create(:summary => "build a zpm", :support_identity_id => rodney.support_identity_id)
+CodeTicket.create(:summary => "find a sentinel", :support_identity_id => blair.support_identity_id)
 dada = CodeTicket.create(:summary => "repeal DADA")
 
 # support tickets

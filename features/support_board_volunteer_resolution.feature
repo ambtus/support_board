@@ -60,12 +60,12 @@ Scenario: volunteers can mark a support ticket as a Comment (don't require any w
     And I follow "#1"
   Then I should see "Status: Linked to Comments"
     When I press "Needs Attention"
-  Then I should see "Status: Open"
+  Then I should see "Status: In progress by oracle"
   When I follow "Support Board"
     And I follow "Comments"
   Then I should not see "#1"
   When I follow "Support Board"
-    And I follow "Open Support Tickets"
+    And I follow "Support Tickets in progress"
   Then I should see "Support Ticket #1"
 
 Scenario: volunteers can link a support ticket to an existing code ticket
@@ -210,10 +210,6 @@ Scenario: volunteers can send email to another volunteer asking them to take a t
     And the email should contain "Thank you, oracle"
   When I click the first link in the email
   Then I should see "Status: Open"
-
-# TODO
-Scenario: changing your designated support pseud should move all your claimed support Tickets
-Scenario: changing your designated support pseud should move all your claimed code Tickets
 
 # TODO
 Scenario: FAQs can be sorted by votes

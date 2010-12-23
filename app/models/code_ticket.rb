@@ -1,6 +1,6 @@
 class CodeTicket < ActiveRecord::Base
 
-  belongs_to :pseud  # the pseud of the user who is working on the ticket
+  belongs_to :support_identity  # the support identity of the user who is working on the ticket
   belongs_to :admin_post # after it's fixed
   belongs_to :code_ticket # for dupes
   has_many :code_votes # for prioritizing (lots of votes = high priority)
@@ -24,7 +24,7 @@ class CodeTicket < ActiveRecord::Base
   # STATUS/RESOLUTION stuff
 
   def status_line
-    if self.pseud
+    if self.support_identity_id
       if self.code_ticket_id
         "Closed as dupe"
       elsif self.deployed_rev

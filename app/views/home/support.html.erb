@@ -10,13 +10,12 @@
   <li><%= link_to "Open a New Support Ticket", new_support_ticket_path %>
   <li><%= link_to "Comments", support_tickets_path(:only => "comment") %>
   <li><%= link_to "Frequently Asked Questions", faqs_path %></li>
-  <li><%= link_to "Coming Soon", admin_posts_path(:coming_soon=>true) %></li>
-  <li><%= link_to "Release Notes", admin_posts_path(:release_notes=>true) %></li>
+  <li><%= link_to "Release Notes", deploy_notes_path %></li>
   <li><%= link_to "Open Code Tickets (Known Issues)", code_tickets_path %>
   <% if current_user %>
     <li><%= link_to "Open Support Tickets", support_tickets_path %>
   <% end %>
-  <% if current_user.try(:support_volunteer) %>
+  <% if current_user.try(:support_volunteer?) %>
     <li><%= link_to "Support tickets requiring Admin attention", support_tickets_path(:only => "admin") %>
     <li><%= link_to "Support Tickets in progress", support_tickets_path(:only => "claimed") %>
     <li><%= link_to "Support Tickets waiting for Code changes", support_tickets_path(:only => "waiting") %>

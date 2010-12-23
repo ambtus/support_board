@@ -6,7 +6,6 @@ Scenario: what volunteers should see
   Then I should see "Open a New Support Ticket"
     And I should see "Comments"
     And I should see "Frequently Asked Questions"
-    And I should see "Coming Soon"
     And I should see "Release Notes"
     And I should see "Open Code Tickets (Known Issues)"
     And I should see "Open Support Tickets"
@@ -46,8 +45,6 @@ Scenario: support board volunteers can steal owned tickets.
     And "oracle" takes support ticket 1
   Given I am logged in as volunteer "hermione"
   When I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle"
     And I follow "Support Tickets in progress"
     And I follow "Support Ticket #1"
     When I press "Take"
@@ -56,13 +53,9 @@ Scenario: support board volunteers can steal owned tickets.
     And the email should contain "hermione"
   When I am logged out
     And I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle"
     And I follow "Support Tickets in progress"
   Then I should not see "Support Ticket #1"
   When I am on hermione's user page
-    And I follow "hermione's pseuds"
-    And I follow "hermione"
     And I follow "Support Tickets in progress"
   Then I should see "Support Ticket #1"
 
@@ -78,8 +71,6 @@ Scenario: support board volunteers can comment on owned tickets.
     And I follow "Support Tickets in progress"
     Then I should see "Support Ticket #1"
   When I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle"
     And I follow "Support Tickets in progress"
     And I follow "Support Ticket #1"
   Then I should see "Status: In progress"
@@ -116,20 +107,16 @@ Scenario: by default, when a volunteer comments, their comments are flagged as b
 Scenario: when a volunteer comments, they can chose to do so as a regular user
   Given a support ticket exists with id: 1
     And a volunteer exists with login: "alice"
-    And "alice" has a support pseud "oracle"
+    And "alice" has a support identity "oracle"
     And I am logged in as "alice"
     And I go to the first support ticket page
-    And I fill in "Add details" with "some official things"
-    And I press "Update Support ticket"
-  Then I should see "Support volunteer oracle wrote: some official things"
   When I fill in "Add details" with "some other things"
-    And I select "alice" from "Pseud"
+    And I uncheck "Answer officially?"
     And I press "Update Support ticket"
-  Then I should see "Support volunteer oracle wrote: some official things"
-    And I should see "alice wrote: some other things"
-    But I should not see "Support volunteer alice wrote"
+  Then I should see "oracle wrote: some other things"
+    But I should not see "Support volunteer oracle wrote"
 
-Scenario: working support tickets should be available from the support pseud page
+Scenario: working support tickets should be available from the user page
   Given a user exists with login: "troubled", id: 1
   And a volunteer exists with login: "oracle", id: 2
   And a volunteer exists with login: "hermione", id: 3
@@ -144,8 +131,6 @@ Scenario: working support tickets should be available from the support pseud pag
     And "oracle" takes support ticket 3
     And "oracle" takes support ticket 4
   When I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle"
     And I follow "Support Tickets in progress"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
@@ -159,14 +144,10 @@ Scenario: working support tickets should be available from the support pseud pag
     And I should see "Support Ticket #4"
   When I am logged in as "oracle"
     And I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle" within ".pseuds"
     And I follow "Support Tickets in progress"
     And I follow "Support Ticket #4"
     And I press "Untake"
   When I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle" within ".pseuds"
     And I follow "Support Tickets in progress"
   Then I should not see "Support Ticket #1"
     And I should not see "Support Ticket #2"
@@ -174,15 +155,11 @@ Scenario: working support tickets should be available from the support pseud pag
     And I should not see "Support Ticket #4"
   When I am logged in as "troubled"
     And I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle" within ".pseuds"
     And I follow "Support Tickets in progress"
     And I follow "Support Ticket #3"
     And I check "Private"
     And I press "Update Support ticket"
   When I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle" within ".pseuds"
     And I follow "Support Tickets in progress"
   Then I should not see "Support Ticket #1"
     And I should not see "Support Ticket #2"
@@ -190,12 +167,10 @@ Scenario: working support tickets should be available from the support pseud pag
     And I should not see "Support Ticket #4"
   When I am logged in as "hermione"
     And I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle" within ".pseuds"
     And I follow "Support Tickets in progress"
     Then I should see "Support Ticket #3"
 
-Scenario: closed support tickets should be available from the support pseud page
+Scenario: closed support tickets should be available from the user page
   Given a user exists with login: "troubled", id: 1
   And a volunteer exists with login: "oracle", id: 2
   And a volunteer exists with login: "hermione", id: 3
@@ -210,53 +185,43 @@ Scenario: closed support tickets should be available from the support pseud page
     And "oracle" takes support ticket 3
   When "troubled" accepts a response to support ticket 1
     And I am on oracle's user page
-    And I follow "oracle's pseuds"
-    And I follow "oracle"
   When I follow "Resolved Support Tickets"
   Then I should see "Support Ticket #1"
     And I should see "Support Ticket #2"
     But I should not see "Support Ticket #3"
 
-Scenario: pseuds don't have to be unique, but in progress tickets by pseud should be correct
+Scenario: support identities don't have to be unique, but in progress tickets should be correct
   Given a volunteer exists with login: "rodney", id: 1
     And a volunteer exists with login: "hermione", id: 2
-  When "rodney" has a support pseud "oracle"
-    And "hermione" has a support pseud "oracle"
+  When "rodney" has a support identity "oracle"
+    And "hermione" has a support identity "oracle"
     And a support ticket exists with id: 1
     And a support ticket exists with id: 2
   When "rodney" takes support ticket 1
     And "hermione" takes support ticket 2
   When I am on rodney's user page
-    And I follow "rodney's pseuds"
-    And I follow "oracle"
     And I follow "Support Tickets in progress"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
   When I am on hermione's user page
-    And I follow "hermione's pseuds"
-    And I follow "oracle"
     And I follow "Support Tickets in progress"
   Then I should not see "Support Ticket #1"
     But I should see "Support Ticket #2"
 
-Scenario: pseuds don't have to be unique, but closed tickets by pseud should be correct
+Scenario: support identities don't have to be unique, but closed tickets should be correct
   Given a volunteer exists with login: "rodney", id: 1
     And a volunteer exists with login: "hermione", id: 2
-  When "rodney" has a support pseud "oracle"
-    And "hermione" has a support pseud "oracle"
+  When "rodney" has a support identity "oracle"
+    And "hermione" has a support identity "oracle"
     And a support ticket exists with id: 1
     And a support ticket exists with id: 2
   When "rodney" categorizes support ticket 1 as Comment
     And "hermione" categorizes support ticket 2 as Comment
   When I am on rodney's user page
-    And I follow "rodney's pseuds"
-    And I follow "oracle"
     And I follow "Resolved Support Tickets"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
   When I am on hermione's user page
-    And I follow "hermione's pseuds"
-    And I follow "oracle"
     And I follow "Resolved Support Tickets"
   Then I should not see "Support Ticket #1"
     But I should see "Support Ticket #2"

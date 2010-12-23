@@ -65,7 +65,7 @@ Scenario: private user support tickets should be private and can't be made publi
   Then I should see "embarrassing"
     And I should not see "Ticket will only be visible to"
 
-Scenario: users can choose to have their name displayed during creation, when they comment their pseud will be shown
+Scenario: users can choose to have their name displayed during creation, when they comment their login will be shown
   Given I am logged in as "troubled"
   When I follow "Open a New Support Ticket"
   When I fill in "Summary" with "Archive is very slow"
@@ -76,35 +76,6 @@ Scenario: users can choose to have their name displayed during creation, when th
     And I should see "Summary: Archive is very slow"
     And I should see "User: troubled"
     And I should see "troubled wrote: For example"
-
-Scenario: if their name is displayed during creation they can use any pseud for details, with the default pseud defaulted
-  Given a user exists with login: "troubled", id: 1
-  Given the following pseuds exist
-    | user_id | name    | is_default |
-    | 1       | alfa    |            |
-    | 1       | charlie | true       |
-  Given I am logged in as "troubled"
-  When I follow "Open a New Support Ticket"
-  When I fill in "Summary" with "Archive is very slow"
-    And I fill in "Details" with "For example"
-    And I check "Display my user name"
-    And I press "Create Support ticket"
-  Then I should see "Support ticket created"
-    And I should see "Summary: Archive is very slow"
-    And I should see "User: troubled"
-    And I should see "charlie wrote: For example"
-  When I fill in "Add details" with "Some more stuff"
-    And I select "alfa" from "Pseud"
-    And I press "Update Support ticket"
-  Then I should see "User: troubled"
-    And I should see "charlie wrote: For example"
-    And I should see "alfa wrote: Some more stuff"
-  When I fill in "Add details" with "Even more stuff"
-    And I press "Update Support ticket"
-  Then I should see "User: troubled"
-    And I should see "charlie wrote: For example"
-    And I should see "alfa wrote: Some more stuff"
-    And I should see "charlie wrote: Even more stuff"
 
 Scenario: users can (un)hide their name after creation
   Given I am logged in as "troubled"
@@ -131,6 +102,8 @@ Scenario: user's tickets should be available from their user page
     | login     | id |
     | troubled  | 1  |
     | tricksy   | 2  |
+  And "troubled" has a support identity "troubled"
+  And "tricksy" has a support identity "tricksy"
   And a volunteer exists with login: "oracle", id: 3
   And the following support tickets exist
     | summary                      | id | private | display_user_name | user_id | email         |

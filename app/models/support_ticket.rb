@@ -1,7 +1,7 @@
 class SupportTicket < ActiveRecord::Base
 
   belongs_to :user   # the user who opened the ticket
-  belongs_to :pseud  # the pseud of the user who is working on the ticket
+  belongs_to :support_identity  # the support_identity of the user who is working on the ticket
   belongs_to :faq  # for 'Question' tickets
   has_one :faq_vote
   belongs_to :code_ticket  # for 'Problem' and 'Suggestion' tickets. automatic +1 vote
@@ -39,8 +39,8 @@ class SupportTicket < ActiveRecord::Base
   # STATUS/RESOLUTION stuff
 
   def status_line
-    if self.pseud_id
-      name = self.pseud.name
+    if self.support_identity_id
+      name = self.support_identity.name
       if self.support_admin_resolved
         "Resolved by #{name}"
       elsif self.code_ticket_id
@@ -59,18 +59,19 @@ class SupportTicket < ActiveRecord::Base
     end
   end
 
-  # marking something as a comment resolves it, which means there needs to be a pseud associated with the resolution
-  def mark_as_comment!(pseud)
-    return false unless pseud.support_volunteer
+  # marking something as a comment resolves it, which means there needs to be a support_identity associated with the resolution
+  def mark_as_comment!(support_identity)
+    return false unless support_identity
     self.comment = true
-    self.pseud = pseud
+    self.support_identity = support_identity
     self.save
   end
 
-  def mark_as_ticket!(pseud)
-    return false unless pseud.support_volunteer
+  # marking something as a not a comment means you were the last support person to touch it
+  def mark_as_ticket!(support_identity)
+    return false unless support_identity
     self.comment = false
-    self.pseud = nil
+    self.support_identity = support_identity
     self.save
   end
 
@@ -133,7 +134,7 @@ class SupportTicket < ActiveRecord::Base
     if !watcher && self.turn_on_notifications == "1"
       # mark the watcher as a public watcher if not the owner or a support volunteer
       public = true
-      public = !current_user.try(:support_volunteer) # support volunteers
+      public = !current_user.try(:support_volunteer?) # support volunteers
       public = false if self.email # guest owners
       public = false if self.user && self.user == current_user # user owner
       self.support_notifications.create(:email => email_address, :public_watcher => public)

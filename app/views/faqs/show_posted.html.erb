@@ -1,4 +1,4 @@
-<% if current_user.try(:support_admin) %>
+<% if current_user.try(:support_admin?) %>
   <%= form_for(@faq) do |f| %>
     <p class="submit"><%= f.submit "Unpost" %></p>
   <% end %>
@@ -8,6 +8,6 @@
 <%= form_for(@faq) do |f| %>
   <p class="submit"><%= f.submit "This FAQ answered my question" %></p>
 <% end %>
-<% if current_user.try(:support_volunteer) %>
+<% if current_user.try(:support_volunteer?) %>
   Votes: <%= @faq.vote_count %>
 <% end %>

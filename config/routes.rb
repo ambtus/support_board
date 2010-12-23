@@ -1,9 +1,5 @@
 SupportBoard::Application.routes.draw do
   resources :users do
-    resources :pseuds do
-      resources :support_tickets
-      resources :code_tickets
-    end
     resources :support_tickets
     resources :code_tickets
   end
@@ -12,12 +8,8 @@ SupportBoard::Application.routes.draw do
   match 'login' => 'user_sessions#new'
   match 'logout' => 'user_sessions#destroy'
 
-  resources :admin_sessions
-  match 'admin/login' => 'admin_sessions#new'
-  match 'admin/logout' => 'admin_sessions#destroy'
-
   resources :faqs
-  resources :admin_posts
+  resources :deploy_notes
   resources :support_tickets
   resources :code_tickets
 

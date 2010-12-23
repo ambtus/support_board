@@ -1,4 +1,4 @@
-<p><%= link_to(@ticket.name, @url) %> has been stolen by <%= link_to(@stealer.name, [@stealer.user, @stealer]) %>.</p>
+<p><%= link_to(@ticket.name, @url) %> has been stolen by <%= link_to(@stealer.name, @stealer.user) %>.</p>
 <%=raw @ticket.summary %>
 <% @details.each do |detail| %>
   <% if detail.resolved_ticket? %>
