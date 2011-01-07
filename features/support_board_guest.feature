@@ -1,26 +1,10 @@
 Feature: the support board as seen by guests
 
-Scenario: what guests should (not) see
-  Given I am on the home page
-  When I follow "Support Board"
-  Then I should see "Open a New Support Ticket"
-    And I should see "Comments"
-    And I should see "Frequently Asked Questions"
-    And I should see "Release Notes"
-    And I should see "Open Code Tickets (Known Issues)"
-  # since they can't comment on them
-  But I should not see "Open Support Tickets"
-  # since they aren't volunteers
-  But I should not see "Admin attention"
-    And I should not see "in progress"
-    And I should not see "Spam"
-    And I should not see "Resolved"
-
 Scenario: guests can view public tickets but not comment on them.
   Given a support ticket exists with summary: "publicly visible"
   When I go to the first support ticket page
   Then I should see "publicly visible"
-    But I should not see "Add details"
+    But I should not see "Details:"
 
 Scenario: guests can't access private tickets even with a direct link.
   Given a support ticket exists with private: true
@@ -58,7 +42,7 @@ Scenario: guests can create a support ticket with initial details. the byline fo
     And I fill in "Summary" with "Archive is very slow"
     And I fill in "Details" with "For example, it took a minute for this page to render"
   When I press "Create Support ticket"
-    And I should see "Ticket owner wrote: For example"
+    And I should see "ticket owner wrote: For example"
 
 Scenario: guests should receive email notification
   Given I am on the home page
@@ -71,10 +55,10 @@ Scenario: guests should receive email notification
 Scenario: guests email notifications should have a link with authentication code
   Given a support ticket exists
     And all emails have been delivered
-  When a volunteer responds to support ticket 1
+  When a volunteer comments on support ticket 1
   Then 1 email should be delivered to "guest@ao3.org"
   When I click the first link in the email
-  Then I should see "Add details"
+  Then I should see "Details:"
 
 Scenario: guests can continue to make other changes (persistent authorization)
   Given I am on the home page
@@ -82,12 +66,12 @@ Scenario: guests can continue to make other changes (persistent authorization)
   When I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
-    And I fill in "Add details" with "For example, it took a minute for this page to render"
-    And I press "Update Support ticket"
-  Then I should see "Ticket owner wrote: For example"
-  When I fill in "Add details" with "Never mind, I just found out my whole network is slow"
-    And I press "Update Support ticket"
-  Then I should see "Ticket owner wrote: Never mind"
+    And I fill in "Details" with "For example, it took a minute for this page to render"
+    And I press "Add details"
+  Then I should see "ticket owner wrote: For example"
+  When I fill in "Details" with "Never mind, I just found out my whole network is slow"
+    And I press "Add details"
+  Then I should see "ticket owner wrote: Never mind"
 
 Scenario: guests still have access later in the same session
   Given I am on the home page
@@ -99,7 +83,7 @@ Scenario: guests still have access later in the same session
   And I follow "Support Board"
   And I follow "Comments"
   When I go to the page for the first support ticket
-    Then I should see "Add details"
+    Then I should see "Details:"
 
 Scenario: guests can create private support tickets
   Given I am on the home page
@@ -140,28 +124,23 @@ Scenario: guests can enter an email address to have authorized links re-sent and
     And all emails have been delivered
 
   When I click the first link in the email
-    And I check "Turn off notifications"
-    And I press "Update Support ticket"
-  Then I should see "Support ticket updated"
-    And I should see "Turn on notifications"
-  When a user responds to support ticket 1
+    And I press "Don't watch this ticket"
+  When a user comments on support ticket 1
   Then 0 emails should be delivered to "guest@ao3.org"
 
   # turning off notifications for one shouldn't affect the other
-  When a user responds to support ticket 2
+  When a user comments on support ticket 2
   Then 1 email should be delivered to "guest@ao3.org"
     And all emails have been delivered
 
   # I'm still on support ticket 1's page
-  When I check "Turn on notifications"
-    And I press "Update Support ticket"
-  Then I should see "Turn off notifications"
+  When I press "Watch this ticket"
 
   # just toggling notifications shouldn't trigger an email. the ticket itself hasn't changed
   Then 0 emails should be delivered to "guest@ao3.org"
     And all emails have been delivered
 
-  When a user responds to support ticket 1
+  When a user comments on support ticket 1
   Then 1 email should be delivered to "guest@ao3.org"
 
 Scenario: if there are no tickets, the guest should be told
@@ -200,25 +179,24 @@ Scenario: guests can't make their private support tickets public
     And I check "Private"
   When I press "Create Support ticket"
   Then I should see "Access: Private"
-    But I should not see "Private. (Ticket will only be visible"
+    But I should not see "(Ticket will only be visible"
 
 Scenario: guests can make their public support tickets private, even to people who already commented who should no longer get email
   Given a support ticket exists
     And all emails have been delivered
   When I am logged in as "helpful"
     And I am on the first support ticket page
-    And I fill in "Add details" with "Have you tried..."
-    And I press "Update Support ticket"
+    And I fill in "Details" with "Have you tried..."
+    And I press "Add details"
   Then 1 email should be delivered to "guest@ao3.org"
   When I am logged out
     And I click the first link in the email
-    And I check "Private"
-    And I press "Update Support ticket"
+    And I press "Make private"
   When I am logged in as "helpful"
     And I am on the first support ticket page
   Then I should see "Sorry, you don't have permission"
   When all emails have been delivered
-    And a volunteer responds to support ticket 1
+    And a volunteer comments on support ticket 1
   Then 1 email should be delivered to "guest@ao3.org"
   And 0 emails should be delivered to "helpful@ao3.org"
 
@@ -227,14 +205,13 @@ Scenario: email to others shouldn't include the authorization
     And all emails have been delivered
   When I am logged in as "helpful"
     And I am on the first support ticket page
-    And I check "Turn on notifications"
-    And I press "Update Support ticket"
+    And I press "Watch this ticket"
   When I am logged out
-    And a user responds to support ticket 1
+    And a user comments on support ticket 1
   Then 1 email should be delivered to "helpful@ao3.org"
   When I click the first link in the email
   Then I should see "wrote"
-    But I should not see "This answer resolves my issue"
+    But I should not see "Ticket will only be visible"
 
 Scenario: guests can (un)resolve their own support tickets using their own answers
   Given I am on the home page
@@ -242,17 +219,16 @@ Scenario: guests can (un)resolve their own support tickets using their own answe
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
-    And I fill in "Add details" with "Never mind"
-    And I press "Update Support ticket"
-  Then I should see "Ticket owner wrote: Never mind"
-  When I check "This answer resolves my issue"
-    And I press "Update Support ticket"
-  Then I should see "Status: Owner resolved"
-    And I should see "Answered by Ticket owner: Never mind"
-  When I uncheck "This answer resolves my issue"
-   And I press "Update Support ticket"
-  Then I should see "Status: Open"
-    And I should see "Ticket owner wrote: Never mind"
+    And I fill in "Details" with "Never mind"
+    And I press "Add details"
+  When I select "ticket owner wrote" from "Support Detail"
+    And I press "This answer resolves my issue"
+  Then I should see "Status: closed by owner"
+    And I should see "ticket owner wrote (accepted): Never mind"
+  When I fill in "Reason" with "no it didn't"
+    And I press "Reopen"
+  Then I should see "Status: open"
+    And I should see "ticket owner wrote: Never mind"
 
 Scenario: guests can (un)resolve their own support tickets using a user answer
   Given I am on the home page
@@ -260,15 +236,15 @@ Scenario: guests can (un)resolve their own support tickets using a user answer
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
-  When a user responds to support ticket 1
+  When a user comments on support ticket 1
     And I reload the page
-  When I check "This answer resolves my issue"
-    And I press "Update Support ticket"
-  Then I should see "Status: Owner resolved"
-    And I should see "Answered by someone: blah blah"
-  When I uncheck "This answer resolves my issue"
-   And I press "Update Support ticket"
-  Then I should see "Status: Open"
+  When I select "someone wrote" from "Support Detail"
+    And I press "This answer resolves my issue"
+  Then I should see "Status: closed by owner"
+    And I should see "someone wrote (accepted): blah blah"
+  When I fill in "Reason" with "no it didn't"
+    And I press "Reopen"
+  Then I should see "Status: open"
     And I should see "someone wrote: blah blah"
 
 Scenario: guests can (un)resolve their own support tickets using a support volunteer answer
@@ -277,97 +253,70 @@ Scenario: guests can (un)resolve their own support tickets using a support volun
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
-  When a volunteer responds to support ticket 1
+  When a volunteer comments on support ticket 1
     And I reload the page
-  When I check "This answer resolves my issue"
-    And I press "Update Support ticket"
-  Then I should see "Status: Owner resolved"
-    And I should see "Answered by Support volunteer oracle: foo bar"
-  When I uncheck "This answer resolves my issue"
-   And I press "Update Support ticket"
-  Then I should see "Status: Open"
-    And I should see "volunteer oracle wrote: foo bar"
+  When I select "oracle (volunteer) wrote" from "Support Detail"
+  When I press "This answer resolves my issue"
+  Then I should see "Status: closed by owner"
+    And I should see "oracle (volunteer) wrote (accepted): foo bar"
+  When I fill in "Reason" with "no it didn't"
+    And I press "Reopen"
+  Then I should see "Status: open"
+    And I should see "oracle (volunteer) wrote: foo bar"
 
-Scenario: guests can mark more than one answer as having resolved their ticket
-  Given I am on the home page
-  When I follow "Open a New Support Ticket"
-    And I fill in "Email" with "guest@ao3.org"
-    And I fill in "Summary" with "Archive is very slow"
-  When I press "Create Support ticket"
-    And I fill in "Add details" with "Never mind"
-    And I press "Update Support ticket"
-    And a user responds to support ticket 1
-  When a volunteer responds to support ticket 1
-    And I reload the page
-  When I check "support_ticket_support_details_attributes_0_resolved_ticket"
-    And I check "support_ticket_support_details_attributes_1_resolved_ticket"
-    And I check "support_ticket_support_details_attributes_2_resolved_ticket"
-    And I press "Update Support ticket"
-  Then I should see "Status: Owner resolved"
-    And I should see "Answered by Ticket owner: Never mind"
-    And I should see "Answered by someone: blah blah"
-    And I should see "Answered by Support volunteer oracle: foo bar"
-  When I uncheck "support_ticket_support_details_attributes_0_resolved_ticket"
-  When I uncheck "support_ticket_support_details_attributes_1_resolved_ticket"
-   And I press "Update Support ticket"
-  Then I should see "Status: Owner resolved"
-    And I should see "Ticket owner wrote: Never mind"
-    And I should see "someone wrote: blah blah"
-    And I should see "Answered by Support volunteer oracle: foo bar"
-  When I uncheck "support_ticket_support_details_attributes_2_resolved_ticket"
-   And I press "Update Support ticket"
-  Then I should see "Status: Open"
-    And I should see "volunteer oracle wrote: foo bar"
-
-Scenario: guests can view open code tickets, but not vote or respond
+Scenario: guests can view open code tickets, but not vote or comment
   Given a code ticket exists with id: 1
   When I am on the first code ticket page
-  Then I should see "Status: Open"
+  Then I should see "Status: open"
     And I should see "Votes: 0"
   But I should not see "Vote up"
-    And I should not see "Add details"
+    And I should not see "Details:"
 
-Scenario: guests can view in progress code tickets, but not vote or respond
+Scenario: guests can view in progress code tickets, but not vote or comment
   Given a code ticket exists with id: 1
     And a volunteer exists with login: "oracle"
   When "oracle" takes code ticket 1
     And I am on the first code ticket page
-  Then I should see "Status: In progress"
+  Then I should see "Status: taken by oracle"
     And I should see "Votes: 0"
   But I should not see "Vote up"
-    And I should not see "Add details"
+    And I should not see "Details:"
 
-Scenario: guests can view closed code tickets, but not vote or respond
+Scenario: guests can view closed code tickets, but not vote or comment
   Given a code ticket exists with id: 1
     And a volunteer exists with login: "oracle"
   When "oracle" takes code ticket 1
     And "oracle" resolves code ticket 1
   When I am on the first code ticket page
-  Then I should see "Status: Fixed"
+  Then I should see "Status: closed by oracle"
     And I should see "Votes: 0"
   But I should not see "Vote up"
-    And I should not see "Add details"
+    And I should not see "Details:"
 
-Scenario: guests reading a FAQ can mark it as "this answered my question" (a FAQ vote)
-  Given a faq exists with posted: true
+Scenario: guests reading a draft FAQ can mark it as "this answered my question" (a FAQ vote)
+  Given a faq exists with position: 1, title: "something interesting"
   When I am on the first faq page
-  Then I should see "faq 1"
+  Then I should see "something interesting"
   When I press "This FAQ answered my question"
-  Then I should not see "Votes: 1"
-  When I am logged in as volunteer "oracle"
-    And I am on the first faq page
   Then I should see "Votes: 1"
 
-Scenario: guests can view posted FAQs, but not comment
-  Given a faq exists with posted: true
+Scenario: guests reading a posted FAQ can mark it as "this answered my question" (a FAQ vote)
+  Given a posted faq exists with position: 1, title: "something else"
   When I am on the first faq page
-  Then I should see "faq 1"
-    But I should not see "Add comment"
+  Then I should see "something else"
+  When I press "This FAQ answered my question"
+  Then I should see "Votes: 1"
 
 Scenario: guests can view draft FAQs, but not comment
-  Given a faq exists with posted: false
+  Given a faq exists with position: 1, title: "nothing much"
   When I am on the first faq page
-  Then I should see "faq 1"
+  Then I should see "nothing much"
+    But I should not see "Add comment"
+
+Scenario: guests can view posted FAQs, but not comment
+  Given a posted faq exists with position: 1, title: "big faq"
+  When I am on the first faq page
+  Then I should see "big faq"
     But I should not see "Add comment"
 
 Scenario: guests can comment on a draft FAQ when following a link from their own support ticket
@@ -378,8 +327,8 @@ Scenario: guests can comment on a draft FAQ when following a link from their own
   When I press "Create Support ticket"
   When a volunteer creates a faq from support ticket 1
     And I reload the page
-  Then I should see "Status: Linked to FAQ by oracle"
-  When I follow "1: faq 1"
+  Then I should see "Status: closed by oracle"
+  When I follow "1: new faq"
     And I fill in "Add comment" with "this sounds good"
     And I press "Update Faq"
   Then I should see "Support ticket owner wrote: this sounds good"
@@ -393,7 +342,7 @@ Scenario: guests can't comment on a posted FAQ when following a link from their 
   When I press "Create Support ticket"
   When a volunteer links support ticket 1 to faq 1
     And I reload the page
-  Then I should see "Status: Linked to FAQ by oracle"
+  Then I should see "Status: closed by oracle"
   When I follow "1: faq 1"
     Then I should not see "Add comment"
 
@@ -405,27 +354,27 @@ Scenario: guests can remove a link to a FAQ if they don't think it resolves thei
   When I press "Create Support ticket"
   When a volunteer creates a faq from support ticket 1
     And I reload the page
-  Then I should see "Status: Linked to FAQ by oracle"
-    And I should see "1: faq 1"
-  When I uncheck "linked to FAQ"
-    And I press "Update Support ticket"
-  Then I should see "Status: In progress"
-    And I should not see "1: faq 1"
+  Then I should see "Status: closed by oracle"
+    And I should see "1: new faq"
+  When I fill in "Reason" with "FAQ not helpful"
+    And I press "Reopen"
+  Then I should see "Status: open"
+    And I should not see "1: new faq"
 
 Scenario: a posted faq should get a vote when linked from a guest support ticket
-  Given a faq exists with posted: true, position: 1
+  Given a posted faq exists with position: 1, title: "slowness"
   Given I am on the home page
   When I follow "Open a New Support Ticket"
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
   When a volunteer links support ticket 1 to faq 1
-  When I am logged in as "oracle"
-    And I am on the first faq page
-  Then I should see "Votes: 1"
+  When I am on the first faq page
+  Then I should see "slowness"
+    And I should see "Votes: 1"
 
 Scenario: a posted faq should get a vote removed when unlinked from a guest support ticket
-  Given a faq exists with posted: true, position: 1
+  Given a posted faq exists with position: 1, title: "slowness"
   Given I am on the home page
   When I follow "Open a New Support Ticket"
     And I fill in "Email" with "guest@ao3.org"
@@ -433,8 +382,8 @@ Scenario: a posted faq should get a vote removed when unlinked from a guest supp
   When I press "Create Support ticket"
   When a volunteer links support ticket 1 to faq 1
     And I reload the page
-  When I uncheck "linked to FAQ"
-    And I press "Update Support ticket"
+  When I fill in "Reason" with "FAQ not helpful"
+    And I press "Reopen"
   When I am logged in as "oracle"
     And I am on the first faq page
   Then I should see "Votes: 0"
@@ -449,7 +398,7 @@ Scenario: a faq should get a vote from guest support tickets when it's posted
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
     And I follow "Unposted FAQs"
-    And I follow "1: faq 1"
+    And I follow "1: new faq"
     And I press "Post"
   Then I should see "Votes: 1"
 
@@ -461,12 +410,14 @@ Scenario: a faq should not get a vote when it's posted if there are no linked su
   When I press "Create Support ticket"
   When a volunteer creates a faq from support ticket 1
     And I reload the page
-  When I uncheck "linked to FAQ"
-    And I press "Update Support ticket"
+  When I fill in "Reason" with "FAQ not helpful"
+    And I press "Reopen"
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
     And I follow "Unposted FAQs"
-    And I follow "1: faq 1"
+    And I follow "1: new faq"
     And I press "Post"
   Then I should see "Votes: 0"
 
+# TODO
+Scenario: save the authenticity_token - as well as browser and IP (makes searching the logs for posts easy)

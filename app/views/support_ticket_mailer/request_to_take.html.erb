@@ -2,9 +2,9 @@
 <%=raw @ticket.summary %>
 <% @details.each do |detail| %>
   <% if detail.resolved_ticket? %>
-    <dt>Answered by <%= detail.byline %>:</dt>
+    <dt><%= detail.byline %> (accepted):</dt>
   <% else %>
-    <dt><%= detail.byline %> wrote:</dt>
+    <dt><%= detail.byline %></dt>
   <% end %>
       <dd><%= raw detail.content %></dd>
 <% end %>

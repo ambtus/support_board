@@ -1,9 +1,9 @@
 class CodeTicketsController < ApplicationController
   def index
-    if params[:resolved]
-      @tickets = CodeTicket.where(:resolved => true)
+    if params[:status]
+      @tickets = CodeTicket.send(params[:status])
     else
-      @tickets = CodeTicket.where(:resolved => false)
+      @tickets = CodeTicket.not_closed
     end
 
     # tickets associated with a user
@@ -28,7 +28,7 @@ class CodeTicketsController < ApplicationController
         end
 
       # support volunteer's working tickets
-      elsif params[:support]
+      else
         @tickets = @tickets.where(:support_identity_id => user.support_identity_id)
       end
 
@@ -42,11 +42,11 @@ class CodeTicketsController < ApplicationController
       @details = @ticket.code_details.where(:private => false)
       render :show_guest
     elsif current_user.support_volunteer?
-      @ticket.code_details.build(:support_response => true) # create a new empty response template
+      @add_details = true # create a new empty response template
       render :show_volunteer
     else # logged in as non-support volunteer
       if !@ticket.support_identity_id # if support took it, it's not longer open for comment
-        @ticket.code_details.build # create a new empty response template
+        @add_details = true # create a new empty response template
       end
       render :show_user
     end
@@ -54,25 +54,31 @@ class CodeTicketsController < ApplicationController
   end
 
   def new
-    if current_user.support_volunteer?
-      @ticket = CodeTicket.new
-      @ticket.code_details.build(:support_response => true)
-    else
-      flash[:notice] = "Sorry, only volunteers can open code tickets. Please open a support ticket instead"
+    if !current_user.try(:support_volunteer?)
+      flash[:notice] = "Sorry, only support volunteers can open code tickets. Please open a support ticket instead"
       redirect_to new_support_ticket_path and return
     end
+    @ticket = CodeTicket.new
+    @add_details = true # create a new empty response template
   end
 
   def create
-    if current_user.support_volunteer?
+    if !current_user.try(:support_volunteer?)
+      flash[:notice] = "Sorry, only support volunteers can open code tickets. Please open a support ticket instead"
+      redirect_to new_support_ticket_path and return
+    end
+    case params[:commit]
+    when "Stage Committed Code Tickets"
+      CodeTicket.stage!(params[:stage_revision])
+      redirect_to support_path and return
+    when "Deploy Verified Code Tickets"
+      CodeTicket.deploy!
+      redirect_to support_path and return
+    else
       @ticket = CodeTicket.new(params[:code_ticket])
       if @ticket.save
         flash[:notice] = "Code ticket created"
-        if @ticket.authentication_code
-          redirect_to code_ticket_path(@ticket, :authentication_code => @ticket.authentication_code)
-        else
-          redirect_to @ticket
-        end
+        redirect_to @ticket
         @ticket.send_create_notifications
       else
         # reset so don't get field with errors which breaks definition lists
@@ -80,52 +86,42 @@ class CodeTicketsController < ApplicationController
         @ticket = CodeTicket.new(params[:code_ticket])
         render :new
       end
-    else
-      flash[:notice] = "Sorry, only support volunteers can open code tickets. Please open a support ticket instead"
-      redirect_to new_support_ticket_path and return
     end
   end
 
   def edit
     @ticket = CodeTicket.find(params[:id])
-    if current_user.support_volunteer?
-      @ticket.code_details.build(:support_response => true) # create a new empty response template
-    else
-      flash[:notice] = "Sorry, only support volunteers can edit code tickets"
-      redirect_to @ticket and return
-    end
   end
 
   def update
     @ticket = CodeTicket.find(params[:id])
-    @ticket.update_attributes(params[:code_ticket])
-    if current_user.try(:support_volunteer?) && params[:commit] != "Update Code ticket"
-      support_identity = current_user.support_identity
-      case params[:commit]
-      when "Take"
-        @ticket.update_attribute(:support_identity_id, current_user.support_identity_id)
-      when "Dupe"
-        @ticket.update_attribute(:support_identity_id, current_user.support_identity_id)
-      end
-      redirect_to @ticket and return
-    elsif current_user
-      @ticket.update_attributes(params[:code_ticket])
-      if @ticket.save
-        flash[:notice] = "Code ticket updated"
-        @ticket.update_votes(current_user)
-        @ticket.update_watchers(current_user)
-        @ticket.send_update_notifications
-        if !current_user && @ticket.authentication_code
-          redirect_to code_ticket_path(@ticket, :authentication_code => @ticket.authentication_code)
-        else
-          redirect_to @ticket
-        end
-      else
-        render :edit
-      end
-    else
-      flash[:notice] = "Sorry, you don't have permission"
-      redirect_back_or_default(@ticket) and return
+    case params[:commit]
+    when "Take"
+      @ticket.take!
+    when "Steal"
+      @ticket.steal!
+    when "Dupe"
+      @ticket.duplicate!(params[:code_ticket_id])
+    when "Reopen"
+      @ticket.reopen!(params[:reason])
+    when "Reject"
+      @ticket.reject!(params[:reason])
+    when "Verify"
+      @ticket.verify!(SupportBoard::REVISION_NUMBER)
+    when "Vote for this ticket"
+      @ticket.vote!
+    when "Watch this ticket"
+      @ticket.watch!
+    when "Don't watch this ticket"
+      @ticket.unwatch!
+    when "Add details"
+      @ticket.comment!(params[:content], !params[:unofficial])
+    when "Update Code ticket"
+      @ticket.update_from_edit!(params[:code_ticket][:summary],
+                      params[:code_ticket][:description],
+                      params[:code_ticket][:url],
+                      params[:code_ticket][:browser])
     end
+    redirect_to @ticket
   end
 end

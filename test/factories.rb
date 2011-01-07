@@ -16,8 +16,9 @@ Factory.define :code_ticket do |code_ticket|
 end
 
 Factory.define :faq do |faq|
+  faq.sequence(:position) { |n| n }
+  faq.after_build { |faq| User.current_user = Factory.create(:volunteer)}
   faq.title { |a| "faq #{a.position}" }
-  faq.after_build { |faq| faq.user_id = Factory.create(:volunteer)}
 end
 
 Factory.define :volunteer, :parent => :user do |volunteer|

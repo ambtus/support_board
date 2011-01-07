@@ -11,13 +11,20 @@ class SupportDetail < ActiveRecord::Base
     self.support_ticket.user.support_identity == self.support_identity # was the ticket opened and commented on by the same user?
   end
 
-  def byline
+  def byline_name
     if by_owner?
-      (self.support_ticket.display_user_name? && self.support_identity_id) ? self.support_identity.name : "Ticket owner"
+      (self.support_ticket.display_user_name? && self.support_identity_id) ? self.support_identity.name : "ticket owner"
     else
-      prefix = self.support_response? ? "Support volunteer " : ""
-      prefix + self.support_identity.name
+      self.support_identity.name + (self.support_response? ? " (volunteer)" : "")
     end
+  end
+
+  def byline
+    date = self.updated_at.to_s(:short)
+    name = self.byline_name
+    system = self.system_log? ? "" : " wrote"
+    accepted = self.resolved_ticket? ? " (accepted)" : ""
+    "[#{date}] #{name}#{system}#{accepted}"
   end
 
   # SANITIZER stuff

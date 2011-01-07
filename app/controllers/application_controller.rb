@@ -10,6 +10,12 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
   before_filter :store_location
 
+  # Store the current user in the User class as User.current_user
+  before_filter :set_current_user
+  def set_current_user
+    User.current_user = current_user
+  end
+
   # store previous page in session to make redirecting back possible
   def store_location
     if session[:return_to] == "redirected"
@@ -42,7 +48,10 @@ protected
   end
 
   def current_user
+    return @current_user if defined?(@current_user)
     @current_user = current_user_session && current_user_session.record
   end
 
 end
+
+

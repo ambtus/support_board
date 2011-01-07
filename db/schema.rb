@@ -16,10 +16,10 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "code_ticket_id"
     t.integer  "support_identity_id"
     t.boolean  "support_response",                       :default => false
+    t.boolean  "system_log",                             :default => false
     t.string   "content"
     t.boolean  "private",                                :default => false
     t.boolean  "resolved_ticket",                        :default => false
-    t.string   "archive_revision"
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -36,13 +36,11 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "summary"
     t.string   "description"
     t.string   "url"
-    t.string   "reported_rev"
-    t.string   "committed_rev"
-    t.string   "deployed_rev"
     t.string   "browser"
+    t.string   "status"
+    t.integer  "revision"
     t.integer  "support_identity_id"
     t.integer  "code_ticket_id"
-    t.integer  "resolved",                                   :default => 0
     t.integer  "summary_sanitizer_version",     :limit => 2, :default => 0, :null => false
     t.integer  "description_sanitizer_version", :limit => 2, :default => 0, :null => false
     t.datetime "created_at"
@@ -91,7 +89,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   create_table "faqs", :force => true do |t|
     t.string   "title"
     t.text     "content"
-    t.integer  "position",                               :default => 1
+    t.integer  "position"
     t.integer  "user_id"
     t.boolean  "posted",                                 :default => false
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
@@ -121,6 +119,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "content"
     t.boolean  "private",                                :default => false
     t.boolean  "resolved_ticket",                        :default => false
+    t.boolean  "system_log",                             :default => false
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -149,19 +148,13 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.boolean  "private",                                :default => false
     t.boolean  "display_user_name",                      :default => false
     t.string   "url"
-    t.string   "archive_revision"
     t.string   "user_agent"
     t.string   "ip_address"
-    t.boolean  "approved",                               :default => false, :null => false
+    t.string   "status"
+    t.string   "revision"
     t.integer  "support_identity_id"
-    t.boolean  "question",                               :default => false
     t.integer  "faq_id"
-    t.boolean  "problem",                                :default => false
     t.integer  "code_ticket_id"
-    t.boolean  "admin",                                  :default => false
-    t.boolean  "support_admin_resolved",                 :default => false
-    t.boolean  "comment",                                :default => false
-    t.integer  "resolved",                               :default => 0
     t.integer  "summary_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"

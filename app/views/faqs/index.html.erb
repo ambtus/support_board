@@ -1,7 +1,7 @@
 <ul>
 <% @faqs.each do |faq| %>
   <li>
-    <%= link_to faq.name, faq%>
+    <%= link_to faq.name, faq%> (<%= faq.vote_count %>)
   </li>
 <% end %>
 </ul>

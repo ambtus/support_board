@@ -1,3 +1,11 @@
+# overriding application.rb
+# will throw a warning
+Given /^the current SupportBoard version is "([^"]*)"$/ do |revision|
+  # " reset quotes for color
+  SupportBoard::REVISION_NUMBER = revision.to_i
+end
+
+
 # creating and logging in as volunteers and admins
 
 Given /^I am logged in as volunteer "([^"]*)"$/ do |login|
@@ -29,157 +37,197 @@ end
 Given /^"([^"]*)" has a support identity "([^"]*)"$/ do |login, name|
   user = User.find_by_login(login)
   assert_not_nil user
-  user.support_identity.update_attribute(:name, name)
+  assert user.support_identity.update_attribute(:name, name)
 end
 
-# user actions on tickets
+# generic user actions on tickets
 
-Given /^a user responds to support ticket (\d+)$/ do |number|
+Given /^a user comments on support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
   user = User.find_by_login("someone")
   user = Factory.create(:user, :login => "someone") unless user
-  ticket.support_details.build(:support_identity => user.support_identity, :content => "blah blah")
-  ticket.save
-  ticket.send_update_notifications
+  User.current_user = user
+  assert ticket.comment!("blah blah")
 end
 
 # generic volunteer actions on tickets
 
-Given /^a volunteer responds to support ticket (\d+)$/ do |number|
+Given /^a volunteer comments on support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
-  user = User.find_by_login("oracle") ||
+  user = User.find_by_login("oracle")
   unless user
     Given %{a volunteer exists with login: "oracle"}
     user = User.find_by_login("oracle")
   end
   assert user.support_volunteer?
-  ticket.support_details.build(:support_identity => user.support_identity, :support_response => true, :content => "foo bar")
-  ticket.save
-  ticket.send_update_notifications
+  User.current_user = user
+  assert ticket.comment!("foo bar")
 end
+
+Given /^a posted faq exists$/ do
+  Given %{a faq exists}
+  Given %{a support admin exists with login: "bofh"}
+  faq = Faq.first
+  User.current_user = User.find_by_login("bofh")
+  faq.post!
+end
+
+Given /^a posted faq exists with position: (\d+), title: "([^"]*)"$/ do |number, title|
+  # " reset quotes for color
+  Given %{a faq exists with position: #{number}, title: "#{title}"}
+  Given %{a support admin exists with login: "bofh"}
+  faq = Faq.find_by_position(number)
+  User.current_user = User.find_by_login("bofh")
+  faq.post!
+end
+
 
 When /^a volunteer creates a faq from support ticket (\d+)$/ do |number|
   ticket = SupportTicket.all[number.to_i - 1]
   Given %{a volunteer exists with login: "oracle"}
-  user = User.find_by_login("oracle")
-  faq = Factory.create(:faq)
-  ticket.update_attribute(:faq_id, faq.id)
-  ticket.update_attribute(:support_identity_id, user.support_identity_id)
-  ticket.send_update_notifications
+  User.current_user = User.find_by_login("oracle")
+  assert faq = ticket.answer!
+  faq.update_attribute(:title, "new faq")
 end
 
 When /^a volunteer links support ticket (\d+) to faq (\d+)$/ do |arg1, arg2|
-  ticket = SupportTicket.all[arg1.to_i - 1]
-  faq = Faq.find_by_position(arg2.to_i)
+  assert ticket = SupportTicket.all[arg1.to_i - 1]
+  assert faq = Faq.find_by_position(arg2.to_i)
   Given %{a volunteer exists with login: "oracle"}
-  user = User.find_by_login("oracle")
-  ticket.update_attribute(:faq_id, faq.id)
-  ticket.update_attribute(:support_identity_id, user.support_identity_id)
-  ticket.send_update_notifications
+  User.current_user = User.find_by_login("oracle")
+  assert ticket.answer!(faq.id)
 end
 
-Given /^a volunteer responds to code ticket (\d+)$/ do |number|
+Given /^a volunteer comments on code ticket (\d+)$/ do |number|
   ticket = CodeTicket.all[number.to_i - 1]
   Given %{a volunteer exists with login: "oracle"}
-  user = User.find_by_login("oracle")
-  ticket.code_details.build(:support_identity => user.support_identity, :support_response => true, :content => "foo bar")
-  ticket.save
-  ticket.send_update_notifications
+  User.current_user =  User.find_by_login("oracle")
+  assert ticket.comment!("foo bar")
 end
 
 # named user actions on tickets.
 # create the support identity they'd get working through the web interface
 
-Given /^"([^"]*)" responds to support ticket (\d+)$/ do |login, number|
+Given /^"([^"]*)" comments on support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
-  assert user = User.find_by_login(login)
-  user.support_identity
-  ticket.support_details.build(:support_identity => user.support_identity, :content => "blah blah")
-  ticket.save
-  ticket.send_update_notifications
+  User.current_user = User.find_by_login(login)
+  assert ticket.comment!("foo bar")
 end
 
 Given /^"([^"]*)" watches support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
-  assert user = User.find_by_login(login)
-  user.support_identity
-  ticket.support_notifications.create(:email => user.email, :public_watcher => true)
+  User.current_user = User.find_by_login(login)
+  # needs a support identity which they would have gotten if they've visited the page
+  User.current_user.support_identity
+  assert ticket.watch!
 end
 
-Given /^"([^"]*)" accepts a response to support ticket (\d+)$/ do |login, number|
+Given /^"([^"]*)" accepts a comment on support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
-  user.support_identity
-  assert ticket.user == user
-  response = ticket.support_details.where(:resolved_ticket => false).first
-  ticket.support_details_attributes = {"0"=>{"resolved_ticket"=>"1", "id"=>response.id}}
-  ticket.save
-  ticket.send_update_notifications
+  User.current_user = User.find_by_login(login)
+  detail = ticket.support_details.where(:resolved_ticket => false).first
+  assert ticket.accept!(detail.id)
 end
 
 Given /^"([^"]*)" takes support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
-  assert user.support_volunteer?
-  ticket.support_identity_id = user.support_identity_id
-  ticket.save
-  ticket.send_update_notifications
+  User.current_user = User.find_by_login(login)
+  assert ticket.take!
 end
 
-Given /^"([^"]*)" categorizes support ticket (\d+) as Comment$/ do |login, number|
+Given /^"([^"]*)" posts support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
-  assert user.support_volunteer?
-  ticket.mark_as_comment!(user.support_identity)
+  User.current_user = User.find_by_login(login)
+  assert ticket.post!
+end
+
+When /^"([^"]*)" creates a faq from support ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = SupportTicket.all[number.to_i - 1]
+  User.current_user = User.find_by_login(login)
+  assert faq = ticket.answer!
+  faq.update_attribute(:title, "new faq")
+end
+
+When /^"([^"]*)" creates a code ticket from support ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = SupportTicket.all[number.to_i - 1]
+  User.current_user = User.find_by_login(login)
+  assert ticket.needs_fix!
+end
+
+When /^"([^"]*)" links support ticket (\d+) to code ticket (\d+)$/ do |login, arg1, arg2|
+  # " reset quotes for color
+  assert ticket = SupportTicket.all[arg1.to_i - 1]
+  assert code = CodeTicket.all[arg2.to_i - 1]
+  User.current_user = User.find_by_login(login)
+  assert ticket.needs_fix!(code.id)
 end
 
 Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
-  assert user.support_volunteer?
-  ticket.send_steal_notification(user.support_identity) if ticket.support_identity_id
-  ticket.update_attribute(:support_identity_id, user.support_identity_id)
+  User.current_user = User.find_by_login(login)
+  assert ticket.take!
+end
+
+Given /^"([^"]*)" commits code ticket (\d+) in "([^"]*)"$/ do |login, number, revision|
+  ticket = CodeTicket.all[number.to_i - 1]
+  User.current_user = User.find_by_login(login)
+  ticket.commit!(revision)
+end
+
+Given /^"([^"]*)" stages code ticket (\d+) in "([^"]*)"$/ do |login, number, revision|
+  ticket = CodeTicket.all[number.to_i - 1]
+  User.current_user = User.find_by_login(login)
+  ticket.commit!("1")
+  ticket.stage!(revision)
+end
+
+Given /^"([^"]*)" verifies code ticket (\d+) in "([^"]*)"$/ do |login, number, revision|
+  ticket = CodeTicket.all[number.to_i - 1]
+  User.current_user = User.find_by_login(login)
+  ticket.commit!("1")
+  ticket.stage!("2")
+  ticket.verify!(revision)
 end
 
 Given /^"([^"]*)" resolves code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
-  user = User.find_by_login(login)
-  assert user.support_volunteer?
-  ticket.support_identity_id = user.support_identity_id
-  ticket.committed_rev = "12345"
-  ticket.save
-  ticket.send_update_notifications
+  User.current_user = User.find_by_login(login)
+  ticket.commit!("1")
+  ticket.stage!("2")
+  ticket.verify!("3")
+  ticket.deploy!("4")
 end
 
-Given /^"([^"]*)" votes up code ticket (\d+)$/ do |login, number|
+Given /^"([^"]*)" votes for code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
-  assert user = User.find_by_login(login)
-  user.support_identity
-  ticket.code_votes.create(:user_id => user.id, :vote => 1)
+  User.current_user = User.find_by_login(login)
+  # needs a support identity which they would have gotten if they've visited the page
+  User.current_user.support_identity
+  assert ticket.vote!
 end
 
 Given /^"([^"]*)" comments on code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
-  assert user = User.find_by_login(login)
-  ticket.code_details.build(:support_identity => user.support_identity, :content => "blah blah", :support_response => user.support_volunteer?)
-  ticket.save
-  ticket.send_update_notifications
+  User.current_user = User.find_by_login(login)
+  assert ticket.comment!("foo bar")
 end
 
 Given /^"([^"]*)" watches code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
-  assert user = User.find_by_login(login)
-  user.support_identity
-  ticket.code_notifications.create(:email => user.email)
+  User.current_user = User.find_by_login(login)
+  # needs a support identity which they would have gotten if they've visited the page
+  User.current_user.support_identity
+  assert ticket.watch!
 end
-

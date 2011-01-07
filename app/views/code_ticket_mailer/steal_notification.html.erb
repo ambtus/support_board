@@ -1,10 +1,8 @@
 <p><%= link_to(@ticket.name, @url) %> has been stolen by <%= link_to(@stealer.support_identity.name, @stealer) %>.</p>
 <%=raw @ticket.summary %>
+<dl>
 <% @details.each do |detail| %>
-  <% if detail.resolved_ticket? %>
-    <dt><%= detail.byline %> (accepted):</dt>
-  <% else %>
-    <dt><%= detail.byline %></dt>
-  <% end %>
-      <dd><%= raw detail.content %></dd>
+  <dt><%= detail.byline %>:</dt>
+    <dd><%= raw detail.content %></dd>
 <% end %>
+</dl>

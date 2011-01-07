@@ -1,6 +1,7 @@
 <h1><%= @user.login %>'s page</h1>
 <% if @user.support_identity_id %>
-<ul>
+  Support info for <%= @user.support_identity.name %>
+  <ul>
   <li>
     <%= link_to "Support tickets opened by #{@user.login}",
                 user_support_tickets_path(@user) %>
@@ -8,7 +9,7 @@
   <li>
     <%= link_to "Support tickets commented on by #{@user.login}",
                 user_support_tickets_path(@user, :comments => true) %>
-    <% if @accepted > 0 %>
+    <% if @accepted %>
      (<%= @accepted %> accepted)
     <% end %>
   </li>
@@ -32,21 +33,25 @@
   </li>
   <% if @user.support_identity.official %>
     <li>
-      <%= link_to "Support Tickets in progress",
-                  user_support_tickets_path(@user, :support => true) %>
+      <%= link_to "Taken Support Tickets",
+                  user_support_tickets_path(@user, :support => true, :status => "taken") %>
     </li>
     <li>
-      <%= link_to "Resolved Support Tickets",
-                  user_support_tickets_path(@user, :support => true, :only => "resolved") %>
+      <%= link_to "Waiting Support Tickets",
+                  user_support_tickets_path(@user, :support => true, :status => "waiting") %>
     </li>
-  <li>
-    <%= link_to "Code Tickets in progress",
-                user_code_tickets_path(@user, :support => true) %>
+    <li>
+      <%= link_to "Answered Support Tickets",
+                  user_support_tickets_path(@user, :support => true, :status => "closed") %>
     </li>
-  <li>
-    <%= link_to "Resolved Code Tickets",
-                user_code_tickets_path(@user, :support => true, :resolved => true) %>
+    <li>
+      <%= link_to "My Open Code Tickets",
+                  user_code_tickets_path(@user) %>
+    </li>
+    <li>
+    <%= link_to "My Closed Code Tickets",
+                user_code_tickets_path(@user, :status => "closed") %>
     </li>
   <% end %>
-</ul>
+  </ul>
 <% end %>

@@ -3,7 +3,9 @@ class CodeDetail < ActiveRecord::Base
   belongs_to :support_identity
 
   def byline
-    prefix = self.support_response? ? "Support volunteer " : ""
-    prefix + self.support_identity.name
+    raise "no support identity" unless self.support_identity
+    name = self.support_identity.name + (self.support_response? ? " (volunteer)" : "")
+    system = self.system_log? ? "" : " wrote"
+    "[#{self.updated_at.to_s(:short)}] #{name}#{system}"
   end
 end

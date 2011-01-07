@@ -1,19 +1,5 @@
 Feature: the support board as seen by logged in volunteers for support tickets
 
-Scenario: what volunteers should see
-  Given I am logged in as volunteer "oracle"
-  When I follow "Support Board"
-  Then I should see "Open a New Support Ticket"
-    And I should see "Comments"
-    And I should see "Frequently Asked Questions"
-    And I should see "Release Notes"
-    And I should see "Open Code Tickets (Known Issues)"
-    And I should see "Open Support Tickets"
-    And I should see "Admin attention"
-    And I should see "Support Tickets in progress"
-    And I should see "Spam"
-    And I should see "Resolved"
-
 Scenario: support board volunteers can access and take private tickets
   Given the following support tickets exist
     | summary                           | private | id |
@@ -22,9 +8,9 @@ Scenario: support board volunteers can access and take private tickets
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
-  Then I should see "Add details"
+  Then I should see "Details"
   When I press "Take"
-  Then I should see "Status: In progress"
+  Then I should see "Status: taken by oracle"
     And I should see "Access: Private"
 
 Scenario: support board volunteers can (un)take tickets.
@@ -33,30 +19,33 @@ Scenario: support board volunteers can (un)take tickets.
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
-  Then I should see "Status: Open"
+  Then I should see "Status: open"
   When I press "Take"
-  Then I should see "Status: In progress"
-    When I press "Untake"
-  Then I should see "Status: Open"
+  Then I should see "Status: taken by oracle"
+  When I fill in "Reason" with "RL has buried me"
+    When I press "Reopen"
+  Then I should see "Status: open"
 
 Scenario: support board volunteers can steal owned tickets.
   Given a support ticket exists with id: 1
     And a volunteer exists with login: "oracle"
     And "oracle" takes support ticket 1
+  Then 1 email should be delivered to "oracle@ao3.org"
+    And all emails have been delivered
   Given I am logged in as volunteer "hermione"
   When I am on oracle's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
     And I follow "Support Ticket #1"
-    When I press "Take"
+    When I press "Steal"
   Then 1 email should be delivered to "oracle@ao3.org"
     And the email should contain "has been stolen by"
     And the email should contain "hermione"
   When I am logged out
     And I am on oracle's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
   Then I should not see "Support Ticket #1"
   When I am on hermione's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
   Then I should see "Support Ticket #1"
 
 Scenario: support board volunteers can comment on owned tickets.
@@ -71,17 +60,16 @@ Scenario: support board volunteers can comment on owned tickets.
     And I follow "Support Tickets in progress"
     Then I should see "Support Ticket #1"
   When I am on oracle's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
     And I follow "Support Ticket #1"
-  Then I should see "Status: In progress"
-    And I should see "Add details"
+  Then I should see "Status: taken by oracle"
+    And I should see "Details"
 
 Scenario: support board volunteers can make tickets private, but not public again
   Given a support ticket exists with id: 1
   When I am logged in as volunteer "oracle"
     And I go to the first support ticket page
-    And I check "Private"
-    And I press "Update Support ticket"
+    And I press "Make private"
   Then I should see "Access: Private"
     And I should not see "Ticket will only be visible to"
 
@@ -100,9 +88,9 @@ Scenario: by default, when a volunteer comments, their comments are flagged as b
   Given a support ticket exists with id: 1
     And I am logged in as volunteer "oracle"
     And I go to the first support ticket page
-    And I fill in "Add details" with "some very interesting things"
-    And I press "Update Support ticket"
-  Then I should see "volunteer oracle wrote"
+    And I fill in "Details" with "some very interesting things"
+    And I press "Add details"
+  Then I should see "oracle (volunteer) wrote"
 
 Scenario: when a volunteer comments, they can chose to do so as a regular user
   Given a support ticket exists with id: 1
@@ -110,11 +98,11 @@ Scenario: when a volunteer comments, they can chose to do so as a regular user
     And "alice" has a support identity "oracle"
     And I am logged in as "alice"
     And I go to the first support ticket page
-  When I fill in "Add details" with "some other things"
-    And I uncheck "Answer officially?"
-    And I press "Update Support ticket"
+  When I fill in "Details" with "some other things"
+    And I uncheck "Official response?"
+    And I press "Add details"
   Then I should see "oracle wrote: some other things"
-    But I should not see "Support volunteer oracle wrote"
+    But I should not see "oracle (volunteer) wrote"
 
 Scenario: working support tickets should be available from the user page
   Given a user exists with login: "troubled", id: 1
@@ -127,16 +115,16 @@ Scenario: working support tickets should be available from the user page
     | 3  | right   | 1       |
     | 4  | wrong   |         |
     And "oracle" takes support ticket 1
-    And "oracle" responds to support ticket 1
+    And "oracle" comments on support ticket 1
     And "oracle" takes support ticket 3
     And "oracle" takes support ticket 4
   When I am on oracle's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
     But I should see "Support Ticket #3"
     And I should see "Support Ticket #4"
-  When "troubled" accepts a response to support ticket 1
+  When "troubled" accepts a comment on support ticket 1
     And I reload the page
   Then I should not see "Support Ticket #1"
     And I should not see "Support Ticket #2"
@@ -144,33 +132,33 @@ Scenario: working support tickets should be available from the user page
     And I should see "Support Ticket #4"
   When I am logged in as "oracle"
     And I am on oracle's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
     And I follow "Support Ticket #4"
-    And I press "Untake"
+    And I fill in "Reason" with "sorry, no time"
+    And I press "Reopen"
   When I am on oracle's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
   Then I should not see "Support Ticket #1"
     And I should not see "Support Ticket #2"
     But I should see "Support Ticket #3"
     And I should not see "Support Ticket #4"
   When I am logged in as "troubled"
     And I am on oracle's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
     And I follow "Support Ticket #3"
-    And I check "Private"
-    And I press "Update Support ticket"
+    And I press "Make private"
   When I am on oracle's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
   Then I should not see "Support Ticket #1"
     And I should not see "Support Ticket #2"
     And I should not see "Support Ticket #3"
     And I should not see "Support Ticket #4"
   When I am logged in as "hermione"
     And I am on oracle's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
     Then I should see "Support Ticket #3"
 
-Scenario: closed support tickets should be available from the user page
+Scenario: support tickets which are still owned by a volunteer should be available from the user page.
   Given a user exists with login: "troubled", id: 1
   And a volunteer exists with login: "oracle", id: 2
   And a volunteer exists with login: "hermione", id: 3
@@ -179,16 +167,36 @@ Scenario: closed support tickets should be available from the user page
     | 1  | 1       |
     | 2  |         |
     | 3  |         |
+    | 4  | 1       |
+    | 5  |         |
     And "oracle" takes support ticket 1
-    And "oracle" responds to support ticket 1
-    And "oracle" categorizes support ticket 2 as Comment
+    And "oracle" comments on support ticket 1
+    And "troubled" accepts a comment on support ticket 1
+    And "oracle" posts support ticket 2
     And "oracle" takes support ticket 3
-  When "troubled" accepts a response to support ticket 1
+    And "oracle" creates a faq from support ticket 4
+    And "oracle" creates a code ticket from support ticket 5
     And I am on oracle's user page
-  When I follow "Resolved Support Tickets"
-  Then I should see "Support Ticket #1"
-    And I should see "Support Ticket #2"
-    But I should not see "Support Ticket #3"
+  When I follow "Answered Support Tickets"
+  Then I should see "Support Ticket #4"
+    But I should not see "Support Ticket #1"
+    And I should not see "Support Ticket #2"
+    And I should not see "Support Ticket #3"
+    And I should not see "Support Ticket #5"
+  When I am on oracle's user page
+    And I follow "Waiting Support Tickets"
+  Then I should see "Support Ticket #5"
+    But I should not see "Support Ticket #1"
+    And I should not see "Support Ticket #2"
+    And I should not see "Support Ticket #3"
+    And I should not see "Support Ticket #4"
+  When I am on oracle's user page
+    And I follow "Taken Support Tickets"
+  Then I should see "Support Ticket #3"
+    But I should not see "Support Ticket #1"
+    And I should not see "Support Ticket #2"
+    And I should not see "Support Ticket #4"
+    And I should not see "Support Ticket #5"
 
 Scenario: support identities don't have to be unique, but in progress tickets should be correct
   Given a volunteer exists with login: "rodney", id: 1
@@ -200,11 +208,11 @@ Scenario: support identities don't have to be unique, but in progress tickets sh
   When "rodney" takes support ticket 1
     And "hermione" takes support ticket 2
   When I am on rodney's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
   When I am on hermione's user page
-    And I follow "Support Tickets in progress"
+    And I follow "Taken Support Tickets"
   Then I should not see "Support Ticket #1"
     But I should see "Support Ticket #2"
 
@@ -215,14 +223,14 @@ Scenario: support identities don't have to be unique, but closed tickets should 
     And "hermione" has a support identity "oracle"
     And a support ticket exists with id: 1
     And a support ticket exists with id: 2
-  When "rodney" categorizes support ticket 1 as Comment
-    And "hermione" categorizes support ticket 2 as Comment
+  When "rodney" creates a faq from support ticket 1
+    And "hermione" creates a faq from support ticket 2
   When I am on rodney's user page
-    And I follow "Resolved Support Tickets"
+    And I follow "Answered Support Tickets"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
   When I am on hermione's user page
-    And I follow "Resolved Support Tickets"
+    And I follow "Answered Support Tickets"
   Then I should not see "Support Ticket #1"
     But I should see "Support Ticket #2"
 
@@ -240,11 +248,11 @@ Scenario: visibility on the comment board
     | I'm leaving fandom!   | 4  |               | 2       | true              | false   |
     | thank you for helping | 5  |               | 3       | true              | true    |
   And a volunteer exists with login: "oracle"
-  When "oracle" categorizes support ticket 1 as Comment
-    And "oracle" categorizes support ticket 2 as Comment
-    And "oracle" categorizes support ticket 3 as Comment
-    And "oracle" categorizes support ticket 4 as Comment
-    And "oracle" categorizes support ticket 5 as Comment
+  When "oracle" posts support ticket 1
+    And "oracle" posts support ticket 2
+    And "oracle" posts support ticket 3
+    And "oracle" posts support ticket 4
+    And "oracle" posts support ticket 5
 
   # logged out
   When I am logged out
@@ -276,7 +284,7 @@ Scenario: visibility on the comment board
     And I should not see "thanks for fixing it"
     And I should not see "thank you for helping"
   When I follow "#1"
-    Then I should not see "Add details"
+    Then I should not see "Details"
 
   When I am logged in as volunteer "hermione"
     And I follow "Support Board"
@@ -291,9 +299,10 @@ Scenario: visibility on the comment board
   But I should not see "happy@ao3.org"
     And I should not see "default"
   When I follow "#1"
-    Then I should see "Add details"
-    When I press "Needs Attention"
-  Then I should see "Add details"
+    Then I should see "Details"
+  When I fill in "Reason" with "not a comment"
+    And I press "Reopen"
+  Then I should see "Details"
   When I follow "Support Board"
     And I follow "Comments"
   Then I should not see "You guys rock!"

@@ -22,16 +22,15 @@ Scenario: users should receive 1 initial notification and 1 for additional updat
     And I press "Create Support ticket"
   Then 1 email should be delivered to "troubled@ao3.org"
     And all emails have been delivered
-  When I fill in "Add details" with "Never mind, I just found out my whole network is slow"
-    And I press "Update Support ticket"
-  Then I should see "Support ticket updated"
-    And I should see "Ticket owner wrote: Never mind"
+  When I fill in "Details" with "Never mind, I just found out my whole network is slow"
+    And I press "Add details"
+  Then I should see "ticket owner wrote: Never mind"
   And 1 email should be delivered to "troubled@ao3.org"
     And all emails have been delivered
-  When a volunteer responds to support ticket 1
+  When a volunteer comments on support ticket 1
   Then 1 email should be delivered to "troubled@ao3.org"
     And all emails have been delivered
-  When a user responds to support ticket 1
+  When a user comments on support ticket 1
   Then 1 email should be delivered to "troubled@ao3.org"
 
 Scenario: users can create private support tickets
@@ -86,15 +85,11 @@ Scenario: users can (un)hide their name after creation
     And I press "Create Support ticket"
     And I should see "User: troubled"
     And I should see "troubled wrote: For example"
-  When I uncheck "Display my user name"
-    And I press "Update Support ticket"
-  Then I should see "Support ticket updated"
-    And I should not see "User: troubled"
-    And I should see "Ticket owner wrote: For example"
-  When I check "Display my user name"
-    And I press "Update Support ticket"
-  Then I should see "Support ticket updated"
-    And I should see "User: troubled"
+  When I press "Hide my user name"
+  Then I should not see "User: troubled"
+    And I should see "ticket owner wrote: For example"
+  When I press "Display my user name"
+  Then I should see "User: troubled"
     And I should see "troubled wrote: For example"
 
 Scenario: user's tickets should be available from their user page
@@ -155,23 +150,22 @@ Scenario: users can (un)resolve their support tickets
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
     And I should see "Summary: Archive is very slow"
-  When I fill in "Add details" with "Never mind, my router was broken"
-    And I press "Update Support ticket"
-    And I should see "Ticket owner wrote: Never mind"
-    And I check "This answer resolves my issue"
-    And I press "Update Support ticket"
-  Then I should see "Status: Owner resolved"
-    And I should see "Answered by Ticket owner: Never mind"
-  When I uncheck "This answer resolves my issue"
-    And I fill in "Add details" with "Router fixed, archive still slow"
-    And I press "Update Support ticket"
-  Then I should see "Status: Open"
-  When a volunteer responds to support ticket 1
+  When I fill in "Details" with "Never mind, my router was broken"
+    And I press "Add details"
+    And I should see "ticket owner wrote: Never mind"
+  When I select "ticket owner wrote" from "Support Detail"
+    And I press "This answer resolves my issue"
+  Then I should see "Status: closed by owner"
+    And I should see "ticket owner wrote (accepted): Never mind"
+    And I fill in "Reason" with "Router fixed, archive still slow"
+    And I press "Reopen"
+  Then I should see "Status: open"
+  When a volunteer comments on support ticket 1
     And I reload the page
-  When I check "support_ticket_support_details_attributes_2_resolved_ticket"
-    And I press "Update Support ticket"
-  Then I should see "Status: Owner resolved"
-    And I should see "Answered by Support volunteer oracle"
+  When I select "oracle (volunteer) wrote" from "Support Detail"
+    And I press "This answer resolves my issue"
+  Then I should see "Status: closed by owner"
+    And I should see "oracle (volunteer) wrote (accepted)"
 
 Scenario: users can answer their support tickets with visible names
   Given I am logged in as "troubled"
@@ -180,13 +174,13 @@ Scenario: users can answer their support tickets with visible names
     And I check "Display my user name"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
-  When I fill in "Add details" with "Never mind, my router was broken"
-    And I press "Update Support ticket"
+  When I fill in "Details" with "Never mind, my router was broken"
+    And I press "Add details"
     And I should see "troubled wrote: Never mind"
-    And I check "This answer resolves my issue"
-    And I press "Update Support ticket"
-  Then I should see "Status: Owner resolved"
-    And I should see "Answered by troubled: Never mind"
+  When I select "troubled wrote" from "Support Detail"
+    And I press "This answer resolves my issue"
+  Then I should see "Status: closed by owner"
+    And I should see "troubled wrote (accepted): Never mind"
 
 Scenario: users can turn notifications on and off their own tickets. notifications shouldn't trigger email.
   Given a user exists with login: "helper"
@@ -196,18 +190,16 @@ Scenario: users can turn notifications on and off their own tickets. notificatio
   Then 0 emails should be delivered
   When I am logged in as "helper"
   When I go to the first support ticket page
-    And I fill in "Add details" with "possible answer"
-    And I press "Update Support ticket"
+    And I fill in "Details" with "possible answer"
+    And I press "Add details"
   Then I should see "helper wrote: possible answer"
     And 0 emails should be delivered to "troubled@ao3.org"
     And all emails have been delivered
   When I am logged in as "troubled"
   When I go to the first support ticket page
-  When I check "Turn on notifications"
-    And I press "Update Support ticket"
-  Then I should see "Turn off notifications"
+  When I press "Watch this ticket"
     And 0 emails should be delivered
-  When I fill in "Add details" with "doesn't work, thanks anyway"
-    And I press "Update Support ticket"
+  When I fill in "Details" with "doesn't work, thanks anyway"
+    And I press "Add details"
   Then 1 emails should be delivered to "troubled@ao3.org"
 

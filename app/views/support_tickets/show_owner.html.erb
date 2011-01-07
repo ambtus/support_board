@@ -1,67 +1,35 @@
+<%= render "show" %>
+
 <%= form_for(@ticket) do |t| %>
- <%= hidden_field_tag :authentication_code, session[:authentication_code] %>
-  <p>
-    <% if @ticket.being_watched?(current_user) %>
-      <%= t.check_box :turn_off_notifications %>
-      <%= t.label :turn_off_notifications, "Turn off notifications"%>
-    <% else %>
-      <%= t.check_box :turn_on_notifications %>
-      <%= t.label :turn_on_notifications, "Turn on notifications"%>
-    <% end %>
-  </p>
-  <% unless @ticket.private %>
-    <p>
-      <%= t.check_box :private %>
-      <%= t.label :private, "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"%>
+  <%= hidden_field_tag :authentication_code, session[:authentication_code] %>
+  <%= hidden_field_tag :email, @ticket.email %>
+  <% if @add_details %>
+    <dt><%= label_tag :content, "Details" %>:</dt>
+      <dd><%= text_area_tag :content %></dd>
+    <p class="submit">
+      <%= submit_tag "Add details" %>
     </p>
+  <% end %>
+  <% unless @ticket.closed? %>
+    <%= label_tag :support_detail_id, "Support Detail" %>
+        <%= select_tag :support_detail_id,
+                       options_from_collection_for_select(@ticket.support_details, "id", "byline") %>
+        <%= submit_tag "This answer resolves my issue" %>
+  <% end %>
+  <% unless @ticket.private? %>
+    <%= submit_tag "Make private"%> (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)
   <% end %>
   <% if current_user %>
-    <p>
-      <%= t.check_box :display_user_name %>
-      <%= t.label :display_user_name, "Display my user name" %>
-    </p>
+    <%= submit_tag @ticket.display_user_name? ? "Hide my user name" : "Display my user name" %>
   <% end %>
-  <% if @ticket.faq_id? %>
-      <%= t.check_box :faq_id, {}, @ticket.faq_id, "" %>
-      <%= t.label :faq_id, "linked to FAQ" %>
+  <% if @ticket.watched?(@ticket.email) %>
+    <%= submit_tag "Don't watch this ticket" %>
+  <% else %>
+    <%= submit_tag "Watch this ticket"%>
   <% end %>
-  <dl>
-    <% if @ticket.display_user_name %>
-      <dt><%= "User" %>:</dt>
-        <dd><%= link_to @ticket.user.login, @ticket.user %></dd>
-    <% end %>
-    <dt><%= "Access" %>:</dt>
-      <dd><%= @ticket.private? ? "Private" : "Public" %>
-    <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.status_line %>
-          <% if @ticket.faq_id %>
-            <%= link_to @ticket.faq.name, @ticket.faq %>
-          <% end %>
-      </dd>
-    <dt><%= "Summary" %>:</dt>
-      <dd><%= raw @ticket.summary %></dd>
-
-    <%= t.fields_for :support_details do |d| %>
-      <% if d.object.new_record? %>
-        <% if current_user %>
-          <%= d.hidden_field :support_identity_id, :value => current_user.support_identity.id %>
-        <% end %>
-        <dt><%= d.label :content, "Add details" %>:</dt>
-          <dd><%= d.text_area :content %>
-      <% elsif !d.object.private? %>
-        <% if d.object.resolved_ticket? %>
-          <dt><%= "Answered by" %> <%= d.object.byline %>:</dt>
-        <% else %>
-          <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
-        <% end %>
-          <dd><%= raw d.object.content %></dd>
-        <dt>&nbsp;</dt>
-          <dd><%= d.check_box :resolved_ticket %> <%= d.label :resolved_ticket, "This answer resolves my issue" %></dd>
-      <% end %>
-    <% end %>
-
-  </dl>
-  <p class="submit">
-    <%= t.submit %>
-  </p>
+  <% if @ticket.current_state.events.include?(:reopen) %>
+    <%= label_tag :reason %>
+    <%= text_field_tag :reason %>
+    <%= submit_tag "Reopen" %>
+  <% end %>
 <% end %>

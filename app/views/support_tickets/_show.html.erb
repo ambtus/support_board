@@ -1,0 +1,24 @@
+<dl>
+  <% if @ticket.display_user_name? %>
+    <dt><%= "User" %>:</dt>
+      <dd><%= link_to @ticket.user.login, @ticket.user %>
+  <% end %>
+  <dt><%= "Status" %>:</dt>
+    <dd><%= @ticket.status_line %>
+      <% if @ticket.code_ticket_id %>
+          <%= link_to @ticket.code_ticket.name, @ticket.code_ticket %>
+      <% end %>
+      <% if @ticket.faq_id %>
+          <%= link_to @ticket.faq.name, @ticket.faq %>
+      <% end %>
+    </dd>
+  <dt><%= "Access" %>:</dt>
+    <dd><%= @ticket.private? ? "Private" : "Public" %>
+  <dt><%= "Summary" %>:</dt>
+    <dd><%= raw @ticket.summary %></dd>
+  <% @ticket.support_details.each do |detail| %>
+    <dt><%= detail.byline %>:</dt>
+      <dd><%= raw detail.content %></dd>
+  <% end %>
+</dl>
+

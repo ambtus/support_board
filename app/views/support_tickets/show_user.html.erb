@@ -1,42 +1,20 @@
+<%= render "show" %>
+
 <%= form_for(@ticket) do |t| %>
-  <p>
-    <% if @ticket.being_watched?(current_user) %>
-      <%= t.check_box :turn_off_notifications %>
-      <%= t.label :turn_off_notifications, "Turn off notifications"%>
-    <% else %>
-      <%= t.check_box :turn_on_notifications %>
-      <%= t.label :turn_on_notifications, "Turn on notifications"%>
+  <% if @add_details %>
+    <% if @ticket.unowned? %>
+      <dt><%= label_tag :unofficial, "Unofficial response?" %></dt>
+        <dd><%= check_box_tag :unofficial %></dd>
     <% end %>
-  </p>
-  <dl>
-    <% if @ticket.display_user_name %>
-      <dt><%= "User" %>:</dt>
-        <dd><%= link_to @ticket.user.login, @ticket.user %>
-    <% end %>
-    <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.status_line %>
-          <% if @ticket.faq_id %>
-            <%= link_to @ticket.faq.name, @ticket.faq %>
-          <% end %>
-      </dd>
-    <dt><%= raw "Summary" %>:</dt>
-      <dd><%= @ticket.summary %></dd>
-    <%= t.fields_for :support_details do |d| %>
-      <% if d.object.new_record? %>
-        <%= d.hidden_field :support_identity_id, :value => current_user.support_identity.id %>
-        <dt><%= d.label :content, "Add details" %>:</dt>
-          <dd><%= d.text_area :content %>
-      <% elsif !d.object.private? %>
-        <% if d.object.resolved_ticket? %>
-          <dt><%= "Answered by" %> <%= d.object.byline %>:</dt>
-        <% else %>
-          <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
-        <% end %>
-            <dd><%= raw d.object.content %></dd>
-      <% end %>
-    <% end %>
-  </dl>
-  <p class="submit">
-    <%= t.submit %>
-  </p>
+    <dt><%= label_tag :content, "Details" %>:</dt>
+      <dd><%= text_area_tag :content %></dd>
+    <p class="submit">
+      <%= submit_tag "Add details" %>
+    </p>
+  <% end %>
+  <% if @ticket.watched? %>
+    <%= submit_tag "Don't watch this ticket" %>
+  <% else %>
+    <%= submit_tag "Watch this ticket"%>
+  <% end %>
 <% end %>

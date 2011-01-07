@@ -1,10 +1,6 @@
 <p><%= link_to @ticket.name, code_ticket_url(@ticket) %> has been updated.</p>
 <%=raw @ticket.summary %>
 <% @details.each do |detail| %>
-  <% if detail.resolved_ticket? %>
-    <dt>Closed by <%= detail.byline %>:</dt>
-  <% else %>
-    <dt><%= detail.byline %> wrote:</dt>
-  <% end %>
-      <dd><%= raw detail.content %></dd>
+  <dt><%= detail.byline %>:</dt>
+    <dd><%= raw detail.content %></dd>
 <% end %>

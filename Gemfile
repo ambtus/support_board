@@ -14,6 +14,8 @@ gem 'permit_yo'
 
 gem "escape_utils"
 
+gem "workflow"
+
 group :development do
   # enable debugging with "rails server -u" or "rails server --debugger"
   gem 'ruby-debug19', :require => 'ruby-debug'

@@ -8,7 +8,7 @@
 <% end %>
 <ul>
   <li><%= link_to "Open a New Support Ticket", new_support_ticket_path %>
-  <li><%= link_to "Comments", support_tickets_path(:only => "comment") %>
+  <li><%= link_to "Comments", support_tickets_path(:status => "posted") %>
   <li><%= link_to "Frequently Asked Questions", faqs_path %></li>
   <li><%= link_to "Release Notes", deploy_notes_path %></li>
   <li><%= link_to "Open Code Tickets (Known Issues)", code_tickets_path %>
@@ -16,13 +16,30 @@
     <li><%= link_to "Open Support Tickets", support_tickets_path %>
   <% end %>
   <% if current_user.try(:support_volunteer?) %>
-    <li><%= link_to "Support tickets requiring Admin attention", support_tickets_path(:only => "admin") %>
-    <li><%= link_to "Support Tickets in progress", support_tickets_path(:only => "claimed") %>
-    <li><%= link_to "Support Tickets waiting for Code changes", support_tickets_path(:only => "waiting") %>
-    <li><%= link_to "Support Tickets linked to FAQs", support_tickets_path(:only => "answered") %>
+    <li><%= link_to "Support tickets requiring Admin attention", support_tickets_path(:status => "admin") %>
+    <li><%= link_to "Support Tickets in progress", support_tickets_path(:status => "taken") %>
+    <li><%= link_to "Support Tickets waiting for Code changes", support_tickets_path(:status => "waiting") %>
+    <li><%= link_to "Closed Support Tickets", support_tickets_path(:status => "closed") %>
+    <li><%= link_to "Spam Support Tickets", support_tickets_path(:status => "spam") %>
+
     <li><%= link_to "Unposted FAQs", faqs_path(:unposted => true) %></li>
-    <li><%= link_to "Resolved Support Tickets", support_tickets_path(:only => "resolved") %>
-    <li><%= link_to "Resolved Code Tickets", code_tickets_path(:resolved => true) %>
-    <li><%= link_to "Spam Support Tickets", support_tickets_path(:only => "spam") %>
+
+    <li><%= link_to "Taken Code Tickets", code_tickets_path(:status => "taken") %>
+    <li><%= link_to "Committed Code Tickets", code_tickets_path(:status => "committed") %>
+    <li><%= link_to "Staged Code Tickets", code_tickets_path(:status => "staged") %>
+    <li><%= link_to "Verified Code Tickets", code_tickets_path(:status => "verified") %>
+    <li><%= link_to "Closed Code Tickets", code_tickets_path(:status => "closed") %>
+  <% end %>
+  <% if current_user.try(:support_admin?) %>
+    <%= form_tag '/code_tickets' do %>
+      <p>
+        <%= label_tag :stage_revision %>
+        <%= text_field_tag :stage_revision %>
+      </p>
+      <p class="submit">
+        <%= submit_tag "Stage Committed Code Tickets" %>
+        <%= submit_tag "Deploy Verified Code Tickets" %>
+      </p>
+    <% end %>
   <% end %>
 </ul>

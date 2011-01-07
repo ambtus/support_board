@@ -1,64 +1,63 @@
-<%= form_for(@ticket) do |t| %>
-  <p class="submit"><%= t.submit (@ticket.support_identity_id ? "Untake" : "Take") %></p>
-  <p>
-    <% if @ticket.being_watched?(current_user) %>
-      <%= t.check_box :turn_off_notifications %>
-      <%= t.label :turn_off_notifications, "Turn off notifications"%>
-    <% else %>
-      <%= t.check_box :turn_on_notifications %>
-      <%= t.label :turn_on_notifications, "Turn on notifications"%>
-    <% end %>
-  </p>
-  <dl>
-    <dt><%= t.label :code_ticket_id, "Code Ticket" %>:</dt>
-      <dd><%= t.select :code_ticket_id, CodeTicket.where(:resolved => false).collect {|p| [ p.name, p.id ] }, :selected => @ticket.code_ticket_id %></dd>
-    <% if @ticket.code_ticket_id? %>
-      <%= t.submit "Not a dupe" %>
-    <% else %>
-      <%= t.submit "Dupe" %>
-    <% end %>
-    <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.status_line %>
-        <% if @ticket.code_ticket_id %>
-            <%= link_to @ticket.code_ticket.name, @ticket.code_ticket %>
-        <% end %>
-      </dd>
-    <dt><%= "Votes" %>:</dt>
-      <dd><%= @ticket.vote_count %></dd>
-    <% unless @ticket.resolved %>
-      <dt><%= t.label :vote_up %>:</dt>
-        <dd>
-          <%= t.check_box :vote_up %>
-        </dd>
-    <% end %>
-
-    <dt><%= "Summary" %>:</dt>
-      <dd><%= raw @ticket.summary %></dd>
-
-    <%= t.fields_for :code_details do |d| %>
-      <% if d.object.new_record? %>
-        <%= d.hidden_field :support_identity_id, :value => current_user.support_identity.id %>
-        <dt><%= d.label :support_response, "Answer officially?" %>:</dt>
-          <dd><%= d.check_box :support_response %></dd>
-        <dt><%= d.label :content, "Add details" %>:</dt>
-          <dd><%= d.text_area :content %></dd>
-      <% else %>
-        <% if d.object.resolved_ticket? %>
-          <dt><%= "Answered by" %> <%= d.object.byline %>:</dt>
-        <% else %>
-          <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
-        <% end %>
-            <dd><%= raw d.object.content %></dd>
-      <% end %>
-    <% end %>
-
- </dl>
-  <p class="submit">
-    <%= t.submit %>
-  </p>
+<% if current_user.support_admin? %>
+  <%= link_to "Edit", edit_code_ticket_path(@ticket) %>
 <% end %>
 
-<p>Related Support tickets</p>
-<% @ticket.support_tickets.each do |t| %>
-  <%= link_to t.name, t %>
+<%= render "show" %>
+
+<% if @ticket.support_tickets.count > 0 %>
+  <p>Related Support tickets</p>
+  <% @ticket.support_tickets.each do |support_ticket| %>
+    <%= link_to support_ticket.id, support_ticket %>
+  <% end %>
+<% end %>
+
+<%= form_for(@ticket) do %>
+  <% if @add_details %>
+    <% if @ticket.unowned? %>
+      <dt><%= label_tag :unofficial, "Unofficial response?" %></dt>
+        <dd><%= check_box_tag :unofficial %></dd>
+    <% end %>
+    <dt><%= label_tag :content, "Details" %>:</dt>
+      <dd><%= text_area_tag :content %></dd>
+    <p class="submit">
+      <%= submit_tag "Add details" %>
+    </p>
+  <% end %>
+  <p class="submit">
+    <% if !@ticket.closed? %>
+      <% unless @ticket.voted? %>
+        <%= submit_tag "Vote for this ticket" %>
+      <% end %>
+      <% if @ticket.watched? %>
+        <%= submit_tag "Don't watch this ticket" %>
+      <% else %>
+        <%= submit_tag "Watch this ticket"%>
+      <% end %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:reopen) %>
+      <%= label_tag :reason %>
+      <%= text_field_tag :reason %>
+      <%= submit_tag "Reopen" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:reject) %>
+      <%= label_tag :reason %>
+      <%= text_field_tag :reason %>
+      <%= submit_tag "Reject" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:take) %>
+      <%= submit_tag "Take" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:steal) && @ticket.not_mine? %>
+      <%= submit_tag "Steal" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:duplicate) %>
+      <%= label_tag :code_ticket_id, "Code Ticket" %>
+      <%= select_tag :code_ticket_id,
+                     options_from_collection_for_select(CodeTicket.not_closed, "id", "id") %>
+      <%= submit_tag "Dupe" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:verify) %>
+      <%= submit_tag "Verify" %>
+    <% end %>
+  </p>
 <% end %>

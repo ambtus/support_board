@@ -1,87 +1,79 @@
-<%= form_for(@ticket) do |t| %>
-  <p class="submit">
-    <%= t.submit (@ticket.support_identity_id == current_user.support_identity_id ? "Untake" : "Take") %>
-    <%= label_tag :support_identity_id, "Support Volunteers" %>:
-       <%= select_tag :support_identity_id, options_for_select(SupportIdentity.where(:official => true).collect {|p| [ p.name, p.id ] }) %>
-    <%= t.submit "Send request to take" %>
-    <br \>
-    <% unless @ticket.user %>
-      <%= t.submit (@ticket.approved? ? "Spam" : "Ham") %>
-    <% end %>
-    <%= t.submit (@ticket.comment? ? "Needs Attention" : "Comment") %>
-    <% unless @ticket.admin %>
-      <%= t.submit "Needs Admin Attention" %>
-    <% end %>
-    <% if current_user.support_admin? %>
-      <%= t.submit (@ticket.support_admin_resolved? ? "Unresolve" : "Admin Resolved") %>
-    <% end %>
-    <dt><%= t.label :code_ticket_id, "Code Ticket" %>:</dt>
-      <dd><%= t.select :code_ticket_id, CodeTicket.where(:resolved => false).collect {|p| [ p.name, p.id ] }, :selected => @ticket.code_ticket_id %></dd>
-    <% if @ticket.code_ticket_id? %>
-      <%= t.submit "Remove link to Code ticket" %>
+<% if current_user.support_admin? %>
+  <%= link_to "Edit", edit_support_ticket_path(@ticket) %>
+<% end %>
+
+<%= render "show" %>
+
+<%= form_for(@ticket) do %>
+  <% if @add_details %>
+    <% if @ticket.unowned? %>
+      <dt><%= label_tag :official, "Official response?" %></dt>
+        <dd><%= check_box_tag :official, true, true %></dd>
     <% else %>
-      <%= t.submit "Link to Code ticket" %>
-      <%= t.submit "Create new Code ticket" %>
+      <%= hidden_field_tag :official, true %>
     <% end %>
-    <dt><%= t.label :faq_id, "FAQ" %>:</dt>
-      <dd><%= t.select :faq_id, Faq.order(:position).collect {|p| [ p.name, p.id ] }, :selected => @ticket.faq_id %></dd>
-    <% if @ticket.faq_id? %>
-      <%= t.submit "Remove link to FAQ" %>
-    <% else %>
-      <%= t.submit "Link to FAQ" %>
-      <%= t.submit "Create new FAQ" %>
-    <% end %>
-  </p>
-  <p>
-    <% if @ticket.being_watched?(current_user) %>
-      <%= t.check_box :turn_off_notifications %>
-      <%= t.label :turn_off_notifications, "Turn off notifications"%>
-    <% else %>
-      <%= t.check_box :turn_on_notifications %>
-      <%= t.label :turn_on_notifications, "Turn on notifications"%>
-    <% end %>
-  </p>
-  <% unless @ticket.private %>
-    <p>
-      <%= t.check_box :private %>
-      <%= t.label :private, "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"%>
+    <dt><%= label_tag :content, "Details" %>:</dt>
+      <dd><%= text_area_tag :content %></dd>
+    <p class="submit">
+      <%= submit_tag "Add details" %>
     </p>
   <% end %>
-  <dl>
-    <% if @ticket.display_user_name %>
-      <dt><%= "User" %>:</dt>
-        <dd><%= link_to @ticket.user.login, @ticket.user %></dd>
-    <% end %>
-    <dt><%= "Access" %>:</dt>
-      <dd><%= @ticket.private? ? "Private" : "Public" %>
-    <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.status_line %>
-          <% if @ticket.faq_id %>
-            <%= link_to @ticket.faq.name, @ticket.faq %>
-          <% end %>
-      </dd>
-    <dt><%= "Summary" %>:</dt>
-      <dd><%= raw @ticket.summary %></dd>
-
-    <%= t.fields_for :support_details do |d| %>
-      <% if d.object.new_record? %>
-       <%= d.hidden_field :support_identity_id, :value => current_user.support_identity.id %>
-        <dt><%= d.label :support_response, "Answer officially?" %>:</dt>
-          <dd><%= d.check_box :support_response %></dd>
-        <dt><%= d.label :content, "Add details" %>:</dt>
-          <dd><%= d.text_area :content %></dd>
-      <% else %>
-        <% if d.object.resolved_ticket? %>
-          <dt><%= "Answered by" %> <%= d.object.byline %>:</dt>
-        <% else %>
-          <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
-        <% end %>
-            <dd><%= raw d.object.content %></dd>
-      <% end %>
-    <% end %>
-
-  </dl>
   <p class="submit">
-    <%= t.submit %>
+    <% unless @ticket.private? %>
+      <%= submit_tag "Make private"%> (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)
+    <% end %>
+    <% if @ticket.watched? %>
+      <%= submit_tag "Don't watch this ticket" %>
+    <% else %>
+      <%= submit_tag "Watch this ticket"%>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:reopen) %>
+      <%= label_tag :reason %>
+      <%= text_field_tag :reason %>
+      <%= submit_tag "Reopen" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:spam) %>
+      <%= submit_tag "Mark as spam" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:ham) %>
+      <%= submit_tag "Mark as ham" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:post) %>
+      <%= submit_tag "Post as comment" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:take) %>
+      <%= submit_tag "Take" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:take) && @ticket.not_mine? %>
+      <%= label_tag :support_identity_id, "Support Volunteers" %>
+      <%= select_tag :support_identity_id,
+                     options_from_collection_for_select(SupportIdentity.official, "id", "name") %>
+      <%= submit_tag "Send request to take" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:steal) && @ticket.not_mine? %>
+      <%= submit_tag "Steal" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:needs_admin) %>
+      <%= submit_tag "Needs admin attention" %>
+    <% end %>
+    <% if current_user.support_admin? && @ticket.current_state.events.include?(:resolve) %>
+      <%= label_tag :resolution %>
+      <%= text_field_tag :resolution %>
+      <%= submit_tag "Resolve" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:needs_fix) %>
+      <%= label_tag :code_ticket_id, "Code Ticket" %>
+      <%= select_tag :code_ticket_id,
+                     options_from_collection_for_select(CodeTicket.not_closed, "id", "id") %>
+      <%= submit_tag "Needs this fix" %>
+      <%= submit_tag "Create new code ticket" %>
+    <% end %>
+    <% if @ticket.current_state.events.include?(:answer) %>
+      <%= label_tag :faq_id, "FAQ" %>
+      <%= select_tag :faq_id,
+                     options_from_collection_for_select(Faq.all, "id", "name") %>
+      <%= submit_tag "Answered by this FAQ" %>
+      <%= submit_tag "Create new FAQ" %>
+    <% end %>
   </p>
 <% end %>

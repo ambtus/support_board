@@ -4,6 +4,7 @@ class SupportTicket < ActiveRecord::Base
   belongs_to :support_identity  # the support_identity of the user who is working on the ticket
   belongs_to :faq  # for 'Question' tickets
   has_one :faq_vote
+  has_one :code_vote
   belongs_to :code_ticket  # for 'Problem' and 'Suggestion' tickets. automatic +1 vote
   has_many :support_notifications  # a bunch of email addresses for update notifications
   has_many :support_details  # like comments, except non-threaded and with extra attributes
@@ -26,7 +27,8 @@ class SupportTicket < ActiveRecord::Base
     "Support Ticket #" + self.id.to_s
   end
 
-  def comment_name(current_user)
+  # used for tickets which were posted
+  def post_name
     if self.email
       "A guest"
     elsif !self.display_user_name
@@ -37,81 +39,222 @@ class SupportTicket < ActiveRecord::Base
   end
 
   # STATUS/RESOLUTION stuff
+  include Workflow
+  workflow_column :status
 
   def status_line
-    if self.support_identity_id
-      name = self.support_identity.name
-      if self.support_admin_resolved
-        "Resolved by #{name}"
-      elsif self.code_ticket_id
-        "Linked to #{self.code_ticket.name} by #{name}"
-      elsif self.faq_id
-        "Linked to FAQ by #{name}"
-      elsif self.comment
-        "Linked to Comments by #{name}"
-      else
-        "In progress by #{name}"
-      end
-    elsif resolved?
-      "Owner resolved"
+    if self.closed? && self.support_identity_id.nil?
+      "closed by owner"
+    elsif self.unowned?
+      "open"
+    elsif self.spam?
+      "spam"
+    elsif self.waiting?
+      "waiting for a code fix"
+    elsif self.waiting_on_admin?
+      "waiting for an admin"
     else
-      "Open"
+      "#{self.status} by #{self.support_identity.name}"
     end
   end
 
-  # marking something as a comment resolves it, which means there needs to be a support_identity associated with the resolution
-  def mark_as_comment!(support_identity)
-    return false unless support_identity
-    self.comment = true
-    self.support_identity = support_identity
-    self.save
-  end
-
-  # marking something as a not a comment means you were the last support person to touch it
-  def mark_as_ticket!(support_identity)
-    return false unless support_identity
-    self.comment = false
-    self.support_identity = support_identity
-    self.save
-  end
-
-  attr_accessor :updated_resolved
-
-  # support tickets can be owner resolved (the owner accepts one or more answers),
-  # support resolved (support has linked it to a FAQ or a ticket or marked it a comment),
-  # or an admin can mark it resolved
-  after_save :update_resolved
-  def update_resolved
-    Rails.logger.debug "running update_resolved after support ticket save"
-    return if updated_resolved # already updated, don't check and save again
-
-    # linked or unlinked to a faq: update the faq votes accordingly.
-    if self.faq_id_changed?
-      if faq_id
-        FaqVote.create(:faq_id => faq.id, :support_ticket_id => self.id)
-      else
-        FaqVote.where(:support_ticket_id => self.id).first.destroy
-      end
+  workflow do
+    state :unowned do
+      event :take, :transitions_to => :taken
+      event :needs_fix, :transitions_to => :waiting
+      event :post, :transitions_to => :posted
+      event :answer, :transitions_to => :closed
+      event :accept, :transitions_to => :closed
+      event :spam, :transitions_to => :spam
+      event :needs_admin, :transitions_to => :waiting_on_admin
+      event :resolve, :transitions_to => :closed
+    end
+    state :taken do
+      event :steal, :transitions_to => :taken
+      event :reopen, :transitions_to => :unowned
+      event :needs_fix, :transitions_to => :waiting
+      event :post, :transitions_to => :posted
+      event :answer, :transitions_to => :closed
+      event :accept, :transitions_to => :closed
+      event :needs_admin, :transitions_to => :waiting_on_admin
+      event :resolve, :transitions_to => :closed
+    end
+    state :waiting do
+      event :reopen, :transitions_to => :unowned
+      event :deploy, :transitions_to => :closed
+    end
+    state :waiting_on_admin do
+      event :reopen, :transitions_to => :unowned
+      event :resolve, :transitions_to => :closed
+    end
+    state :posted do
+      event :reopen, :transitions_to => :unowned
+    end
+    state :spam do
+      event :ham, :transitions_to => :unowned
+    end
+    state :closed do
+      event :reopen, :transitions_to => :unowned
     end
 
-    old = self.resolved
-    owner_resolved = (self.support_details.resolved.count > 0)
-
-    support_resolved = (self.faq_id || self.code_ticket_id || self.comment)
-
-    self.resolved = owner_resolved || support_resolved || self.support_admin_resolved
-    new = self.resolved
-    self.updated_resolved = true # set attr_accessor so don't trigger infinite loop
-    # for some very strange reason, updating 0 with 0 makes rails think the attribute
-    # is dirty, and it's acting as if it had changed.
-    self.save unless old == new
+    on_transition do |from, to, triggering_event, *event_args|
+      support_identity_id = User.current_user.try(:support_identity_id)
+      official = User.current_user && User.current_user.support_volunteer?
+      content = "#{from} -> #{to}"
+      content += " (#{event_args.first})" unless event_args.blank?
+      self.support_details.create(:content => content,
+                               :support_identity_id => support_identity_id,
+                               :support_response => official,
+                               :system_log => true)
+      self.send_update_notifications unless [:spam, :ham, :steal].include?(triggering_event)
+    end
   end
 
- # NOTIFICATION stuff
+  self.workflow_spec.state_names.each do |state|
+    scope state, :conditions => { :status => state.to_s }
+  end
 
+  def self.not_closed
+    where('status != "closed"').where('status != "spam"').where('status != "posted"')
+  end
+
+  def spam
+    raise "Couldn't mark as spam, not logged in." unless User.current_user
+    raise "Couldn't mark as spam, not a support volunteer." unless User.current_user.support_volunteer?
+    # don't submit spam reports unless in production mode
+    Rails.env.production? && Akismetor.submit_spam(akismet_attributes)
+    self.support_identity_id = User.current_user.support_identity_id
+  end
+
+  def ham
+    raise "Couldn't mark as ham, not logged in." unless User.current_user
+    raise "Couldn't mark as ham, not a support volunteer." unless User.current_user.support_volunteer?
+    # don't submit ham reports unless in production mode
+    Rails.env.production? && Akismetor.submit_ham(akismet_attributes)
+    self.support_identity_id = nil
+  end
+
+  def take
+    raise "Couldn't take, not logged in." unless User.current_user
+    raise "Couldn't take, not a support volunteer." unless User.current_user.support_volunteer?
+    self.support_identity_id = User.current_user.support_identity_id
+    self.watch! unless self.watched?
+  end
+
+  def not_mine?
+    raise "Couldn't check ownership. Not logged in." unless User.current_user
+    self.support_identity_id != User.current_user.support_identity_id
+  end
+
+  def steal
+    raise "Couldn't steal, not logged in." unless User.current_user
+    raise "Couldn't steal, not a support volunteer." unless User.current_user.support_volunteer?
+    self.send_steal_notification(User.current_user)
+    self.support_identity_id = User.current_user.support_identity_id
+  end
+
+  def give!(support_id)
+    raise "Couldn't give, not logged in." unless User.current_user
+    raise "Couldn't give, not a support volunteer." unless User.current_user.support_volunteer?
+    SupportTicketMailer.request_to_take(self, SupportIdentity.find(support_id).user, User.current_user).deliver
+  end
+
+  def reopen(reason, email=nil)
+    raise "Couldn't reopen. No reason given." if reason.blank?
+    if !email.blank? || !User.current_user
+      raise "Couldn't reopen. not owner!" unless (self.email == email)
+    elsif !User.current_user.support_volunteer?
+      raise "Couldn't reopen. not owner!" unless (User.current_user.id == self.user_id)
+    end
+    self.code_ticket_id = self.faq_id = self.support_identity_id = nil
+    self.faq_vote.destroy if self.faq_vote
+    self.code_vote.destroy if self.code_vote
+    self.support_details.update_all("resolved_ticket = NULL")
+  end
+
+  def post
+    raise "Couldn't post, not logged in." unless User.current_user
+    raise "Couldn't post, not a support volunteer." unless User.current_user.support_volunteer?
+    self.support_identity = User.current_user.support_identity
+  end
+
+  def needs_fix(code_ticket_id=nil)
+    raise "Couldn't set to waiting, not logged in." unless User.current_user
+    raise "Couldn't set to waiting, not a support volunteer." unless User.current_user.support_volunteer?
+    if code_ticket_id
+      code_ticket = CodeTicket.find_by_id(code_ticket_id)
+      raise "Couldn't set to waiting: no code ticket with id: #{code_ticket_id}" unless code_ticket
+      CodeVote.create(:code_ticket_id => code_ticket_id, :support_ticket_id => self.id, :vote => 2)
+    else
+      code_ticket = CodeTicket.create(:summary => self.summary)
+      code_ticket_id = code_ticket.id
+      CodeVote.create(:code_ticket_id => code_ticket_id, :support_ticket_id => self.id, :vote => 3)
+    end
+    self.code_ticket_id = code_ticket_id
+    self.support_identity = User.current_user.support_identity
+    code_ticket
+  end
+
+  def answer(faq_id=nil)
+    raise "Couldn't set to answered, not logged in." unless User.current_user
+    raise "Couldn't set to answered, not a support volunteer." unless User.current_user.support_volunteer?
+    if faq_id
+      faq = Faq.find_by_id(faq_id)
+      raise "Couldn't set to waiting: no faq with id: #{faq_id}" unless faq
+    else
+      faq = Faq.create
+      faq_id = faq.id
+    end
+    self.faq_id = faq_id
+    self.support_identity = User.current_user.support_identity
+    FaqVote.create(:faq_id => faq_id, :support_ticket_id => self.id, :vote => 1)
+    faq
+  end
+
+  def resolve(resolution)
+    raise "Couldn't resolve. No resolution given." if resolution.blank?
+    if !User.current_user.try(:support_admin?)
+      raise "Couldn't resolve. Not a support admin."
+    end
+    self.support_identity = User.current_user.support_identity
+  end
+
+  # SUPPORT DETAILS stuff
+  # only logged in users or the ticket owner can comment
+  # only support volunteers can comment on non-open tickets
+  def comment!(content, official=true, email=nil)
+    if !User.current_user && email
+      raise "Couldn't comment. not owner!" unless (self.email == email)
+    elsif User.current_user.nil?
+      raise "Couldn't comment. Not logged in."
+    end
+    support_response = (official && User.current_user.support_volunteer?)
+    if self.unowned? || support_response || (User.current_user == self.user)
+      self.support_details.create(:content => content,
+                               :support_identity_id => User.current_user.try(:support_identity).try(:id),
+                               :support_response => support_response,
+                               :system_log => false)
+      self.send_update_notifications
+    else
+      raise "Couldn't comment. Only official comments allowed."
+    end
+  end
+
+  def accept(detail_id, email = nil)
+    detail = self.support_details.find_by_id(detail_id)
+    raise "Couldn't accept answer. No detail with id: #{detail_id}" unless detail
+    if !email.blank?
+      raise "Couldn't accept answer. not owner!" unless (self.email == email)
+    else
+      raise "Couldn't accept answer. Not logged in." unless User.current_user
+      raise "Couldn't accept answer. not owner!" unless (self.user == User.current_user)
+    end
+    detail.update_attribute(:resolved_ticket, true)
+    self.support_identity_id = nil
+  end
+
+  # NOTIFICATION stuff
   attr_accessor :turn_off_notifications
-  attr_accessor :turn_on_notifications
-  attr_accessor :send_notifications
 
   after_create :add_owner_as_watcher
   def add_owner_as_watcher
@@ -121,27 +264,65 @@ class SupportTicket < ActiveRecord::Base
     self.support_notifications.create(:email => self.email || self.user.email)
   end
 
-  # run from controller after update
-  def update_watchers(current_user)
-    # take care of the current user's wishes re notification
-    # the email of the user editing the ticket. if there is no current_user, it must be the guest owner
-    email_address = current_user ? current_user.email : self.email
-    # are they already watching?
-    watcher = self.support_notifications.where(:email => email_address).first
-    # if they are, and they want to stop, remove the watcher
-    watcher.destroy if (watcher && self.turn_off_notifications == "1")
-    # if they aren't, and they want to start, add a watcher.
-    if !watcher && self.turn_on_notifications == "1"
-      # mark the watcher as a public watcher if not the owner or a support volunteer
-      public = true
-      public = !current_user.try(:support_volunteer?) # support volunteers
-      public = false if self.email # guest owners
-      public = false if self.user && self.user == current_user # user owner
-      self.support_notifications.create(:email => email_address, :public_watcher => public)
+  def make_private!(email = nil)
+    if !email.blank?
+      raise "Couldn't make private. not owner!" unless (self.email == email)
+    else
+      raise "Couldn't make private. Not logged in." unless User.current_user
+      if !User.current_user.support_volunteer? && (User.current_user != self.user)
+        raise "Couldn't make private. Not owner."
+      end
     end
+    self.update_attribute(:private, true)
+    # remove all watchers who aren't support volunteers or owners
+    self.support_notifications.where(:public_watcher => true).delete_all
+    support_identity_id = User.current_user.try(:support_identity_id)
+    official = User.current_user && User.current_user.support_volunteer?
+    content = "made private"
+    self.support_details.create(:content => content,
+                                :support_identity_id => support_identity_id,
+                                :support_response => official,
+                                :system_log => true)
+  end
 
-    # if the ticket has been made private remove all watchers who aren't support volunteers or owners
-    self.support_notifications.where(:public_watcher => true).delete_all if self.private?
+  def hide_username!
+    if self.email
+      raise "Couldn't hide username. Guest tickets don't have usernames"
+    else
+      raise "Couldn't hide username. Not logged in." unless User.current_user
+      if !User.current_user.support_volunteer? && (User.current_user != self.user)
+        raise "Couldn't hide username. Not owner."
+      end
+    end
+    self.update_attribute(:display_user_name, false)
+    support_identity_id = User.current_user.try(:support_identity_id)
+    official = User.current_user && User.current_user.support_volunteer?
+    content = "hide username"
+    self.support_details.create(:content => content,
+                                :support_identity_id => support_identity_id,
+                                :support_response => official,
+                                :system_log => true)
+
+  end
+
+  def show_username!
+    if self.email
+      raise "Couldn't show username. Guest tickets don't have usernames"
+    else
+      raise "Couldn't show username. Not logged in." unless User.current_user
+      if !User.current_user.support_volunteer? && (User.current_user != self.user)
+        raise "Couldn't show username. Not owner."
+      end
+    end
+    self.update_attribute(:display_user_name, true)
+    support_identity_id = User.current_user.support_identity_id
+    official = User.current_user && User.current_user.support_volunteer?
+    content = "show username"
+    self.support_details.create(:content => content,
+                                :support_identity_id => support_identity_id,
+                                :support_response => official,
+                                :system_log => true)
+
   end
 
   def mail_to
@@ -149,51 +330,46 @@ class SupportTicket < ActiveRecord::Base
   end
 
   # used in view to determine whether to offer to turn on or off notifications
-  def being_watched?(current_user)
-    # the email of the user viewing the ticket.
-    # if there is no current_user, it must be the guest owner
-    # because other non-logged-in users aren't offered the choice
-    email_address = current_user ? current_user.email : self.email
+  def watched?(email = nil)
+    email_address = email || User.current_user.try(:email)
+    raise "Couldn't check watch. No email address to check." unless email_address
     # if there's no watcher with that email, this will be nil which acts as false
     self.support_notifications.where(:email => email_address).first
   end
 
-  before_save :check_if_changed
-  def check_if_changed
-    self.send_notifications = true if self.changed?
-    self.send_notifications = true if !self.support_details.select{|d| d.changed?}.empty?
-    true
+  def watch!(email = nil)
+    if !email.blank?
+      raise "Couldn't watch. not owner!" unless (self.email == email)
+      self.support_notifications.create(:email => email)
+    else
+      raise "Couldn't watch. Not logged in." unless User.current_user
+      raise "Couldn't watch. Already watching." if watched?
+      public = !User.current_user.support_volunteer?
+      raise "Couldn't watch. ticket private!" if (self.private? && public)
+      # create a support identity for tracking purposes
+      User.current_user.support_identity unless User.current_user.support_identity_id
+      self.support_notifications.create(:email => User.current_user.email, :public_watcher => public)
+    end
   end
 
-  # situations where notifications should not be sent
-  def skip_notifications?
-    # skip the notification if neither the support ticket nor any of its details have changed, just the watchers
-    # set in check_if_changed before save. will only trigger if you use self.support_details.build && self.save
-    # if you update the support_details without going through the master ticket, this will not trigger!
-    return true unless self.send_notifications
-
-    # don't try to send email if there's no-one to send it to
-    return true if self.support_notifications.count < 1
-
-    # don't send email when something is spam
-    return true unless self.approved
-
-    false
+  def unwatch!(email = nil)
+    raise "Couldn't remove watch. Not watching." unless watched?(email)
+    if !email.blank?
+      self.support_notifications.where(:email => email).delete_all
+    else
+      self.support_notifications.where(:email => User.current_user.email).delete_all
+    end
   end
 
   def send_create_notifications
-    unless self.skip_notifications?
-      self.mail_to.each do |recipient|
-        SupportTicketMailer.create_notification(self, recipient).deliver
-      end
+    self.mail_to.each do |recipient|
+      SupportTicketMailer.create_notification(self, recipient).deliver
     end
   end
 
   def send_update_notifications
-    unless self.skip_notifications?
-      self.mail_to.each do |recipient|
-        SupportTicketMailer.update_notification(self, recipient).deliver
-      end
+    self.mail_to.each do |recipient|
+      SupportTicketMailer.update_notification(self, recipient).deliver
     end
   end
 
@@ -205,22 +381,19 @@ class SupportTicket < ActiveRecord::Base
 
   before_create :create_authentication_code
   def create_authentication_code
-    if self.email
-      self.authentication_code = SecureRandom.hex(10)
-    end
+    self.authentication_code = SecureRandom.hex(10) if self.email
   end
 
-  def owner?(code, current_user)
-    if !current_user # not logged in
+  def owner?(code=nil)
+    if User.current_user.nil? # not logged in
       return false if self.authentication_code.blank? # not a guest ticket
       code == self.authentication_code # does ticket authentication match authentication code?
     else # logged in
-      current_user.id == self.user_id  # does ticket owner match current user?
+      User.current_user.id == self.user_id  # does ticket owner match current user?
     end
   end
 
   # SPAM stuff
-  attr_protected :approved
 
   before_create :check_for_spam
   def check_for_spam
@@ -229,19 +402,9 @@ class SupportTicket < ActiveRecord::Base
 
   def check_for_spam?
     # don't check for spam while running tests or if logged in
-    self.approved = Rails.env.test? || self.user_id || !Akismetor.spam?(akismet_attributes)
-  end
-
-  def mark_as_spam!
-    update_attribute(:approved, false)
-    # don't submit spam reports unless in production mode
-    Rails.env.production? && Akismetor.submit_spam(akismet_attributes)
-  end
-
-  def mark_as_ham!
-    update_attribute(:approved, true)
-    # don't submit ham reports unless in production mode
-    Rails.env.production? && Akismetor.submit_ham(akismet_attributes)
+    approved = Rails.env.test? || self.user_id || !Akismetor.spam?(akismet_attributes)
+    self.spam! unless approved
+    return approved
   end
 
   def akismet_attributes

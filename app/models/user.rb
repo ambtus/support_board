@@ -6,6 +6,9 @@ class User < ActiveRecord::Base
   has_and_belongs_to_many :roles
   belongs_to :support_identity
 
+  # Allows other models to get the current user with User.current_user
+  cattr_accessor :current_user
+
  def support_identity_with_create
     support_identity_without_create || SupportIdentity.create(:name => self.login, :user => self)
   end

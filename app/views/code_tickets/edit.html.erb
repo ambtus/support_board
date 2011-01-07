@@ -1,53 +1,20 @@
 <%= form_for(@ticket) do |t| %>
-  <p class="submit"><%= t.submit (@ticket.support_identity_id ? "Untake" : "Take") %></p>
-  <p>
-    <% if @ticket.being_watched?(current_user) %>
-      <%= t.check_box :turn_off_notifications %>
-      <%= t.label :turn_off_notifications, "Turn off notifications"%>
-    <% else %>
-      <%= t.check_box :turn_on_notifications %>
-      <%= t.label :turn_on_notifications, "Turn on notifications"%>
-    <% end %>
-  </p>
   <dl>
-    <dt><%= "Status" %>:</dt>
-      <dd><%= @ticket.status_line %></dd>
-    <dt><%= "Votes" %>:</dt>
-      <dd><%= @ticket.vote_count %></dd>
-    <% unless @ticket.resolved %>
-      <dt><%= t.label :vote_up %>:</dt>
-        <dd>
-          <%= t.check_box :vote_up %>
-        </dd>
-    <% end %>
-
     <dt><%= t.label :summary %>:</dt>
       <dd><%= t.text_field :summary %></dd>
-
-    <%= t.fields_for :code_details do |d| %>
-      <% if d.object.new_record? %>
-        <%= d.hidden_field :support_identity_id, :value => current_user.support_identity.id %>
-        <% if current_user.support_identity.official %>
-          <dt><%= d.label :support_response, "Answer officially?" %>:</dt>
-            <dd><%= d.check_box :support_response %></dd>
-        <% end %>
-        <dt><%= d.label :content, "Add details" %>:</dt>
-          <dd><%= d.text_area :content %></dd>
-      <% else %>
-        <% if d.object.resolved_ticket? %>
-          <dt><%= "Answered by" %> <%= d.object.byline %>:</dt>
-        <% else %>
-          <dt><%= d.object.byline %> <%= "wrote" %>:</dt>
-        <% end %>
-            <dd><%= raw d.object.content %></dd>
-      <% end %>
-    <% end %>
-
+   <dt><%= t.label :description %>:</dt>
+      <dd><%= t.text_field :description %></dd>
+    <dt><%= t.label :url %>:</dt>
+      <dd><%= t.text_field :url %></dd>
+   <dt><%= t.label :browser %>:</dt>
+      <dd><%= t.text_field :browser %></dd>
  </dl>
   <p class="submit">
     <%= t.submit %>
   </p>
 <% end %>
+
+<%= render "show" %>
 
 <p>Related Support tickets</p>
 <% @ticket.support_tickets.each do |t| %>
