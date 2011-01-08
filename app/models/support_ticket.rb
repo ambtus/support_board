@@ -20,8 +20,6 @@ class SupportTicket < ActiveRecord::Base
   validates_presence_of :summary
   validates_length_of :summary, :maximum=> 140 # tweet length!
 
-  attr_protected :support_admin_resolved
-
   # used in lists
   def name
     "Support Ticket #" + self.id.to_s
@@ -98,6 +96,7 @@ class SupportTicket < ActiveRecord::Base
     end
 
     on_transition do |from, to, triggering_event, *event_args|
+      next if self.new_record?
       support_identity_id = User.current_user.try(:support_identity_id)
       official = User.current_user && User.current_user.support_volunteer?
       content = "#{from} -> #{to}"
@@ -401,8 +400,8 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def check_for_spam?
-    # don't check for spam while running tests or if logged in
-    approved = Rails.env.test? || self.user_id || !Akismetor.spam?(akismet_attributes)
+    # don't check for spam unless in production and no user_id
+    approved = !Rails.env.production? || self.user_id || !Akismetor.spam?(akismet_attributes)
     self.spam! unless approved
     return approved
   end

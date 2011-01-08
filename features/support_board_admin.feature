@@ -177,3 +177,24 @@ Scenario: updating the version number will close all the waiting support tickets
     But I should not see "Support Ticket #2"
     And I should not see "Support Ticket #3"
 
+Scenario: support admins (only - privacy issues) can see the authenticity_token, browser agent and originating IP
+  Given I am on the home page
+  When I follow "Open a New Support Ticket"
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+  When I press "Create Support ticket"
+  Then I should see "Support ticket created"
+    And I should see "Archive is very slow"
+  But I should not see "guest@ao3.org"
+    And I should not see "authenticity_token"
+    And I should not see "agent"
+    And I should not see "Remote IP"
+  When I am logged in as support admin "incharge"
+    And I follow "Support Board"
+    And I follow "Open Support Tickets"
+    And I follow "Support Ticket #"
+  Then I should see "Archive is very slow"
+    And I should see "authenticity_token:"
+    And I should see "user agent:"
+    And I should see "remote IP: 127.0.0.1"
+

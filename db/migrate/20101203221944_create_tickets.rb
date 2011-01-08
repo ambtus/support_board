@@ -18,6 +18,7 @@ class CreateTickets < ActiveRecord::Migration
       t.string :url
       t.string :user_agent
       t.string :ip_address
+      t.string :authenticity_token
 
       t.string :status
       t.string :revision

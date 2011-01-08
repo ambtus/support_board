@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "url"
     t.string   "user_agent"
     t.string   "ip_address"
+    t.string   "authenticity_token"
     t.string   "status"
     t.string   "revision"
     t.integer  "support_identity_id"

@@ -306,3 +306,6 @@ Scenario: visibility on the comment board
   When I follow "Support Board"
     And I follow "Comments"
   Then I should not see "You guys rock!"
+
+# TODO
+Scenario: support volunteers (only - privacy issues) can see the referring URL
