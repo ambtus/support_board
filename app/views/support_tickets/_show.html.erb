@@ -9,7 +9,7 @@
           <%= link_to @ticket.code_ticket.name, @ticket.code_ticket %>
       <% end %>
       <% if @ticket.faq_id %>
-          <%= link_to @ticket.faq.name, @ticket.faq %>
+          <%= link_to @ticket.faq.title, @ticket.faq %>
       <% end %>
     </dd>
   <dt><%= "Access" %>:</dt>

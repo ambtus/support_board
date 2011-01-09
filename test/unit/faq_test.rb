@@ -1,10 +1,6 @@
 require 'test_helper'
 
 class FaqTest < ActiveSupport::TestCase
-  test "name" do
-    assert_equal "1: where to find salt", Faq.find(1).name
-    assert_equal "2: why we don't have enough ZPMs", Faq.find(2).name
-  end
   test "normal flow" do
     assert_equal "rfc", Faq.find(2).status
     assert_equal "faq", Faq.find(1).status

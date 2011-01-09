@@ -339,7 +339,7 @@ Scenario: guests can comment on a draft FAQ when following a link from their own
   When a volunteer creates a faq from support ticket 1
     And I reload the page
   Then I should see "Status: closed by oracle"
-  When I follow "1: new faq"
+  When I follow "new faq"
     And I fill in "Details" with "this sounds good"
     And I press "Add details"
   Then I should see "support ticket owner wrote: this sounds good"
@@ -354,7 +354,7 @@ Scenario: guests can't comment on a posted FAQ when following a link from their 
   When a volunteer links support ticket 1 to faq 1
     And I reload the page
   Then I should see "Status: closed by oracle"
-  When I follow "1: faq 1"
+  When I follow "faq 1"
     Then I should not see "Details"
 
 Scenario: guests can remove a link to a FAQ if they don't think it resolves their ticket
@@ -366,11 +366,11 @@ Scenario: guests can remove a link to a FAQ if they don't think it resolves thei
   When a volunteer creates a faq from support ticket 1
     And I reload the page
   Then I should see "Status: closed by oracle"
-    And I should see "1: new faq"
+    And I should see "new faq"
   When I fill in "Reason" with "FAQ not helpful"
     And I press "Reopen"
   Then I should see "Status: open"
-    And I should not see "1: new faq"
+    And I should not see "new faq" within "a"
 
 Scenario: a posted faq should get a vote when linked from a guest support ticket
   Given a posted faq exists with position: 1, title: "slowness"
@@ -408,8 +408,8 @@ Scenario: a faq should get a vote from guest support tickets when it's posted
     And a volunteer creates a faq from support ticket 1
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
-    And I follow "Unposted FAQs"
-    And I follow "1: new faq"
+    And I follow "FAQs waiting for comments"
+    And I follow "new faq"
     And I press "Post"
   Then I should see "Votes: 1"
 
@@ -425,8 +425,30 @@ Scenario: a faq should not get a vote when it's posted if there are no linked su
     And I press "Reopen"
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
-    And I follow "Unposted FAQs"
-    And I follow "1: new faq"
+    And I follow "FAQs waiting for comments"
+    And I follow "new faq"
     And I press "Post"
   Then I should see "Votes: 0"
+
+Scenario: FAQs can be sorted by votes
+  Given the following faqs exist
+    | id | title   |
+    | 1  | first   |
+    | 2  | second  |
+    | 3  | third   |
+  And the following faq votes exist
+    | faq_id | vote  |
+    | 1      | 3     |
+    | 2      | 7     |
+    | 3      | 1     |
+  When I am on the home page
+    And I follow "Support Board"
+    And I follow "FAQs waiting for comments"
+  Then I should see "1: first"
+    And I should see "2: second"
+    And I should see "3: third"
+  When I follow "Sort by vote count"
+  Then I should see "1: second"
+    And I should see "2: first"
+    And I should see "3: third"
 

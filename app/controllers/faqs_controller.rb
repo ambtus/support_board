@@ -1,6 +1,7 @@
 class FaqsController < ApplicationController
   def index
-    @faqs = params[:unposted] ? Faq.rfc : Faq.faq
+    @faqs = params[:rfc] ? Faq.rfc : Faq.faq
+    @faqs = @faqs.sort_by_vote if params[:by_vote]
   end
 
   def show

@@ -83,7 +83,7 @@
     <% if @ticket.current_state.events.include?(:answer) %>
       <%= label_tag :faq_id, "FAQ" %>
       <%= select_tag :faq_id,
-                     options_from_collection_for_select(Faq.all, "id", "name") %>
+                     options_from_collection_for_select(Faq.all, "id", "title") %>
       <%= submit_tag "Answered by this FAQ" %>
       <%= submit_tag "Create new FAQ" %>
     <% end %>

@@ -12,13 +12,13 @@ class Faq < ActiveRecord::Base
 
   default_scope :order => 'position ASC'
 
-  # used in lists
-  def name
-    "#{self.position.to_s}: #{self.title}"
-  end
-
   def vote_count
     faq_votes.sum(:vote)
+  end
+
+  # okay until the time we have more than one page of FAQs
+  def self.sort_by_vote
+    self.all.sort{|f1,f2|f2.vote_count <=> f1.vote_count}
   end
 
   before_create :set_owner

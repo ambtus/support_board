@@ -12,6 +12,7 @@
   <li><%= link_to "Frequently Asked Questions", faqs_path %></li>
   <li><%= link_to "Release Notes", deploy_notes_path %></li>
   <li><%= link_to "Open Code Tickets (Known Issues)", code_tickets_path %>
+  <li><%= link_to "FAQs waiting for comments", faqs_path(:rfc => true) %></li>
   <% if current_user %>
     <li><%= link_to "Open Support Tickets", support_tickets_path %>
   <% end %>
@@ -22,7 +23,6 @@
     <li><%= link_to "Closed Support Tickets", support_tickets_path(:status => "closed") %>
     <li><%= link_to "Spam Support Tickets", support_tickets_path(:status => "spam") %>
 
-    <li><%= link_to "Unposted FAQs", faqs_path(:unposted => true) %></li>
 
     <li><%= link_to "New Code Ticket", new_code_ticket_path %></li>
     <li><%= link_to "Taken Code Tickets", code_tickets_path(:status => "taken") %></li>

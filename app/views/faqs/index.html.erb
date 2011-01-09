@@ -1,7 +1,12 @@
+<% if params[:by_vote] %>
+  <%= link_to "Sort by position", faqs_path(:rfc => params[:rfc]) %>
+<% else %>
+  <%= link_to "Sort by vote count", faqs_path(:by_vote => true, :rfc => params[:rfc]) %>
+<% end %>
 <ul>
-<% @faqs.each do |faq| %>
+<% @faqs.each_with_index do |faq, i| %>
   <li>
-    <%= link_to faq.name, faq%> (<%= faq.vote_count %>)
+    <%= i + 1 %>: <%= link_to faq.title, faq%> (<%= faq.vote_count %>)
   </li>
 <% end %>
 </ul>

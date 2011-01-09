@@ -5,10 +5,10 @@ Scenario: support admins can post drafts which will show up on the FAQ page
   When I am logged in as support admin "incharge"
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"
-  Then I should not see "1: some question"
+  Then I should not see "some question"
   When I follow "Support Board"
-    And I follow "Unposted FAQs"
-    And I follow "1: some question"
+    And I follow "FAQs waiting for comments"
+    And I follow "some question"
     And I press "Post"
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"
@@ -27,7 +27,7 @@ Scenario: support admins can unpost drafts which will be removed from the FAQ pa
     And I follow "Frequently Asked Questions"
   Then I should not see "1: some question"
   When I follow "Support Board"
-    And I follow "Unposted FAQs"
+    And I follow "FAQs waiting for comments"
   Then I should see "1: some question"
 
 Scenario: when a draft FAQ is marked posted, the comments are no longer visible.
@@ -199,3 +199,4 @@ Scenario: support admins (only - privacy issues) can see the authenticity_token,
     And I should see "user agent:"
     And I should see "remote IP: 127.0.0.1"
 
+#TODO release notes

@@ -22,11 +22,11 @@ Scenario: users can remove a link to a FAQ if they don't think it resolves their
   When a volunteer creates a faq from support ticket 1
     And I reload the page
   Then I should see "Status: closed by oracle"
-    And I should see "1: new faq"
+    And I should see "new faq"
   When I fill in "Reason" with "not even close"
     And I press "Reopen"
   Then I should see "Status: open"
-    And I should not see "1: new faq"
+    And I should not see "new faq" within "a"
 
 Scenario: users reading a FAQ can mark it as "this answered my question" (a FAQ vote)
   Given a posted faq exists with position: 1, title: "something"
@@ -68,8 +68,8 @@ Scenario: a faq should get a vote from user support tickets when it's posted
     And a volunteer creates a faq from support ticket 1
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
-    And I follow "Unposted FAQs"
-    And I follow "1: new faq"
+    And I follow "FAQs waiting for comments"
+    And I follow "new faq"
     And I press "Post"
   Then I should see "Votes: 1"
 
@@ -85,7 +85,7 @@ Scenario: a faq should not get a vote when it's posted if there are no linked su
     And I press "Reopen"
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
-    And I follow "Unposted FAQs"
-    And I follow "1: new faq"
+    And I follow "FAQs waiting for comments"
+    And I follow "new faq"
     And I press "Post"
   Then I should see "Votes: 0"

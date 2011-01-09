@@ -129,11 +129,10 @@ Scenario: volunteers can link a support ticket to an existing draft FAQ
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
-    And I select "1: some question" from "FAQ"
+    And I select "some question" from "FAQ"
     And I press "Answered by this FAQ"
   Then 1 emails should be delivered to "guest@ao3.org"
-    And I should see "Status: closed by oracle 1: some question"
-    And I should see "1: some question"
+    And I should see "Status: closed by oracle some question"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
@@ -145,7 +144,7 @@ Scenario: volunteers can link a support ticket to an existing draft FAQ
     Then I should see "Status: open"
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"
-    Then I should not see "1: some question"
+    Then I should not see "some question"
 
 Scenario: volunteers can link a support ticket to an existing posted FAQ
   Given a posted faq exists with position: 1, title: "some question"
@@ -154,11 +153,11 @@ Scenario: volunteers can link a support ticket to an existing posted FAQ
   When I follow "Support Board"
     And I follow "Open Support Tickets"
     And I follow "Support Ticket #1"
-    And I select "1: some question" from "FAQ"
+    And I select "some question" from "FAQ"
     And I press "Answered by this FAQ"
-  Then I should see "Status: closed by oracle 1: some question"
+  Then I should see "Status: closed by oracle some question"
     And 1 email should be delivered to "guest@ao3.org"
-  When I follow "1: some question"
+  When I follow "some question"
   Then I should see "Votes: 1"
   When I follow "Support Board"
     And I follow "Open Support Tickets"
@@ -169,10 +168,10 @@ Scenario: volunteers can link a support ticket to an existing posted FAQ
   When I fill in "Reason" with "incorrect FAQ"
     And I press "Reopen"
   Then I should see "Status: open"
-    And I should not see "1: some question" within "a"
+    And I should not see "some question" within "a"
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"
-    And I follow "1: some question"
+    And I follow "some question"
   Then I should see "Votes: 0"
 
 Scenario: volunteers can create a new (draft) FAQ and link to it in one step
@@ -187,19 +186,21 @@ Scenario: volunteers can create a new (draft) FAQ and link to it in one step
   When I fill in "Title" with "New question"
     And I press "Update Faq"
   When I follow "Support Board"
+    And I follow "Frequently Asked Questions"
+    Then I should not see "New question"
+  When I follow "Support Board"
+    And I follow "FAQs waiting for comments"
+    Then I should see "New question"
+  When I follow "Support Board"
     And I follow "Open Support Tickets"
   Then I should not see "Support Ticket #1"
   When I follow "Support Board"
     And I follow "Closed Support Tickets"
     And I follow "Support Ticket #1"
-  Then I should see "Status: closed by oracle 1: New question"
-    And I should see "1: New question"
+  Then I should see "Status: closed by oracle New question"
   When I fill in "Reason" with "incorrect FAQ"
     And I press "Reopen"
   Then I should see "Status: open"
-  When I follow "Support Board"
-    And I follow "Frequently Asked Questions"
-    Then I should not see "1: New question"
 
 Scenario: volunteers can send email to another volunteer asking them to take a ticket
   Given a support ticket exists
@@ -217,7 +218,4 @@ Scenario: volunteers can send email to another volunteer asking them to take a t
     And the email should contain "Thank you, oracle"
   When I click the first link in the email
   Then I should see "Status: open"
-
-# TODO
-Scenario: FAQs can be sorted by votes
 
