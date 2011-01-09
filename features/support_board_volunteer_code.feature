@@ -1,9 +1,5 @@
 Feature: volunteers working with code tickets
 
-#TODO
-Scenario: creating a code ticket from a support ticket should enter agent url in browser
-Scenario: creating a new code ticket should have somewhere to enter the browser
-
 Scenario: support identities don't have to be unique, but taken tickets should be correct
   Given a volunteer exists with login: "rodney", id: 1
     And a volunteer exists with login: "hermione", id: 2
@@ -39,6 +35,36 @@ Scenario: identities don't have to be unique, but closed tickets should be corre
     And I follow "Closed Code Tickets"
   Then I should not see "Code Ticket #1"
     But I should see "Code Ticket #2"
+
+Scenario: creating a code ticket from a support ticket should enter referring url in url
+  Given a support ticket exists with url: "/works/1523"
+  When I am logged in as volunteer "oracle"
+    And I am on the first support ticket page
+  Then I should see "referring url: /works/1523"
+  When I press "Create new code ticket"
+    And I am on the page for the first code ticket
+  Then I should see "url: /works/1523"
+
+Scenario: creating a code ticket from a support ticket should enter user agent in browser
+  Given a support ticket exists with user_agent: "Mozilla/5.0"
+  When I am logged in as volunteer "oracle"
+    And I am on the first support ticket page
+  Then I should see "user agent: Mozilla/5.0"
+  When I press "Create new code ticket"
+    And I am on the page for the first code ticket
+  Then I should see "browser: Mozilla/5.0"
+
+Scenario: creating a new code ticket should have somewhere to enter the browser and url
+  When I am logged in as volunteer "oracle"
+    And I follow "Support Board"
+    And I follow "New Code Ticket"
+    And I fill in "Summary" with "something is wrong"
+    And I fill in "Url" with "/tags"
+    And I fill in "Browser" with "IE6"
+    And I press "Create Code ticket"
+  Then I should see "Code ticket created"
+    And I should see "url: /tags"
+    And I should see "browser: IE6"
 
 Scenario: volunteers can close a code ticket as a dupe
   Given a code ticket exists with summary: "original", id: 1

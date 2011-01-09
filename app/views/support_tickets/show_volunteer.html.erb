@@ -3,11 +3,11 @@
     <% if current_user.support_admin? %>
       <dt>authenticity_token:</dt>
         <dd><%= @ticket.authenticity_token %></dd>
-      <dt>user agent:</dt>
-        <dd><%= @ticket.user_agent %></dd>
       <dt>remote IP:</dt>
         <dd><%= @ticket.ip_address %></dd>
     <% end %>
+    <dt>user agent:</dt>
+      <dd><%= @ticket.user_agent %></dd>
     <dt>referring url:</dt>
       <dd><%= @ticket.url %></dd>
   </dl>

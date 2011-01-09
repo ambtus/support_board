@@ -24,11 +24,12 @@
 
     <li><%= link_to "Unposted FAQs", faqs_path(:unposted => true) %></li>
 
-    <li><%= link_to "Taken Code Tickets", code_tickets_path(:status => "taken") %>
-    <li><%= link_to "Committed Code Tickets", code_tickets_path(:status => "committed") %>
-    <li><%= link_to "Staged Code Tickets", code_tickets_path(:status => "staged") %>
-    <li><%= link_to "Verified Code Tickets", code_tickets_path(:status => "verified") %>
-    <li><%= link_to "Closed Code Tickets", code_tickets_path(:status => "closed") %>
+    <li><%= link_to "New Code Ticket", new_code_ticket_path %></li>
+    <li><%= link_to "Taken Code Tickets", code_tickets_path(:status => "taken") %></li>
+    <li><%= link_to "Committed Code Tickets", code_tickets_path(:status => "committed") %></li>
+    <li><%= link_to "Staged Code Tickets", code_tickets_path(:status => "staged") %></li>
+    <li><%= link_to "Verified Code Tickets", code_tickets_path(:status => "verified") %></li>
+    <li><%= link_to "Closed Code Tickets", code_tickets_path(:status => "closed") %></li>
   <% end %>
   <% if current_user.try(:support_admin?) %>
     <%= form_tag '/code_tickets' do %>

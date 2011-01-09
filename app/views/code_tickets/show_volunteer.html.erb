@@ -4,12 +4,20 @@
 
 <%= render "show" %>
 
+<dl>
+  <dt>url:</dt>
+    <dd><%= @ticket.url %></dd>
+ <dt>browser:</dt>
+    <dd><%= @ticket.browser %></dd>
 <% if @ticket.support_tickets.count > 0 %>
-  <p>Related Support tickets</p>
+  <dt>Related Support tickets:</dt>
+  <dd>
   <% @ticket.support_tickets.each do |support_ticket| %>
     <%= link_to support_ticket.id, support_ticket %>
   <% end %>
+  </dd>
 <% end %>
+</dl>
 
 <%= form_for(@ticket) do %>
   <% if @add_details %>

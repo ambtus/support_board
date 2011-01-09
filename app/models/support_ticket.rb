@@ -185,7 +185,7 @@ class SupportTicket < ActiveRecord::Base
       raise "Couldn't set to waiting: no code ticket with id: #{code_ticket_id}" unless code_ticket
       CodeVote.create(:code_ticket_id => code_ticket_id, :support_ticket_id => self.id, :vote => 2)
     else
-      code_ticket = CodeTicket.create(:summary => self.summary)
+      code_ticket = CodeTicket.create(:summary => self.summary, :url => self.url, :browser => self.user_agent)
       code_ticket_id = code_ticket.id
       CodeVote.create(:code_ticket_id => code_ticket_id, :support_ticket_id => self.id, :vote => 3)
     end
