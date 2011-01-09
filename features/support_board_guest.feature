@@ -452,3 +452,25 @@ Scenario: FAQs can be sorted by votes
     And I should see "2: first"
     And I should see "3: third"
 
+Scenario: code tickets can be sorted by votes
+  Given the following code tickets exist
+    | id | summary |
+    | 1  | first   |
+    | 2  | second  |
+    | 3  | third   |
+  And the following code votes exist
+    | code_ticket_id | vote  |
+    | 1              | 3     |
+    | 2              | 7     |
+    | 3              | 1     |
+  When I am on the home page
+    And I follow "Support Board"
+    And I follow "Open Code Tickets (Known Issues)"
+  Then I should see "1: Code Ticket #1 (3)"
+    And I should see "2: Code Ticket #2 (7)"
+    And I should see "3: Code Ticket #3 (1)"
+  When I follow "Sort by vote count"
+  Then I should see "1: Code Ticket #2 (7)"
+    And I should see "2: Code Ticket #1 (3)"
+    And I should see "3: Code Ticket #3 (1)"
+

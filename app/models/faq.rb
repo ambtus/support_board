@@ -16,7 +16,7 @@ class Faq < ActiveRecord::Base
     faq_votes.sum(:vote)
   end
 
-  # okay until the time we have more than one page of FAQs
+  # okay until we need to paginate
   def self.sort_by_vote
     self.all.sort{|f1,f2|f2.vote_count <=> f1.vote_count}
   end

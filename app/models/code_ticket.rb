@@ -176,6 +176,11 @@ class CodeTicket < ActiveRecord::Base
     code_votes.sum(:vote)
   end
 
+  # okay until we need to paginate
+  def self.sort_by_vote
+    self.all.sort{|f1,f2|f2.vote_count <=> f1.vote_count}
+  end
+
   def update_from_edit!(summary, description, url, browser)
     raise "Couldn't update. Not logged in." unless User.current_user
     raise "Couldn't update. Not support volunteer." unless User.current_user.support_volunteer?

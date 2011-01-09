@@ -1,4 +1,11 @@
-<% @tickets.each do |ticket| %>
-  <p><%= link_to(ticket.name, ticket) %></p>
-  <%=raw ticket.summary %>
+<% if params[:by_vote] %>
+  <%= link_to "Sort by position", code_tickets_path(params.merge :by_vote => false) %>
+<% else %>
+  <%= link_to "Sort by vote count", code_tickets_path(params.merge :by_vote => true) %>
 <% end %>
+<dl>
+<% @tickets.each_with_index do |ticket, i| %>
+  <dt><%= i + 1 %>: <%= link_to(ticket.name, ticket) %> (<%= ticket.vote_count %>)</dt>
+  <dd><%=raw ticket.summary %></dd>
+<% end %>
+</dl>

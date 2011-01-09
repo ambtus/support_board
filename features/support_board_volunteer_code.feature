@@ -140,7 +140,5 @@ Scenario: volunteers can steel a code ticket
     And the email should contain "hermione"
 
 # TODO
-Scenario: putting "closes issue #" in the commit message should transition to committed
-Scenario: linking to a commit on github should transition to committed
-Scenario: code tickets can be sorted by votes
-Scenario: committing a code ticket closes its associated support tickets
+Scenario: putting "closes issue #" in the git commit message should transition to committed
+Scenario: transition to committed should require a github commit id, which should act as a link

@@ -33,6 +33,7 @@ class CodeTicketsController < ApplicationController
       end
 
     end
+    @tickets = @tickets.sort_by_vote if params[:by_vote]
   end
 
   def show
