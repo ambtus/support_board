@@ -1,4 +1,5 @@
 class SupportTicketsController < ApplicationController
+  skip_before_filter :store_location, :only => [:new]
 
   def index
     # start a scope

@@ -307,5 +307,28 @@ Scenario: visibility on the comment board
     And I follow "Comments"
   Then I should not see "You guys rock!"
 
-# TODO
 Scenario: support volunteers (only - privacy issues) can see the referring URL
+  Given I am on the home page
+    And I follow "Open a New Support Ticket"
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is very slow"
+  When I press "Create Support ticket"
+  Then I should see "Support ticket created"
+    And I should see "Archive is very slow"
+  But I should not see "referring url: /"
+  When I follow "Open a New Support Ticket"
+  When I fill in "Email" with "guest@ao3.org"
+    And I fill in "Summary" with "Archive is hard to use"
+  When I press "Create Support ticket"
+  Then I should see "Support ticket created"
+    And I should see "Archive is hard to use"
+  But I should not see "referring url: /support_tickets/"
+  When I am logged in as support admin "incharge"
+    And I am on the page for the first support ticket
+  Then I should see "Archive is very slow"
+    And I should see "referring url: /"
+    But I should not see "referring url: /support_tickets/"
+  When I am on the page for the second support ticket
+  Then I should see "Archive is hard to use"
+    And I should see "referring url: /support_tickets/"
+

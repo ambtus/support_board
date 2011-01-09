@@ -17,6 +17,9 @@ module NavigationHelpers
    when /^the page for the first support ticket/
       support_ticket_path(:id => SupportTicket.first.id)
 
+   when /^the page for the second support ticket/
+      support_ticket_path(:id => SupportTicket.all[1].id)
+
     # the following are examples using path_to_pickle
 
     when /^#{capture_model}(?:'s)? page$/                           # eg. the forum's page
