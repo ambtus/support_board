@@ -128,7 +128,7 @@ class CreateTickets < ActiveRecord::Migration
       t.timestamps
     end
 
-    create_table :deploy_notes, :force => true do |t|
+    create_table :release_notes, :force => true do |t|
       t.string   :version
       t.text     :content
       t.string   :deployed_rev
@@ -154,7 +154,7 @@ class CreateTickets < ActiveRecord::Migration
     drop_table :code_details
     drop_table :code_votes
     drop_table :code_notifications
-    drop_table :deploy_notes
+    drop_table :release_notes
     drop_column :users, :support_identity_id
   end
 end

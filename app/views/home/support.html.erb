@@ -10,7 +10,7 @@
   <li><%= link_to "Open a New Support Ticket", new_support_ticket_path %>
   <li><%= link_to "Comments", support_tickets_path(:status => "posted") %>
   <li><%= link_to "Frequently Asked Questions", faqs_path %></li>
-  <li><%= link_to "Release Notes", deploy_notes_path %></li>
+  <li><%= link_to "Release Notes", release_notes_path %></li>
   <li><%= link_to "Open Code Tickets (Known Issues)", code_tickets_path %>
   <li><%= link_to "FAQs waiting for comments", faqs_path(:rfc => true) %></li>
   <% if current_user %>
@@ -30,6 +30,9 @@
     <li><%= link_to "Staged Code Tickets", code_tickets_path(:status => "staged") %></li>
     <li><%= link_to "Verified Code Tickets", code_tickets_path(:status => "verified") %></li>
     <li><%= link_to "Closed Code Tickets", code_tickets_path(:status => "closed") %></li>
+
+    <li><%= link_to "New Release Note", new_release_note_path %></li>
+    <li><%= link_to "Unposted Release Notes", release_notes_path(:unposted => true) %></li>
   <% end %>
   <% if current_user.try(:support_admin?) %>
     <%= form_tag '/code_tickets' do %>

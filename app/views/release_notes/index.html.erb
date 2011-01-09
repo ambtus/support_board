@@ -1,0 +1,5 @@
+<% @release_notes.each do |form| %>
+  <dt><%= link_to(form.version, form) %></dt>
+  <dd><%=raw form.content %></dd>
+<% end %>
+</dl>

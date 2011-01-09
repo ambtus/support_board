@@ -1,0 +1,12 @@
+<% if current_user.try(:support_volunteer?) %>
+  <% if current_user.support_admin? || !@release_note.posted? %>
+    <%= link_to "Edit", edit_release_note_path(@release_note) %>
+  <% end %>
+<% end %>
+<dl>
+  <dt><%= "Version" %>:</dt>
+    <dd><%= @release_note.version %></dd>
+  <dt><%= "Deployed Revision" %>:</dt>
+    <dd><%= @release_note.deployed_rev %></dd>
+</dl>
+<%= raw @release_note.content %>

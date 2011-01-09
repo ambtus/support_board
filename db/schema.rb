@@ -56,17 +56,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
-  create_table "deploy_notes", :force => true do |t|
-    t.string   "version"
-    t.text     "content"
-    t.string   "deployed_rev"
-    t.integer  "support_identity_id"
-    t.boolean  "posted",                                 :default => false
-    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "faq_details", :force => true do |t|
     t.integer  "faq_id"
     t.integer  "support_identity_id"
@@ -101,6 +90,17 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "status"
     t.integer  "support_identity_id"
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0, :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "release_notes", :force => true do |t|
+    t.string   "version"
+    t.text     "content"
+    t.string   "deployed_rev"
+    t.integer  "support_identity_id"
+    t.boolean  "posted",                                 :default => false
+    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

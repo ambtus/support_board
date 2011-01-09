@@ -65,7 +65,7 @@ class CodeTicketsController < ApplicationController
 
   def create
     if !current_user.try(:support_volunteer?)
-      flash[:notice] = "Sorry, only support volunteers can open code tickets. Please open a support ticket instead"
+      flash[:notice] = "Sorry, only support volunteers can create code tickets. Please open a support ticket instead"
       redirect_to new_support_ticket_path and return
     end
     case params[:commit]
@@ -91,6 +91,10 @@ class CodeTicketsController < ApplicationController
   end
 
   def edit
+    if !current_user.try(:support_volunteer?)
+      flash[:notice] = "Sorry, only support volunteers can edit code tickets."
+      redirect_to new_support_ticket_path and return
+    end
     @ticket = CodeTicket.find(params[:id])
   end
 

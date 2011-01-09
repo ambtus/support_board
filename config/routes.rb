@@ -9,7 +9,7 @@ SupportBoard::Application.routes.draw do
   match 'logout' => 'user_sessions#destroy'
 
   resources :faqs
-  resources :deploy_notes
+  resources :release_notes
   resources :support_tickets
   resources :code_tickets
 
