@@ -73,7 +73,15 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.boolean  "support_response",                       :default => false
     t.string   "content"
     t.boolean  "private",                                :default => false
+    t.boolean  "system_log",                             :default => false
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "faq_notifications", :force => true do |t|
+    t.integer  "faq_id"
+    t.string   "email"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -90,9 +98,9 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "title"
     t.text     "content"
     t.integer  "position"
-    t.integer  "user_id"
-    t.boolean  "posted",                                 :default => false
-    t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
+    t.string   "status"
+    t.integer  "support_identity_id"
+    t.integer  "content_sanitizer_version", :limit => 2, :default => 0, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

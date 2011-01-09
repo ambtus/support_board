@@ -1,7 +1,8 @@
 # overriding application.rb
-# will throw a warning
 Given /^the current SupportBoard version is "([^"]*)"$/ do |revision|
   # " reset quotes for color
+  # suppress warnings about 'already initialized constant REVISION_NUMBER'
+  module SupportBoard ; remove_const :REVISION_NUMBER ; end
   SupportBoard::REVISION_NUMBER = revision.to_i
 end
 

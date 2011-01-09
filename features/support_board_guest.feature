@@ -322,13 +322,13 @@ Scenario: guests can view draft FAQs, but not comment
   Given a faq exists with position: 1, title: "nothing much"
   When I am on the first faq page
   Then I should see "nothing much"
-    But I should not see "Add comment"
+    But I should not see "Details"
 
 Scenario: guests can view posted FAQs, but not comment
   Given a posted faq exists with position: 1, title: "big faq"
   When I am on the first faq page
   Then I should see "big faq"
-    But I should not see "Add comment"
+    But I should not see "Details"
 
 Scenario: guests can comment on a draft FAQ when following a link from their own support ticket
   Given I am on the home page
@@ -340,12 +340,12 @@ Scenario: guests can comment on a draft FAQ when following a link from their own
     And I reload the page
   Then I should see "Status: closed by oracle"
   When I follow "1: new faq"
-    And I fill in "Add comment" with "this sounds good"
-    And I press "Update Faq"
-  Then I should see "Support ticket owner wrote: this sounds good"
+    And I fill in "Details" with "this sounds good"
+    And I press "Add details"
+  Then I should see "support ticket owner wrote: this sounds good"
 
 Scenario: guests can't comment on a posted FAQ when following a link from their own support ticket
-  Given a faq exists with posted: true, position: 1
+  Given a posted faq exists
   Given I am on the home page
   When I follow "Open a New Support Ticket"
     And I fill in "Email" with "guest@ao3.org"
@@ -355,7 +355,7 @@ Scenario: guests can't comment on a posted FAQ when following a link from their 
     And I reload the page
   Then I should see "Status: closed by oracle"
   When I follow "1: faq 1"
-    Then I should not see "Add comment"
+    Then I should not see "Details"
 
 Scenario: guests can remove a link to a FAQ if they don't think it resolves their ticket
   Given I am on the home page

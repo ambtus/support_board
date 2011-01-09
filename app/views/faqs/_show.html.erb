@@ -1,0 +1,10 @@
+Votes: <%= @faq.vote_count %>
+<p><%= @faq.title %></p>
+<%= raw @faq.content %></dd>
+<% @details.each do |d| %>
+  <dt><%= d.byline %>:</dt>
+    <dd><%= raw d.content %></dd>
+<% end %>
+<%= form_for(@faq) do %>
+  <p class="submit"><%= submit_tag "This FAQ answered my question" %></p>
+<% end %>

@@ -1,16 +1,10 @@
 <%= render "show" %>
-<%= link_to "Edit", edit_faq_path(@faq) %>
 <%= form_for(@faq) do %>
-  <% if current_user.try(:support_admin?) %>
-    <p class="submit"><%= submit_tag "Post" %></p>
-  <% end %>
-  <dt><%= label_tag :official, "Official response?" %></dt>
-    <dd><%= check_box_tag :official, true, true %></dd>
   <dt><%= label_tag :content, "Details" %>:</dt>
     <dd><%= text_area_tag :content %></dd>
   <p class="submit">
     <%= submit_tag "Add details" %>
-    <% if @faq.watched? %>
+    <% if @faq.watched?(session[:authentication_code]) %>
       <%= submit_tag "Don't watch this FAQ" %>
     <% else %>
       <%= submit_tag "Watch this FAQ"%>

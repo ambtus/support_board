@@ -1,12 +1,1 @@
-Votes: <%= @faq.vote_count %>
-<p><%= @faq.title %></p>
-<%= raw @faq.content %></dd>
-
-<% @details.each do |d| %>
-  <dt><%= d.byline %> <%= "wrote" %>:</dt>
-    <dd><%= raw d.content %></dd>
-<% end %>
-
-<%= form_for(@faq) do |f| %>
-  <p class="submit"><%= f.submit "This FAQ answered my question" %></p>
-<% end %>
+<%= render "show" %>

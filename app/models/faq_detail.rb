@@ -1,20 +1,16 @@
 class FaqDetail < ActiveRecord::Base
   belongs_to :faq
   belongs_to :support_identity
-  has_many :support_tickets
-
-  def by_owner?
-    return true if
-    self.support_tickets.join(:users) & User.join(:support_identities) & SupportIdentity.where(:id => self.support_identity_id) # was the ticket opened and commented on by the same user?
-  end
 
   def byline
-    if self.support_identity_id.blank? # only owners of support tickets can add details without being logged in
-      "Guest Support ticket owner"
+    if self.support_identity_id.blank? # only owners of support tickets can add details to faqs without a support identity
+      name = "support ticket owner"
+      system = " wrote"
     else
-      prefix = self.support_response? ? "Support volunteer " : ""
-      prefix + self.support_identity.name
+      name = self.support_identity.name + (self.support_response? ? " (volunteer)" : "")
+      system = self.system_log? ? "" : " wrote"
     end
+    "[#{self.updated_at.to_s(:short)}] #{name}#{system}"
   end
 
   # SANITIZER stuff

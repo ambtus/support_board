@@ -1,11 +1,11 @@
 class SupportTicket < ActiveRecord::Base
 
-  belongs_to :user   # the user who opened the ticket
+  belongs_to :user   # the user who opened the ticket (optional)
   belongs_to :support_identity  # the support_identity of the user who is working on the ticket
-  belongs_to :faq  # for 'Question' tickets
-  has_one :faq_vote
-  has_one :code_vote
-  belongs_to :code_ticket  # for 'Problem' and 'Suggestion' tickets. automatic +1 vote
+  belongs_to :faq  # for tickets closed by answering with a FAQ
+  has_one :faq_vote # automatic votes when associated with a code ticket
+  belongs_to :code_ticket  # for waiting tickets. closed when the code ticket is deployed
+  has_one :code_vote # automatic votes when associated with a code ticket
   has_many :support_notifications  # a bunch of email addresses for update notifications
   has_many :support_details  # like comments, except non-threaded and with extra attributes
 

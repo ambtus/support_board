@@ -21,7 +21,8 @@ Scenario: support admins can unpost drafts which will be removed from the FAQ pa
     And I follow "Frequently Asked Questions"
   Then I should see "1: some question"
     And I am on the first faq page
-  And I press "Unpost"
+    And I fill in "Reason" with "needs more work"
+  And I press "Reopen for comments"
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"
   Then I should not see "1: some question"
@@ -33,14 +34,14 @@ Scenario: when a draft FAQ is marked posted, the comments are no longer visible.
   Given a faq exists with position: 1
   When I am logged in as "helpful"
     And I am on the first faq page
-    And I fill in "Add comment" with "please include"
-    And I press "Update Faq"
+    And I fill in "Details" with "please include"
+    And I press "Add details"
   Then I should see "helpful wrote: please include"
   When I am logged in as volunteer "oracle"
     And I am on the first faq page
-    And I fill in "Add comment" with "don't forget"
-    And I press "Update Faq"
-  Then I should see "Support volunteer oracle wrote: don't forget"
+    And I fill in "Details" with "don't forget"
+    And I press "Add details"
+  Then I should see "oracle (volunteer) wrote: don't forget"
   When I am logged in as support admin "incharge"
     And I am on the first faq page
     And I press "Post"
@@ -48,7 +49,7 @@ Scenario: when a draft FAQ is marked posted, the comments are no longer visible.
     And I follow "Frequently Asked Questions"
   Then I should see "1: faq 1"
     But I should not see "helpful wrote: please include"
-    And I should not see "Support volunteer oracle wrote: don't forget"
+    And I should not see "oracle (volunteer) wrote: don't forget"
 
 Scenario: admin's can mark an admin ticket admin resolved
   Given a support ticket exists with summary: "please resend activation code", id: 1

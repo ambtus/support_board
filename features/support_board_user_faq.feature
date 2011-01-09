@@ -1,17 +1,17 @@
 Feature: FAQs as seen by logged in users
 
 Scenario: users can view posted FAQs, but not comment
-  Given a faq exists with posted: true
+  Given a posted faq exists
   When I am on the first faq page
-  Then I should see "faq 1"
-    But I should not see "Add comment"
+  Then I should see "faq"
+    But I should not see "Details"
 
 Scenario: users can comment on a draft FAQ
-  Given a faq exists with posted: false
+  Given a faq exists
     And I am logged in as "someone"
   When I am on the first faq page
-    And I fill in "Add comment" with "this sounds good"
-    And I press "Update Faq"
+    And I fill in "Details" with "this sounds good"
+    And I press "Add details"
   Then I should see "someone wrote: this sounds good"
 
 Scenario: users can remove a link to a FAQ if they don't think it resolves their ticket

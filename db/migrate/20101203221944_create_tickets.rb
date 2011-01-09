@@ -53,8 +53,8 @@ class CreateTickets < ActiveRecord::Migration
       t.string   :title
       t.text     :content
       t.integer  :position
-      t.integer :user_id
-      t.boolean :posted, :default => false
+      t.string   :status
+      t.integer  :support_identity_id
 
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
@@ -66,6 +66,7 @@ class CreateTickets < ActiveRecord::Migration
       t.boolean :support_response, :default => false
       t.string :content
       t.boolean :private, :default => false
+      t.boolean  :system_log, :default => false
 
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
@@ -75,6 +76,12 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :faq_id
       t.integer :support_ticket_id
       t.integer :vote, :limit => 1, :default => 1
+
+      t.timestamps
+    end
+    create_table :faq_notifications do |t|
+      t.integer :faq_id
+      t.string :email
 
       t.timestamps
     end
@@ -135,14 +142,19 @@ class CreateTickets < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table :support_identities
     drop_table :support_tickets
     drop_table :support_details
     drop_table :support_notifications
     drop_table :faqs
+    drop_table :faq_details
+    drop_table :faq_votes
+    drop_table :faq_notifications
     drop_table :code_tickets
     drop_table :code_details
     drop_table :code_votes
     drop_table :code_notifications
+    drop_table :deploy_notes
     drop_column :users, :support_identity_id
   end
 end

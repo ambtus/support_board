@@ -78,7 +78,7 @@ faq2 = Faq.create(:title => "why we don't have enough ZPMs")
 
 User.current_user = rodney
 faq3 =Faq.create(:title => "what's DADA?")
-faq2.post!
+faq3.post!
 
 User.current_user = bofh
 faq4 = Faq.create(:title => "how to recover your password")

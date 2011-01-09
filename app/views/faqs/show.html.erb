@@ -1,0 +1,8 @@
+<%= render "show" %>
+<%= form_for(@faq) do %>
+  <% if current_user.try(:support_volunteer?) %>
+    <%= label_tag :reason %>
+    <%= text_field_tag :reason %>
+    <%= submit_tag "Reopen for comments" %>
+  <% end %>
+<% end %>

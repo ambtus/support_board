@@ -1,0 +1,6 @@
+<p><%= link_to @faq.name, faq_url(@faq) %> has been updated.</p>
+<%=raw @faq.summary %>
+<% @details.each do |detail| %>
+  <dt><%= detail.byline %>:</dt>
+    <dd><%= raw detail.content %></dd>
+<% end %>

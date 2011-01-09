@@ -122,7 +122,7 @@ Scenario: volunteers can open a new code ticket and link to it in one step (with
   Then I should see "Support Ticket #1"
 
 Scenario: volunteers can link a support ticket to an existing draft FAQ
-  Given a faq exists with position: 1, title: "some question", posted: false
+  Given a faq exists with position: 1, title: "some question"
     And a support ticket exists with id: 1
   When I am logged in as volunteer "oracle"
   When I follow "Support Board"
@@ -147,7 +147,7 @@ Scenario: volunteers can link a support ticket to an existing draft FAQ
     Then I should not see "1: some question"
 
 Scenario: volunteers can link a support ticket to an existing posted FAQ
-  Given a faq exists with position: 1, title: "some question", posted: true
+  Given a posted faq exists with position: 1, title: "some question"
     And a support ticket exists with id: 1
   When I am logged in as volunteer "oracle"
   When I follow "Support Board"

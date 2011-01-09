@@ -1,31 +1,22 @@
 class FaqsController < ApplicationController
   def index
-    @faqs = Faq.order(:position)
-    if params[:unposted]
-      @faqs = @faqs.where(:posted => false)
-    else
-      @faqs = @faqs.where(:posted => true)
-    end
+    @faqs = params[:unposted] ? Faq.rfc : Faq.faq
   end
 
   def show
     @faq = Faq.find(params[:id])
-    # don't show details if posted
-    if @faq.posted?
-      render :show_posted
-    else
-      if !current_user && session[:authentication_code]
-        @faq.faq_details.build # create a new empty response template
-        render :show_owner
-      elsif !current_user # not logged in, can't comment
-        @details = @faq.faq_details.where(:private => false)
-        render :show_guest
-      elsif current_user.support_volunteer?
-        @faq.faq_details.build(:support_response => true) # create a new empty response template
+    @details = []
+    # special views if still requesting comments
+    if @faq.rfc?
+      @details = @faq.faq_details
+      if current_user.try(:support_volunteer?)
         render :show_volunteer
-      else # logged in as non-support volunteer
-        @faq.faq_details.build # create a new empty response template
-        render :show_user
+      elsif current_user || @faq.guest_owner?(session[:authentication_code])
+        @details = @details.where(:private => false)
+        render :show_commentable
+      else # not logged in, can't comment
+        @details = @details.where(:private => false)
+        render :show_guest
       end
     end
   end
@@ -42,35 +33,23 @@ class FaqsController < ApplicationController
 
   def update
     @faq = Faq.find(params[:id])
-    if params[:commit] == "This FAQ answered my question"
-      FaqVote.create(:faq_id => @faq.id)
-    elsif current_user.try(:support_admin?)
-      case params[:commit]
-      when "Post"
-        @faq.update_attribute(:user_id, current_user.id)
-        @faq.update_attribute(:posted, true)
-        redirect_to @faq and return
-      when "Unpost"
-        @faq.update_attribute(:user_id, current_user.id)
-        @faq.update_attribute(:posted, false)
-      end
-    elsif current_user.try(:support_volunteer?)
-      @faq.update_attributes(params[:faq])
-      if @faq.save
-        flash[:notice] = "FAQ updated"
-      else
-        render :edit and return
-      end
-    elsif current_user || session[:authentication_code]
-      # TODO only update faq_details
-      @faq.update_attributes(params[:faq])
-      if @faq.save
-        flash[:notice] = "Comments added"
-      else
-        render :edit and return
-      end
-    else
-      flash[:notice] = "Sorry, you don't have permission"
+    case params[:commit]
+    when "This FAQ answered my question"
+      @faq.vote!
+    when "Post"
+      @faq.post!
+    when "Reopen for comments"
+      @faq.open_for_comments!(params[:reason])
+    when "Add details"
+      @faq.comment!(params[:content], params[:official], session[:authentication_code])
+    when "Watch this FAQ"
+      @faq.watch!(params[:email])
+    when "Don't watch this FAQ"
+      @faq.unwatch!(params[:email])
+    when "Update Faq"
+      @faq.update_from_edit!(params[:faq][:position],
+                             params[:faq][:title],
+                             params[:faq][:content])
     end
     redirect_to @faq and return
   end
