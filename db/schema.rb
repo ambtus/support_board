@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "revision"
     t.integer  "support_identity_id"
     t.integer  "code_ticket_id"
+    t.integer  "release_note_id"
     t.integer  "summary_sanitizer_version",     :limit => 2, :default => 0, :null => false
     t.integer  "description_sanitizer_version", :limit => 2, :default => 0, :null => false
     t.datetime "created_at"
@@ -95,7 +96,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   end
 
   create_table "release_notes", :force => true do |t|
-    t.string   "version"
+    t.string   "release"
     t.text     "content"
     t.string   "deployed_rev"
     t.integer  "support_identity_id"

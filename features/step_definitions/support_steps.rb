@@ -205,7 +205,8 @@ Given /^"([^"]*)" resolves code ticket (\d+)$/ do |login, number|
   ticket.commit!("1")
   ticket.stage!("2")
   ticket.verify!("3")
-  ticket.deploy!("4")
+  rn = Factory.create(:release_note)
+  ticket.deploy!("4", rn.id)
 end
 
 Given /^"([^"]*)" votes for code ticket (\d+)$/ do |login, number|

@@ -1,4 +1,11 @@
 class ReleaseNotesController < ApplicationController
+  def index
+    if params[:drafts]
+      @release_notes = ReleaseNote.drafts
+    else
+      @release_notes = ReleaseNote.posted
+    end
+  end
   def new
     if !current_user.try(:support_volunteer?)
       flash[:notice] = "Sorry, only support volunteers can create release notes."

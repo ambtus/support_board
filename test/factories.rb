@@ -28,3 +28,7 @@ end
 Factory.define :support_admin, :parent => :user do |admin|
   admin.after_create { |volunteer| volunteer.support_admin = "1" }
 end
+
+Factory.define :release_note do |note|
+  note.sequence(:release) { |n| n }
+end

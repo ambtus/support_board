@@ -1,9 +1,9 @@
 <%= form_for(@release_note) do |t| %>
   <dl>
-    <dt><%= t.label :version %>:</dt>
-      <dd><%= t.text_field :version %></dd>
+    <dt><%= t.label :release %>:</dt>
+      <dd><%= t.text_field :release %></dd>
    <dt><%= t.label :content %>:</dt>
-      <dd><%= t.text_field :content %></dd>
+      <dd><%= t.text_area :content %></dd>
  </dl>
   <p class="submit">
     <%= t.submit %>

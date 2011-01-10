@@ -73,8 +73,8 @@ class CodeTicketsController < ApplicationController
       CodeTicket.stage!(params[:stage_revision])
       redirect_to support_path and return
     when "Deploy Verified Code Tickets"
-      CodeTicket.deploy!
-      redirect_to support_path and return
+      note = CodeTicket.deploy!(params[:release_note])
+      redirect_to note and return
     else
       @ticket = CodeTicket.new(params[:code_ticket])
       if @ticket.save

@@ -4,9 +4,17 @@
   <% end %>
 <% end %>
 <dl>
-  <dt><%= "Version" %>:</dt>
-    <dd><%= @release_note.version %></dd>
-  <dt><%= "Deployed Revision" %>:</dt>
+  <dt><%= "Release" %>:</dt>
+    <dd><%= @release_note.release %></dd>
+  <dt><%= "Deploy Revision" %>:</dt>
     <dd><%= @release_note.deployed_rev %></dd>
 </dl>
 <%= raw @release_note.content %>
+
+<dt>Related Code tickets:</dt>
+<dd>
+<% @release_note.code_tickets.each do |ticket| %>
+  <%= link_to ticket.id, ticket %>
+<% end %>
+</dd>
+

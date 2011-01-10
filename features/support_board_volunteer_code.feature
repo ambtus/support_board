@@ -147,15 +147,15 @@ Scenario: volunteers can create new release notes
   When I am logged in as volunteer "oracle"
     And I follow "Support Board"
     And I follow "New Release Note"
-    And I fill in "Version" with "0.8.4.7"
+    And I fill in "Release" with "0.8.4.7"
     And I fill in "Content" with "bug fix release"
     And I press "Create Release note"
-  Then I should see "Version: 0.8.4.7"
+  Then I should see "Release: 0.8.4.7"
     And I should see "bug fix release"
   When I follow "Edit"
-    And I fill in "Version" with "0.8.4.8"
+    And I fill in "Release" with "0.8.4.8"
     And I press "Update Release note"
-  Then I should see "Version: 0.8.4.8"
+  Then I should see "Release: 0.8.4.8"
 
 # TODO
 Scenario: volunteers can edit release notes which haven't been posted yet

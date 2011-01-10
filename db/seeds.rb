@@ -62,10 +62,12 @@ ct5.verify!("1996")
 ct6 = CodeTicket.create(:summary => "create the world wide web")
 User.current_user = bofh
 ct6.take!
-ct6.commit!("1980")
-ct6.stage!("1990")
-ct6.verify!("2000")
-ct6.deploy!("2010")
+ct6.commit!("1")
+ct6.stage!("2")
+ct6.verify!("3")
+rn = ReleaseNote.create(:release => "1.0", :content => "new in this release, the www!")
+CodeTicket.deploy!(rn.id)
+rn = ReleaseNote.create(:release => "2.0", :content => "new in this release, web 2.0!")
 
 # faqs
 User.current_user = sam

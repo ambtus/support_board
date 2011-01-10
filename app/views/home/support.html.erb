@@ -32,7 +32,7 @@
     <li><%= link_to "Closed Code Tickets", code_tickets_path(:status => "closed") %></li>
 
     <li><%= link_to "New Release Note", new_release_note_path %></li>
-    <li><%= link_to "Unposted Release Notes", release_notes_path(:unposted => true) %></li>
+    <li><%= link_to "Draft Release Notes", release_notes_path(:drafts => true) %></li>
   <% end %>
   <% if current_user.try(:support_admin?) %>
     <%= form_tag '/code_tickets' do %>
@@ -42,6 +42,13 @@
       </p>
       <p class="submit">
         <%= submit_tag "Stage Committed Code Tickets" %>
+      </p>
+      <p>
+        <%= label_tag :release_note %>
+        <%= select_tag :release_note,
+                     options_from_collection_for_select(ReleaseNote.drafts, "id", "release") %>
+      </p>
+      <p class="submit">
         <%= submit_tag "Deploy Verified Code Tickets" %>
       </p>
     <% end %>

@@ -23,12 +23,15 @@ class CodeTicket < ActiveRecord::Base
     CodeTicket.committed.where("revision <= ?", revision).each {|ct| ct.stage!(revision)}
   end
 
-  def self.deploy!
+  def self.deploy!(release_note_id)
     raise "Couldn't deploy. Not logged in." unless User.current_user
     raise "Couldn't deploy. Not logged in as support admin." unless User.current_user.support_admin?
+    note = ReleaseNote.find release_note_id  # will raise not found if doesn't exist
     revision = SupportBoard::REVISION_NUMBER
-    CodeTicket.verified.where("revision <= ?", revision).each {|ct| ct.deploy!(revision)}
+    CodeTicket.verified.where("revision <= ?", revision).each {|ct| ct.deploy!(revision, release_note_id)}
     SupportTicket.waiting.where("revision <= ?", revision).each {|st| st.deploy!(revision)}
+    note.update_attribute(:posted, true)
+    return note
   end
 
   # used in lists
@@ -151,9 +154,11 @@ class CodeTicket < ActiveRecord::Base
     self.support_identity_id = User.current_user.support_identity_id
   end
 
-  def deploy(revision)
+  def deploy(revision, release_note_id)
     raise "Couldn't deploy. No revision given." if revision.blank?
+    ReleaseNote.find(release_note_id) # will raise error if no release note
     self.revision = revision
+    self.release_note_id = release_note_id
     self.support_tickets.each {|st| st.update_attribute(:revision, revision) }
     self.support_identity_id = User.current_user.support_identity_id
   end
