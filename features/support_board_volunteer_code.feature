@@ -133,10 +133,6 @@ Scenario: volunteers can steel a code ticket
     And the email should contain "has been stolen by"
     And the email should contain "hermione"
 
-# TODO
-Scenario: putting "closes issue #" in the git commit message should transition to committed
-Scenario: transition to committed should require a github commit id, which should act as a link
-
 Scenario: volunteers can create new release notes
   When I am logged in as volunteer "oracle"
     And I follow "Support Board"
@@ -152,4 +148,8 @@ Scenario: volunteers can create new release notes
   Then I should see "Release: 0.8.4.8"
 
 # TODO
-Scenario: volunteers can edit release notes which haven't been posted yet
+
+
+Scenario: putting "closes issue #" in the git commit message should transition to committed
+
+Scenario: transition to committed manually should require a github commit link

@@ -13,6 +13,8 @@ SupportBoard::Application.routes.draw do
   resources :support_tickets
   resources :code_tickets
 
+  match 'github' => 'github#push', :via => "post"
+
   match 'support' => 'home#support'
   root :to => "home#index"
 end
