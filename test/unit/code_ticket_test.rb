@@ -60,6 +60,42 @@ class CodeTicketTest < ActiveSupport::TestCase
     assert_nil dupe.code_ticket_id
     assert_equal "open", ticket.status_line
   end
+  test "move watchers from duplicate" do
+    ticket = CodeTicket.find(1)
+    assert_equal 0, ticket.mail_to.size
+    dupe = CodeTicket.find(2)
+    assert_equal 1, dupe.mail_to.size # sam
+    User.current_user = User.find_by_login("john")
+    dupe.watch!
+    assert_equal 2, dupe.mail_to.size # sam and john
+    User.current_user = User.find_by_login("rodney")
+    assert dupe.duplicate!(ticket.id)
+    assert_equal 2, ticket.reload.mail_to.size
+    assert_equal 0, dupe.reload.mail_to.size
+  end
+  test "move votes from duplicate" do
+    ticket = CodeTicket.find(1)
+    assert_equal 0, ticket.vote_count
+    dupe = CodeTicket.find(2)
+    assert_equal 0, dupe.vote_count
+    User.current_user = User.find_by_login("john")
+    dupe.vote!
+    assert_equal 1, dupe.vote_count
+    User.current_user = User.find_by_login("rodney")
+    assert dupe.duplicate!(ticket.id)
+    assert_equal 1, ticket.vote_count
+    assert_equal 0, dupe.vote_count
+  end
+  test "move support tickets from duplicate" do
+    ticket = CodeTicket.find(1)
+    assert_equal 0, ticket.support_tickets.count
+    dupe = CodeTicket.find(3)
+    assert_equal 1, dupe.support_tickets.count
+    User.current_user = User.find_by_login("rodney")
+    assert dupe.duplicate!(ticket.id)
+    assert_equal 1, ticket.support_tickets.count
+    assert_equal 0, dupe.support_tickets.count
+  end
   test "scopes" do
     assert_equal 1, CodeTicket.unowned.count
     assert_equal 1, CodeTicket.taken.count

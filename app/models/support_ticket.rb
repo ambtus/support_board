@@ -181,8 +181,8 @@ class SupportTicket < ActiveRecord::Base
     raise "Couldn't set to waiting, not logged in." unless User.current_user
     raise "Couldn't set to waiting, not a support volunteer." unless User.current_user.support_volunteer?
     if code_ticket_id
-      code_ticket = CodeTicket.find_by_id(code_ticket_id)
-      raise "Couldn't set to waiting: no code ticket with id: #{code_ticket_id}" unless code_ticket
+      code_ticket = CodeTicket.find code_ticket_id # will raise error if no ticket
+      raise "can't assign to a duplicate" if code_ticket.code_ticket_id
       CodeVote.create(:code_ticket_id => code_ticket_id, :support_ticket_id => self.id, :vote => 2)
     else
       code_ticket = CodeTicket.create(:summary => self.summary, :url => self.url, :browser => self.user_agent)

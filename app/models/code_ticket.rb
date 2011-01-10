@@ -68,6 +68,7 @@ class CodeTicket < ActiveRecord::Base
       event :reopen, :transitions_to => :unowned
     end
     state :committed do
+      event :duplicate, :transitions_to => :closed
       event :stage, :transitions_to => :staged
       event :reopen, :transitions_to => :unowned
     end
@@ -113,9 +114,14 @@ class CodeTicket < ActiveRecord::Base
     self.support_identity_id != User.current_user.support_identity_id
   end
 
-  def duplicate(dupe_id)
-    raise "Couldn't duplicate: no code ticket with id: #{dupe_id}" unless CodeTicket.find_by_id(id)
-    self.code_ticket_id = dupe_id
+  def duplicate(original_id)
+    CodeTicket.find original_id # will raise error if no such ticket
+    self.code_ticket_id = original_id
+    self.support_tickets.update_all(:code_ticket_id => original_id)
+    # it's okay if there are duplicates. mail_to uses uniq. and unwatch uses destroy all
+    self.code_notifications.update_all(:code_ticket_id => original_id)
+    # probably should remove duplicates, but a couple extra votes doesn't hurt
+    self.code_votes.update_all(:code_ticket_id => original_id)
     self.support_identity_id = User.current_user.support_identity_id
   end
 
@@ -172,6 +178,7 @@ class CodeTicket < ActiveRecord::Base
   end
 
   def vote!(count = 1)
+    raise "can't vote for a duplicate" if self.code_ticket_id
     raise "Couldn't vote. Not logged in." unless User.current_user
     raise "already voted" if voted?
     self.code_votes.create(:user => User.current_user, :vote => count)
@@ -228,6 +235,7 @@ class CodeTicket < ActiveRecord::Base
   end
 
   def watch!
+    raise "can't watch a duplicate" if self.code_ticket_id
     raise "Couldn't watch. Not logged in." unless User.current_user
     raise "Couldn't watch. Already watching." if watched?
     # create a support identity for tracking purposes

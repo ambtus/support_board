@@ -87,12 +87,6 @@ Scenario: volunteers can close a code ticket as a dupe
     And I follow "Closed Code Tickets"
   Then I should see "Code Ticket #2"
 
-# TODO
-Scenario: closing a ticket as a dupe should move its watchers
-Scenario: closing a ticket as a dupe should move its votes
-Scenario: closing a ticket as a dupe should move its support tickets
-Scenario: closing a ticket as a dupe should merge its browser info
-
 Scenario: volunteers can close a code ticket by rejecting it
   Given a code ticket exists with summary: "original", id: 1
   When I am logged in as volunteer "oracle"
