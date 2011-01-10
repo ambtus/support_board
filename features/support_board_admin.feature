@@ -196,6 +196,23 @@ Scenario: updating the version number will close all the waiting support tickets
     But I should not see "Support Ticket #2"
     And I should not see "Support Ticket #3"
 
+Scenario: support admins can edit release notes which have been posted
+  Given a release note exists with release: "8.5.7"
+  When I am logged in as support admin "incharge"
+    And I follow "Support Board"
+    And I select "8.5.7" from "Release note"
+    And I press "Deploy Verified Code Tickets"
+  When I follow "Edit"
+    And I fill in "Release" with "8.5.8"
+    And I fill in "Content" with "some stuff"
+    And I press "Update Release note"
+  Then I should see "Release: 8.5.8"
+    And I should see "some stuff"
+  When I am logged in as volunteer "oracle"
+    And I am on the first release note page
+  Then I should see "some stuff"
+    But I should not see "Edit"
+
 Scenario: support admins (only - privacy issues) can see the authenticity_token, browser agent and originating IP
   Given I am on the home page
   When I follow "Open a New Support Ticket"
@@ -217,5 +234,3 @@ Scenario: support admins (only - privacy issues) can see the authenticity_token,
     And I should see "user agent:"
     And I should see "remote IP: 127.0.0.1"
 
-# TODO
-Scenario: support admins can edit release notes which have been posted
