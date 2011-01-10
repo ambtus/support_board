@@ -14,5 +14,6 @@ class GithubController < ApplicationController
     repository = payload["repository"]
     time = repository["pushed_at"].to_time
     Rails.logger.info "pushed: #{time}"
+    render :nothing => true
   end
 end
