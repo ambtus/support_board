@@ -220,3 +220,22 @@ Scenario: volunteers can send email to another volunteer asking them to take a t
   Then I should see "Status: open"
 
 Scenario: volunteers can verify staged Tickets
+  Given a volunteer exists with login: "coder"
+    And a volunteer exists with login: "tester"
+    And a code ticket exists with id: 1
+    And a code ticket exists with id: 2
+    And "coder" commits code ticket 1
+    And "coder" takes code ticket 2
+  When I am logged in as support admin "incharge"
+    And I follow "Support Board"
+    And I press "Stage Committed Code Tickets"
+  When I am logged in as "tester"
+    And I follow "Support Board"
+    And I follow "Staged Code Tickets"
+  Then I should not see "Code Ticket #2"
+  When I follow "Code Ticket #1"
+    And I press "Verify"
+  Then I should see "Status: verified by tester"
+    When I follow "Support Board"
+    And I follow "Staged Code Tickets"
+  Then I should not see "Code Ticket #1"
