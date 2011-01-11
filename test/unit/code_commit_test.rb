@@ -6,8 +6,10 @@ class CodeCommitTest < ActiveSupport::TestCase
     assert_equal cc.support_identity_id, SupportIdentity.find_by_name("rodney").id
   end
   test "no support id" do
+    assert_nil SupportIdentity.find_by_name("new coder")
     assert cc = CodeCommit.create(:author => "new coder")
-    assert_nil cc.support_identity_id
+    assert SupportIdentity.find_by_name("new coder")
+    assert_equal "new coder", cc.support_identity.name
   end
   test "no match" do
     cc = CodeCommit.create(:author => "sam")

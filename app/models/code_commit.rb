@@ -6,7 +6,9 @@ class CodeCommit < ActiveRecord::Base
 
   before_create :find_support_identity
   def find_support_identity
-    self.support_identity = SupportIdentity.find_by_name(self.author)
+    identity = SupportIdentity.find_by_name(self.author)
+    identity = SupportIdentity.create(:name => self.author) unless identity
+    self.support_identity = identity
   end
 
   after_create :match_to_code_ticket
