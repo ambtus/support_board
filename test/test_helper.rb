@@ -4,12 +4,14 @@ require 'rails/test_help'
 DatabaseCleaner.strategy = :truncation
 
 class ActiveSupport::TestCase
-  # TODO when seeds are finalized, dump them to fixtures and load fixtures instead
-  setup do
-    load "#{Rails.root}/db/seeds.rb"
-  end
-  teardown do
-    DatabaseCleaner.clean
-  end
+  self.use_transactional_fixtures = true
+  self.use_instantiated_fixtures = false
+  fixtures :all
+#   setup do
+#     load "#{Rails.root}/db/seeds.rb"
+#   end
+#   teardown do
+#     DatabaseCleaner.clean
+#   end
 end
 

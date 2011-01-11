@@ -21,6 +21,11 @@ class CodeCommit < ActiveRecord::Base
     match = self.message.match /issue (\d+)/
     if match
       ticket = CodeTicket.find_by_id(match[1])
+      if self.support_identity.user
+        User.current_user = self.support_identity.user
+      else
+        User.current_user = Role.find_by_name("support_admin").users.first
+      end
       ticket.commit!(self.id) if ticket
     end
   end
