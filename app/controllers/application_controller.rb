@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   helper_method :app_version
 
   def app_version
-    @app_version || File.read(Rails.root + "REVISION")
+    @app_version || ReleaseNote.last.try(:release)
   end
 
   helper_method :current_user

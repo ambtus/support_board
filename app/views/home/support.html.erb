@@ -36,10 +36,6 @@
   <% end %>
   <% if current_user.try(:support_admin?) %>
     <%= form_tag '/code_tickets' do %>
-      <p>
-        <%= label_tag :stage_revision %>
-        <%= text_field_tag :stage_revision %>
-      </p>
       <p class="submit">
         <%= submit_tag "Stage Committed Code Tickets" %>
       </p>

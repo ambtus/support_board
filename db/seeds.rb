@@ -44,29 +44,29 @@ ct2.take!
 ct3 = CodeTicket.create(:summary => "repeal DADA")
 User.current_user = rodney
 ct3.take!
-ct3.commit!("2010")
+CodeCommit.create(:author => "rodney", :message => "closes issue 3")
 
 ct4 = CodeTicket.create(:summary => "build a zpm")
 User.current_user = rodney
 ct4.take!
-ct4.commit!("2009")
-ct4.stage!("2010")
+CodeCommit.create(:author => "rodney", :message => "issue 4")
+ct4.reload.stage!
 
 ct5 = CodeTicket.create(:summary => "find a sentinel")
 User.current_user = blair
 ct5.take!
-ct5.commit!("1983")
-ct5.stage!("1996")
-ct5.verify!("1996")
+CodeCommit.create(:author => "blair", :message => "closes issue 5")
+ct5.reload.stage!
+ct5.verify!
 
 ct6 = CodeTicket.create(:summary => "create the world wide web")
 User.current_user = bofh
 ct6.take!
-ct6.commit!("1")
-ct6.stage!("2")
-ct6.verify!("3")
+CodeCommit.create(:author => "bofh", :message => "issue 6")
+ct6.reload.stage!
+ct6.verify!
 rn = ReleaseNote.create(:release => "1.0", :content => "new in this release, the www!")
-CodeTicket.deploy!(rn.id)
+ct6.deploy!(rn.id)
 rn = ReleaseNote.create(:release => "2.0", :content => "new in this release, web 2.0!")
 
 # faqs

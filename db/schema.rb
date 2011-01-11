@@ -12,6 +12,18 @@
 
 ActiveRecord::Schema.define(:version => 20101203221944) do
 
+  create_table "code_commits", :force => true do |t|
+    t.string   "author"
+    t.string   "url"
+    t.string   "message"
+    t.string   "pushed_at"
+    t.integer  "code_ticket_id"
+    t.integer  "support_identity_id"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "code_details", :force => true do |t|
     t.integer  "code_ticket_id"
     t.integer  "support_identity_id"
@@ -38,7 +50,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "url"
     t.string   "browser"
     t.string   "status"
-    t.integer  "revision"
     t.integer  "support_identity_id"
     t.integer  "code_ticket_id"
     t.integer  "release_note_id"

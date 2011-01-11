@@ -2,11 +2,13 @@ class CodeTicket < ActiveRecord::Base
 
   belongs_to :support_identity # the support identity of the last user to work on the ticket
   belongs_to :code_ticket # for dupes
+  belongs_to :release_note # when deployed
 
   has_many :code_votes # for prioritizing (lots of votes = high priority)
   has_many :code_notifications  # a bunch of email addresses for update notifications
   has_many :code_details  # like comments, except non-threaded and with extra attributes
-  has_many :support_tickets
+  has_many :support_tickets  # tickets waiting for this fix
+  has_many :code_commits # created from git hub pushes
 
   # don't save new empty details
   accepts_nested_attributes_for :code_details, :reject_if => proc { |attributes|
@@ -17,19 +19,22 @@ class CodeTicket < ActiveRecord::Base
   validates_length_of :summary, :maximum=> 140 # tweet length!
 
   # CodeTicket methods
-  def self.stage!(revision)
+  def self.stage!
     raise "Couldn't stage. Not logged in." unless User.current_user
     raise "Couldn't stage. Not logged in as support admin." unless User.current_user.support_admin?
-    CodeTicket.committed.where("revision <= ?", revision).each {|ct| ct.stage!(revision)}
+    raise "Couldn't stage. Not all commits matched" if CodeCommit.unmatched.count > 0
+    CodeCommit.matched.each do |cc|
+      cc.stage!
+      cc.code_ticket.stage!
+    end
   end
 
   def self.deploy!(release_note_id)
     raise "Couldn't deploy. Not logged in." unless User.current_user
     raise "Couldn't deploy. Not logged in as support admin." unless User.current_user.support_admin?
     note = ReleaseNote.find release_note_id  # will raise not found if doesn't exist
-    revision = SupportBoard::REVISION_NUMBER
-    CodeTicket.verified.where("revision <= ?", revision).each {|ct| ct.deploy!(revision, release_note_id)}
-    SupportTicket.waiting.where("revision <= ?", revision).each {|st| st.deploy!(revision)}
+    raise "Couldn't deploy. Not all tickets verified" if CodeCommit.staged.count > 0
+    CodeCommit.verified.each {|cc| cc.code_ticket.deploy!(release_note_id)}
     note.update_attribute(:posted, true)
     return note
   end
@@ -46,8 +51,12 @@ class CodeTicket < ActiveRecord::Base
   def status_line
     if self.code_ticket_id
       "closed as duplicate by #{self.support_identity.name}"
+    elsif self.release_note_id
+      "deployed in #{self.release_note.release}"
     elsif self.unowned?
       "open"
+    elsif self.staged?
+      "waiting for verification"
     else
       "#{self.status} by #{self.support_identity.name}"
     end
@@ -68,6 +77,7 @@ class CodeTicket < ActiveRecord::Base
       event :reopen, :transitions_to => :unowned
     end
     state :committed do
+      event :commit, :transitions_to => :committed
       event :duplicate, :transitions_to => :closed
       event :stage, :transitions_to => :staged
       event :reopen, :transitions_to => :unowned
@@ -138,34 +148,33 @@ class CodeTicket < ActiveRecord::Base
   def reopen(reason)
     raise "Couldn't reopen. No reason given." if reason.blank?
     self.code_ticket_id = nil
-    self.revision = nil
+    self.release_note_id = nil
     self.support_identity_id = nil
   end
 
-  def commit(revision)
-    raise "Couldn't commit. No revision given." if revision.blank?
-    self.revision = revision
+  def commit(code_commit_id)
+    cc = CodeCommit.find(code_commit_id) # will raise unless exists
+    self.support_identity_id = cc.support_identity_id
+    cc.code_ticket_id = self.id
+    cc.status = "matched"
+    cc.save!
+  end
+
+  # don't update support identity, still belongs to committer
+  def stage
+  end
+
+  def verify
+    raise "Couldn't verify. Not logged in." unless User.current_user
+    raise "Couldn't verify. Not support volunteer." unless User.current_user.support_volunteer?
+    self.code_commits.update_all(:status => "verified")
     self.support_identity_id = User.current_user.support_identity_id
   end
 
-  def stage(revision)
-    raise "Couldn't stage. No revision given." if revision.blank?
-    self.revision = revision
-    self.support_identity_id = User.current_user.support_identity_id
-  end
-
-  def verify(revision)
-    raise "Couldn't verify. No revision given." if revision.blank?
-    self.revision = revision
-    self.support_identity_id = User.current_user.support_identity_id
-  end
-
-  def deploy(revision, release_note_id)
-    raise "Couldn't deploy. No revision given." if revision.blank?
-    ReleaseNote.find(release_note_id) # will raise error if no release note
-    self.revision = revision
+  def deploy(release_note_id)
+    note = ReleaseNote.find(release_note_id) # will raise error if no release note
     self.release_note_id = release_note_id
-    self.support_tickets.each {|st| st.update_attribute(:revision, revision) }
+    self.support_tickets.each {|st| st.deploy!}
     self.support_identity_id = User.current_user.support_identity_id
   end
 

@@ -99,35 +99,29 @@ Scenario: admin's can mark open tickets admin resolved
     And I follow "Closed Support Tickets"
   Then I should see "Support Ticket #1"
 
-Scenario: entering a stage version number will stage all the relevant committed tickets
+Scenario: stage all the committed tickets
   Given a volunteer exists with login: "rodney"
     And a code ticket exists with id: 1
     And a code ticket exists with id: 2
-    And a code ticket exists with id: 3
-    And "rodney" commits code ticket 1 in "2001"
-    And "rodney" commits code ticket 2 in "2000"
-    And "rodney" commits code ticket 3 in "1000"
+    And "rodney" commits code ticket 1
+    And "rodney" takes code ticket 2
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
-    And I fill in "Stage revision" with "2000"
-    And I press "Stage Committed Code Tickets"
-    And I follow "Staged Code Tickets"
-  Then I should see "Code Ticket #2"
-    And I should see "Code Ticket #3"
-    But I should not see "Code Ticket #1"
-  When I follow "Support Board"
     And I follow "Committed Code Tickets"
   Then I should see "Code Ticket #1"
     But I should not see "Code Ticket #2"
-    And I should not see "Code Ticket #3"
+  When I follow "Support Board"
+    And I press "Stage Committed Code Tickets"
+  Then I should see "Code Ticket #1"
+    But I should not see "Code Ticket #2"
+  When I follow "Support Board"
+    And I follow "Committed Code Tickets"
+  Then I should not see "Code Ticket"
 
-Scenario: updating the version number will deploy all the verified code tickets and attach a release note
+Scenario: deploy all the verified code tickets and attach a release note
   Given a support admin exists with login: "incharge"
-    And the current SupportBoard version is "2000"
     And a code ticket exists with id: 1
     And a code ticket exists with id: 2
-    And a code ticket exists with id: 3
-    And a code ticket exists with id: 4
     And a release note exists with release: "8.5.7"
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
@@ -136,56 +130,51 @@ Scenario: updating the version number will deploy all the verified code tickets 
   When I follow "Support Board"
     And I follow "Draft Release Notes"
     Then I should see "8.5.7"
-  When "incharge" verifies code ticket 1 in "2000"
-    And "incharge" verifies code ticket 2 in "2001"
-    And "incharge" verifies code ticket 3 in "1000"
-    And "incharge" stages code ticket 4 in "1050"
+  When "incharge" commits code ticket 1
+    And "incharge" verifies code ticket 2
   When I follow "Support Board"
-    And I select "8.5.7" from "Release note"
-    And I press "Deploy Verified Code Tickets"
-  Then I should see "1"
-    And I should see "3"
-    But I should not see "2"
-    And I should not see "4"
-  When I follow "Support Board"
-    And I follow "Staged Code Tickets"
-  Then I should see "Code Ticket #4"
-    But I should not see "Code Ticket #1"
-    And I should not see "Code Ticket #2"
-    And I should not see "Code Ticket #3"
+    And I follow "Committed Code Tickets"
+  Then I should see "Code Ticket #1"
+    But I should not see "Code Ticket #2"
   When I follow "Support Board"
     And I follow "Verified Code Tickets"
   Then I should see "Code Ticket #2"
-    But I should not see "Code Ticket #1"
-    And I should not see "Code Ticket #3"
-    And I should not see "Code Ticket #4"
+    And I should not see "Code Ticket #1"
   When I follow "Support Board"
     And I follow "Closed Code Tickets"
+  Then I should not see "Code Ticket"
+  When I follow "Support Board"
+    And I select "8.5.7" from "Release note"
+    And I press "Deploy Verified Code Tickets"
+  Then I should see "2"
+    But I should not see "1"
+  When I follow "Support Board"
+    And I follow "Committed Code Tickets"
   Then I should see "Code Ticket #1"
-    And I should see "Code Ticket #3"
     But I should not see "Code Ticket #2"
-    And I should not see "Code Ticket #4"
+  When I follow "Support Board"
+    And I follow "Verified Code Tickets"
+  Then I should not see "Code Ticket"
+  When I follow "Support Board"
+    And I follow "Closed Code Tickets"
+  Then I should see "Code Ticket #2"
+    But I should not see "Code Ticket #1"
   When I follow "Support Board"
     And I follow "Release Notes"
     And I follow "8.5.7"
 
-Scenario: updating the version number will close all the waiting support tickets
+Scenario: close the waiting support tickets
   Given a support admin exists with login: "incharge"
     And a volunteer exists with login: "oracle"
   Given a code ticket exists with id: 1
     And a code ticket exists with id: 2
-    And a code ticket exists with id: 3
     And a release note exists with release: "8.5.7"
-  Given "incharge" verifies code ticket 1 in "1999"
-    And "incharge" verifies code ticket 2 in "2001"
-    And "incharge" commits code ticket 3 in "1999"
-    And the current SupportBoard version is "2000"
+  Given "incharge" verifies code ticket 1
+    And "incharge" commits code ticket 2
   Given a support ticket exists with id: 1
     And a support ticket exists with id: 2
-    And a support ticket exists with id: 3
     And "oracle" links support ticket 1 to code ticket 1
     And "oracle" links support ticket 2 to code ticket 2
-    And "oracle" links support ticket 3 to code ticket 3
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
     And I select "8.5.7" from "Release note"
@@ -194,7 +183,6 @@ Scenario: updating the version number will close all the waiting support tickets
     And I follow "Closed Support Tickets"
   Then I should see "Support Ticket #1"
     But I should not see "Support Ticket #2"
-    And I should not see "Support Ticket #3"
 
 Scenario: support admins can edit release notes which have been posted
   Given a release note exists with release: "8.5.7"

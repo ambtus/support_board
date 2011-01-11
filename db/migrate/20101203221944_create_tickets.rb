@@ -93,7 +93,6 @@ class CreateTickets < ActiveRecord::Migration
       t.string  :browser
 
       t.string :status
-      t.integer :revision
       t.integer :support_identity_id
       t.integer :code_ticket_id
       t.integer :release_note_id
@@ -125,6 +124,17 @@ class CreateTickets < ActiveRecord::Migration
     create_table :code_notifications do |t|
       t.integer :code_ticket_id
       t.string :email
+
+      t.timestamps
+    end
+    create_table :code_commits do |t|
+      t.string :author
+      t.string :url
+      t.string :message
+      t.string :pushed_at
+      t.integer :code_ticket_id
+      t.integer :support_identity_id
+      t.string  :status
 
       t.timestamps
     end

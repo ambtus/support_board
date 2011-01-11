@@ -70,8 +70,8 @@ class CodeTicketsController < ApplicationController
     end
     case params[:commit]
     when "Stage Committed Code Tickets"
-      CodeTicket.stage!(params[:stage_revision])
-      redirect_to support_path and return
+      CodeTicket.stage!
+      redirect_to code_tickets_path(:status => "staged") and return
     when "Deploy Verified Code Tickets"
       note = CodeTicket.deploy!(params[:release_note])
       redirect_to note and return
@@ -112,7 +112,7 @@ class CodeTicketsController < ApplicationController
     when "Reject"
       @ticket.reject!(params[:reason])
     when "Verify"
-      @ticket.verify!(SupportBoard::REVISION_NUMBER)
+      @ticket.verify!
     when "Vote for this ticket"
       @ticket.vote!
     when "Watch this ticket"

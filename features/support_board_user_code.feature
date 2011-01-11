@@ -14,10 +14,11 @@ Scenario: can view code tickets, vote on not-resolved tickets, and comment on no
     And I follow "Open Code Tickets"
   Then I should not see "Code Ticket #1"
     But I should see "Code Ticket #2"
+    And I should see "Code Ticket #3"
     And I should see "something that is broken"
     And I should see "something on the horizon"
   When I am on the first code ticket page
-    Then I should see "Status: closed"
+    Then I should see "Status: deployed in 1"
     And I should see "Votes: 0"
     And I should not see "Details"
   When I follow "Support Board"

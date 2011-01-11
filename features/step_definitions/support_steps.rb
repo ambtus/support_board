@@ -1,12 +1,3 @@
-# overriding application.rb
-Given /^the current SupportBoard version is "([^"]*)"$/ do |revision|
-  # " reset quotes for color
-  # suppress warnings about 'already initialized constant REVISION_NUMBER'
-  module SupportBoard ; remove_const :REVISION_NUMBER ; end
-  SupportBoard::REVISION_NUMBER = revision.to_i
-end
-
-
 # creating and logging in as volunteers and admins
 
 Given /^I am logged in as volunteer "([^"]*)"$/ do |login|
@@ -177,36 +168,43 @@ Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
   assert ticket.take!
 end
 
-Given /^"([^"]*)" commits code ticket (\d+) in "([^"]*)"$/ do |login, number, revision|
+Given /^"([^"]*)" commits code ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
   User.current_user = User.find_by_login(login)
-  ticket.commit!(revision)
+  cc = CodeCommit.create(:author => login)
+  ticket.commit!(cc.id)
 end
 
-Given /^"([^"]*)" stages code ticket (\d+) in "([^"]*)"$/ do |login, number, revision|
+Given /^"([^"]*)" stages code ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
   User.current_user = User.find_by_login(login)
-  ticket.commit!("1")
-  ticket.stage!(revision)
+  cc = CodeCommit.create(:author => login)
+  ticket.commit!(cc.id)
+  ticket.stage!
 end
 
-Given /^"([^"]*)" verifies code ticket (\d+) in "([^"]*)"$/ do |login, number, revision|
+Given /^"([^"]*)" verifies code ticket (\d+)$/ do |login, number|
+  # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
   User.current_user = User.find_by_login(login)
-  ticket.commit!("1")
-  ticket.stage!("2")
-  ticket.verify!(revision)
+  cc = CodeCommit.create(:author => login)
+  ticket.commit!(cc.id)
+  ticket.stage!
+  ticket.verify!
 end
 
 Given /^"([^"]*)" resolves code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = CodeTicket.all[number.to_i - 1]
   User.current_user = User.find_by_login(login)
-  ticket.commit!("1")
-  ticket.stage!("2")
-  ticket.verify!("3")
-  rn = Factory.create(:release_note)
-  ticket.deploy!("4", rn.id)
+  cc = CodeCommit.create(:author => login)
+  ticket.commit!(cc.id)
+  ticket.stage!
+  ticket.verify!
+  rn = Factory.create(:release_note, :release => "1")
+  ticket.deploy!(rn.id)
 end
 
 Given /^"([^"]*)" votes for code ticket (\d+)$/ do |login, number|
