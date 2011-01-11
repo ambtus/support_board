@@ -32,3 +32,7 @@ end
 Factory.define :release_note do |note|
   note.sequence(:release) { |n| n }
 end
+
+Factory.define :code_commit do |commit|
+  commit.sequence(:author) { |n| "committer#{n}" }
+end

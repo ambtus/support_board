@@ -1,0 +1,6 @@
+<dl>
+<% @commits.each do |commit| %>
+  <dt><%= link_to "#{commit.id} #{commit.support_identity.name}", commit %></dt>
+  <dd><%= commit.message %></dd>
+<% end %>
+</dl>

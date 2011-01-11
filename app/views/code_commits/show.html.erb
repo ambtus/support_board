@@ -1,0 +1,30 @@
+<% if current_user.try(:support_volunteer?) %>
+  <% if current_user.support_admin? || @commit.unmatched? %>
+    <%= form_for(@commit) do |t| %>
+      <%= label_tag :code_ticket_id, "Code Ticket" %>
+      <%= select_tag :code_ticket_id,
+                     options_from_collection_for_select(CodeTicket.for_commit, "id", "id") %>
+      <%= submit_tag "Match" %>
+    <% end %>
+  <% end %>
+<% end %>
+<dl>
+  <dt><%= "Author" %>:</dt>
+    <dd><%= @commit.author %></dd>
+  <dt><%= "URL" %>:</dt>
+    <dd><%= link_to "Github", @commit.url %></dd>
+  <dt><%= "message" %>:</dt>
+    <dd><%= @commit.message %></dd>
+  <dt><%= "Pushed" %>:</dt>
+    <dd><%= @commit.pushed_at %></dd>
+  <dt><%= "Status" %>:</dt>
+    <dd><%= @commit.status %></dd>
+  <% if @commit.matched? %>
+    <dt><%= "Associated Code Ticket" %>:</dt>
+      <dd><%= link_to @commit.code_ticket.name, @commit.code_ticket %></dd>
+  <% end %>
+  <% if @commit.support_identity.user %>
+    <dt><%= "User" %>:</dt>
+      <dd><%= link_to @commit.support_identity.user.login, @commit.support_identity.user %>
+  <% end %>
+</dl>

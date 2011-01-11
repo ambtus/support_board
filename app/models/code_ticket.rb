@@ -114,6 +114,10 @@ class CodeTicket < ActiveRecord::Base
     where('status != "closed"')
   end
 
+  def self.for_commit
+    where('status != "closed"').where('status != "verified"').where('status != "committed"')
+  end
+
   def take
     self.support_identity_id = User.current_user.support_identity_id
     self.watch! unless self.watched?

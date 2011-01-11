@@ -147,9 +147,3 @@ Scenario: volunteers can create new release notes
     And I press "Update Release note"
   Then I should see "Release: 0.8.4.8"
 
-# TODO
-
-
-Scenario: putting "closes issue #" in the git commit message should transition to committed
-
-Scenario: transition to committed manually should require a github commit link

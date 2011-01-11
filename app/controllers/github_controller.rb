@@ -10,6 +10,7 @@ class GithubController < ApplicationController
       cc.author = commit["author"]["name"]
       cc.message = commit["message"]
       cc.url = commit["url"]
+      cc.pushed_at = pushed_at
       cc.save!
     end
   end

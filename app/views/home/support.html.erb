@@ -35,6 +35,7 @@
     <li><%= link_to "Draft Release Notes", release_notes_path(:drafts => true) %></li>
   <% end %>
   <% if current_user.try(:support_admin?) %>
+    <li><%= link_to "Unmatched Commits", code_commits_path(:status => "unmatched") %></li>
     <%= form_tag '/code_tickets' do %>
       <p class="submit">
         <%= submit_tag "Stage Committed Code Tickets" %>

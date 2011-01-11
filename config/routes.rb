@@ -12,6 +12,7 @@ SupportBoard::Application.routes.draw do
   resources :release_notes
   resources :support_tickets
   resources :code_tickets
+  resources :code_commits
 
   match 'github' => 'github#push', :via => "post"
 
