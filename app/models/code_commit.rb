@@ -4,6 +4,10 @@ class CodeCommit < ActiveRecord::Base
 
   validates_presence_of :author
 
+  def name
+    "#{self.id} by #{self.support_identity.name}"
+  end
+
   before_create :find_support_identity
   def find_support_identity
     identity = SupportIdentity.find_by_name(self.author)

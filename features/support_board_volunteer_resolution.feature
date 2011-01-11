@@ -219,3 +219,4 @@ Scenario: volunteers can send email to another volunteer asking them to take a t
   When I click the first link in the email
   Then I should see "Status: open"
 
+Scenario: volunteers can verify staged Tickets

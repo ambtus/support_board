@@ -5,6 +5,10 @@
           <%= link_to @ticket.code_ticket.name, @ticket.code_ticket %>
       <% end %>
     </dd>
+    <% @ticket.code_commits.each do |commit| %>
+      <dt>Commit <%= link_to commit.name, commit %></dt>
+        <dd><%= link_to commit.message, commit.url %></dd>
+    <% end %>
   <dt><%= "Votes" %>:</dt>
     <dd><%= @ticket.vote_count %></dd>
   <dt><%= "Summary" %>:</dt>

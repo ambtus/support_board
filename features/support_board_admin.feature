@@ -224,14 +224,15 @@ Scenario: support admins (only - privacy issues) can see the authenticity_token,
 
 Scenario: transition to committed manually by linking to a code committed
   Given a code ticket exists with id: 1
-    And a code commit exists with id: 1, author: "newbie"
+    And a code commit exists with id: 1, author: "newbie", message: "first commit"
   When I am logged in as support admin "incharge"
     And I follow "Support Board"
     And I follow "Unmatched Commits"
-  When I follow "1 newbie"
+  When I follow "1 by newbie"
     And I select "1" from "Code Ticket"
     And I press "Match"
   Then I should be on the code commits page
     And I should not see "Commit #1"
   When I am on the first code ticket page
     Then I should see "committed by newbie"
+    And I should see "Commit 1 by newbie first commit"
