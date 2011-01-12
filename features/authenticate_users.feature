@@ -1,7 +1,6 @@
 Feature: User Authentication
 
 Scenario: Log in
-  Given a user exists with login: "sam"
   When I am on sam's user page
   Then I should see "sam's page"
   When I fill in "User name" with "sam"
