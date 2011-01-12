@@ -27,8 +27,8 @@ class SupportTicketTest < ActiveSupport::TestCase
   test "scopes" do
     assert_equal 1, SupportTicket.unowned.count
     assert_equal 1, SupportTicket.taken.count
-    assert_equal 1, SupportTicket.waiting.count
-    assert_equal 3, SupportTicket.not_closed.count
+    assert_equal 2, SupportTicket.waiting.count
+    assert_equal 4, SupportTicket.not_closed.count
     assert_equal 1, SupportTicket.spam.count
     assert_equal 2, SupportTicket.closed.count
   end

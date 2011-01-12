@@ -11,14 +11,14 @@ class CodeTicketTest < ActiveSupport::TestCase
     assert_equal %Q{unowned -> taken}, two.code_details.last.content
     three = CodeTicket.find(3)
     assert_equal "rodney", three.code_commits.first.support_identity.name
-    assert_equal "committed by rodney", three.status_line
-    assert_equal %Q{taken -> committed (1)}, three.code_details.last.content
+    assert_equal "verified by rodney", three.status_line
+    assert_equal %Q{staged -> verified}, three.code_details.last.content
     four = CodeTicket.find(4)
     assert_equal "waiting for verification", four.status_line
     assert_equal %Q{committed -> staged}, four.code_details.last.content
     five = CodeTicket.find(5)
-    assert_equal "verified by blair", five.status_line
-    assert_equal %Q{staged -> verified}, five.code_details.last.content
+    assert_equal "committed by blair", five.status_line
+    assert_equal %Q{taken -> committed (4)}, five.code_details.last.content
     six = CodeTicket.find(6)
     assert_equal "deployed in 1.0", six.status_line
     assert_match %Q{verified -> closed (1)}, six.code_details.last.content
@@ -86,7 +86,7 @@ class CodeTicketTest < ActiveSupport::TestCase
   test "move support tickets from duplicate" do
     ticket = CodeTicket.find(1)
     assert_equal 0, ticket.support_tickets.count
-    dupe = CodeTicket.find(3)
+    dupe = CodeTicket.find(5)
     assert_equal 1, dupe.support_tickets.count
     User.current_user = User.find_by_login("rodney")
     assert dupe.duplicate!(ticket.id)

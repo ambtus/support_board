@@ -40,11 +40,14 @@ ct1 = CodeTicket.create(:summary => "fix the roof")
 ct2 = CodeTicket.create(:summary => "save the world")
 User.current_user = sam
 ct2.take!
+CodeCommit.create(:author => "sam", :message => "no issue number")
 
 ct3 = CodeTicket.create(:summary => "repeal DADA")
 User.current_user = rodney
 ct3.take!
 CodeCommit.create(:author => "rodney", :message => "closes issue 3")
+ct3.reload.stage!
+ct3.verify!
 
 ct4 = CodeTicket.create(:summary => "build a zpm")
 User.current_user = rodney
@@ -56,8 +59,6 @@ ct5 = CodeTicket.create(:summary => "find a sentinel")
 User.current_user = blair
 ct5.take!
 CodeCommit.create(:author => "blair", :message => "closes issue 5")
-ct5.reload.stage!
-ct5.verify!
 
 ct6 = CodeTicket.create(:summary => "create the world wide web")
 User.current_user = bofh
@@ -67,6 +68,7 @@ ct6.reload.stage!
 ct6.verify!
 rn = ReleaseNote.create(:release => "1.0", :content => "new in this release, the www!")
 ct6.deploy!(rn.id)
+rn.update_attribute(:posted, true)
 rn = ReleaseNote.create(:release => "2.0", :content => "new in this release, web 2.0!")
 
 # faqs
@@ -90,7 +92,7 @@ User.current_user = blair
 faq5 = Faq.create(:title => "what's a sentinel?")
 
 # support tickets
-st1 = SupportTicket.create(:summary => "some problem", :email => "guest@ao3.org")
+st1 = SupportTicket.create(:summary => "some problem", :email => "guest@ao3.org", :authenticity_token => "123456", :user_agent => "Mozilla/5.0", :ip_address => "72.14.204.103")
 
 st2 = SupportTicket.create(:summary => "a personal problem", :email => "guest@ao3.org", :private => true)
 User.current_user = sam
@@ -109,4 +111,8 @@ st5.answer!(faq4.id)
 st6 = SupportTicket.create(:summary => "what's wrong with me?", :user_id => jim.id, :private =>true)
 User.current_user = blair
 st6.answer!(faq5.id)
+
+st7 = SupportTicket.create(:summary => "where can I find a guide", :user_id => jim.id)
+User.current_user = blair
+st7.needs_fix!(ct5.id)
 

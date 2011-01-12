@@ -2,194 +2,194 @@ code_detail_1:
   code_ticket_id: 2
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:03 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 1
   private: false
   resolved_ticket: false
   support_identity_id: 4
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:03 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_2:
   code_ticket_id: 3
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 2
   private: false
   resolved_ticket: false
   support_identity_id: 5
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_3:
   code_ticket_id: 3
-  content: taken -> committed (1)
+  content: taken -> committed (2)
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 3
   private: false
   resolved_ticket: false
   support_identity_id: 5
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_4:
-  code_ticket_id: 4
-  content: unowned -> taken
+  code_ticket_id: 3
+  content: committed -> staged
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 4
   private: false
   resolved_ticket: false
   support_identity_id: 5
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_5:
-  code_ticket_id: 4
-  content: taken -> committed (2)
+  code_ticket_id: 3
+  content: staged -> verified
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 5
   private: false
   resolved_ticket: false
   support_identity_id: 5
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_6:
   code_ticket_id: 4
-  content: committed -> staged
+  content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 6
   private: false
   resolved_ticket: false
   support_identity_id: 5
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_7:
-  code_ticket_id: 5
-  content: unowned -> taken
+  code_ticket_id: 4
+  content: taken -> committed (3)
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 7
   private: false
   resolved_ticket: false
-  support_identity_id: 6
+  support_identity_id: 5
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_8:
-  code_ticket_id: 5
-  content: taken -> committed (3)
+  code_ticket_id: 4
+  content: committed -> staged
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 8
   private: false
   resolved_ticket: false
-  support_identity_id: 6
+  support_identity_id: 5
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_9:
   code_ticket_id: 5
-  content: committed -> staged
+  content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 9
   private: false
   resolved_ticket: false
   support_identity_id: 6
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_10:
   code_ticket_id: 5
-  content: staged -> verified
+  content: taken -> committed (4)
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 10
   private: false
   resolved_ticket: false
   support_identity_id: 6
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_11:
   code_ticket_id: 6
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 11
   private: false
   resolved_ticket: false
   support_identity_id: 7
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_12:
   code_ticket_id: 6
-  content: taken -> committed (4)
+  content: taken -> committed (5)
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 12
   private: false
   resolved_ticket: false
   support_identity_id: 7
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_13:
   code_ticket_id: 6
   content: committed -> staged
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 13
   private: false
   resolved_ticket: false
   support_identity_id: 7
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_14:
   code_ticket_id: 6
   content: staged -> verified
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:04 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 14
   private: false
   resolved_ticket: false
   support_identity_id: 7
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:04 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 
 code_detail_15:
   code_ticket_id: 6
   content: verified -> closed (1)
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:05 UTC
+  created_at: 2011-01-12 02:41:32 UTC
   id: 15
   private: false
   resolved_ticket: false
   support_identity_id: 7
   support_response: true
   system_log: true
-  updated_at: 2011-01-11 04:27:05 UTC
+  updated_at: 2011-01-12 02:41:32 UTC
 

@@ -1,7 +1,7 @@
 support_detail_1:
   content: unowned -> spam
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:05 UTC
+  created_at: 2011-01-12 02:41:33 UTC
   id: 1
   private: false
   resolved_ticket: false
@@ -9,12 +9,12 @@ support_detail_1:
   support_response: true
   support_ticket_id: 2
   system_log: true
-  updated_at: 2011-01-11 04:27:05 UTC
+  updated_at: 2011-01-12 02:41:33 UTC
 
 support_detail_2:
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:05 UTC
+  created_at: 2011-01-12 02:41:33 UTC
   id: 2
   private: false
   resolved_ticket: false
@@ -22,12 +22,12 @@ support_detail_2:
   support_response: true
   support_ticket_id: 3
   system_log: true
-  updated_at: 2011-01-11 04:27:05 UTC
+  updated_at: 2011-01-12 02:41:33 UTC
 
 support_detail_3:
   content: unowned -> waiting (3)
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:05 UTC
+  created_at: 2011-01-12 02:41:33 UTC
   id: 3
   private: false
   resolved_ticket: false
@@ -35,12 +35,12 @@ support_detail_3:
   support_response: true
   support_ticket_id: 4
   system_log: true
-  updated_at: 2011-01-11 04:27:05 UTC
+  updated_at: 2011-01-12 02:41:33 UTC
 
 support_detail_4:
   content: unowned -> closed (4)
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:05 UTC
+  created_at: 2011-01-12 02:41:33 UTC
   id: 4
   private: false
   resolved_ticket: false
@@ -48,12 +48,12 @@ support_detail_4:
   support_response: true
   support_ticket_id: 5
   system_log: true
-  updated_at: 2011-01-11 04:27:05 UTC
+  updated_at: 2011-01-12 02:41:33 UTC
 
 support_detail_5:
   content: unowned -> closed (5)
   content_sanitizer_version: 0
-  created_at: 2011-01-11 04:27:05 UTC
+  created_at: 2011-01-12 02:41:33 UTC
   id: 5
   private: false
   resolved_ticket: false
@@ -61,5 +61,18 @@ support_detail_5:
   support_response: true
   support_ticket_id: 6
   system_log: true
-  updated_at: 2011-01-11 04:27:05 UTC
+  updated_at: 2011-01-12 02:41:33 UTC
+
+support_detail_6:
+  content: unowned -> waiting (5)
+  content_sanitizer_version: 0
+  created_at: 2011-01-12 02:41:33 UTC
+  id: 6
+  private: false
+  resolved_ticket: false
+  support_identity_id: 6
+  support_response: true
+  support_ticket_id: 7
+  system_log: true
+  updated_at: 2011-01-12 02:41:33 UTC
 
