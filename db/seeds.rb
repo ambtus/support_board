@@ -52,7 +52,8 @@ ct3.verify!
 ct4 = CodeTicket.create(:summary => "build a zpm")
 User.current_user = rodney
 ct4.take!
-CodeCommit.create(:author => "rodney", :message => "issue 4")
+cc3 = CodeCommit.create(:author => "rodney", :message => "issue 4")
+cc3.reload.stage!
 ct4.reload.stage!
 
 ct5 = CodeTicket.create(:summary => "find a sentinel")
@@ -63,7 +64,8 @@ CodeCommit.create(:author => "blair", :message => "closes issue 5")
 ct6 = CodeTicket.create(:summary => "create the world wide web")
 User.current_user = bofh
 ct6.take!
-CodeCommit.create(:author => "bofh", :message => "issue 6")
+cc5 = CodeCommit.create(:author => "bofh", :message => "issue 6")
+cc5.reload.stage!
 ct6.reload.stage!
 ct6.verify!
 rn = ReleaseNote.create(:release => "1.0", :content => "new in this release, the www!")
