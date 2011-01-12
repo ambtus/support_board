@@ -1,6 +1,13 @@
 require 'test_helper'
 
 class CodeCommitTest < ActiveSupport::TestCase
+  test "normal flow" do
+    assert CodeCommit.find(1).unmatched?
+    assert CodeCommit.find(2).verified?
+    assert CodeCommit.find(3).staged?
+    assert CodeCommit.find(4).matched?
+    assert CodeCommit.find(5).deployed?
+  end
   test "find support id" do
     cc = CodeCommit.create(:author => "rodney")
     assert_equal cc.support_identity_id, SupportIdentity.find_by_name("rodney").id

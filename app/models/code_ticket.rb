@@ -24,7 +24,6 @@ class CodeTicket < ActiveRecord::Base
     raise "Couldn't stage. Not logged in as support admin." unless User.current_user.support_admin?
     raise "Couldn't stage. Not all commits matched" if CodeCommit.unmatched.count > 0
     CodeCommit.matched.each do |cc|
-      cc.stage!
       cc.code_ticket.stage!
     end
   end
@@ -166,18 +165,20 @@ class CodeTicket < ActiveRecord::Base
 
   # don't update support identity, still belongs to committer
   def stage
+    self.code_commits.each {|cc| cc.stage!}
   end
 
   def verify
     raise "Couldn't verify. Not logged in." unless User.current_user
     raise "Couldn't verify. Not support volunteer." unless User.current_user.support_volunteer?
-    self.code_commits.update_all(:status => "verified")
+    self.code_commits.each {|cc| cc.verify!}
     self.support_identity_id = User.current_user.support_identity_id
   end
 
   def deploy(release_note_id)
     note = ReleaseNote.find(release_note_id) # will raise error if no release note
     self.release_note_id = release_note_id
+    self.code_commits.each {|cc| cc.deploy!}
     self.support_tickets.each {|st| st.deploy!}
     self.support_identity_id = User.current_user.support_identity_id
   end

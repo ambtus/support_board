@@ -43,9 +43,12 @@ class CodeCommit < ActiveRecord::Base
       event :stage, :transitions_to => :staged
     end
     state :staged do
+      event :verify, :transitions_to => :verified
+    end
+    state :verified do
       event :deploy, :transitions_to => :deployed
     end
-    state :verified
+    state :deployed
   end
 
   self.workflow_spec.state_names.each do |state|
