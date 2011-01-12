@@ -51,6 +51,8 @@ class SupportTicket < ActiveRecord::Base
       "waiting for a code fix"
     elsif self.waiting_on_admin?
       "waiting for an admin"
+    elsif self.closed? && self.code_ticket_id
+      "fixed in #{self.code_ticket.release_note.release}"
     else
       "#{self.status} by #{self.support_identity.name}"
     end

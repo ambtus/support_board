@@ -1,7 +1,7 @@
 <% if current_user.support_volunteer? %>
   <dl>
     <% if current_user.support_admin? %>
-      <dt>authenticity_token:</dt>
+      <dt>authenticity token:</dt>
         <dd><%= @ticket.authenticity_token %></dd>
       <dt>remote IP:</dt>
         <dd><%= @ticket.ip_address %></dd>

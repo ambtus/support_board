@@ -23,6 +23,9 @@ module NavigationHelpers
    when /^the page for the first code ticket/
       code_ticket_path(:id => CodeTicket.first.id)
 
+   when /^the page for the first faq/
+      faq_path(:id => Faq.first.id)
+
     # the following are examples using path_to_pickle
 
     when /^#{capture_model}(?:'s)? page$/                           # eg. the forum's page

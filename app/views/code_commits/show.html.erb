@@ -3,7 +3,7 @@
     <%= form_for(@commit) do |t| %>
       <%= label_tag :code_ticket_id, "Code Ticket" %>
       <%= select_tag :code_ticket_id,
-                     options_from_collection_for_select(CodeTicket.for_commit, "id", "id") %>
+                     options_from_collection_for_select(CodeTicket.for_commit, "id", "summary") %>
       <%= submit_tag "Match" %>
     <% end %>
   <% end %>
