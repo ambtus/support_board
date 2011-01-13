@@ -49,3 +49,5 @@ Scenario: automatic unofficial identity when watch a code ticket
     And I press "Watch this ticket"
   When I am on sam's user page
   Then I should see "Support info for sam"
+
+Scenario: a user can claim an unowned support identity (created by a github commit)

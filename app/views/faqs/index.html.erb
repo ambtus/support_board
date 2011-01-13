@@ -1,7 +1,7 @@
 <% if params[:by_vote] %>
-  <%= link_to "Sort by position", faqs_path(:rfc => params[:rfc]) %>
+  <%= link_to "Sort by position", faqs_path(params.merge :by_vote => false) %>
 <% else %>
-  <%= link_to "Sort by vote count", faqs_path(:by_vote => true, :rfc => params[:rfc]) %>
+  <%= link_to "Sort by vote count", faqs_path(params.merge :by_vote => true) %>
 <% end %>
 <ul>
 <% @faqs.each_with_index do |faq, i| %>

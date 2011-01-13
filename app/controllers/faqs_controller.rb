@@ -1,10 +1,12 @@
 class FaqsController < ApplicationController
   def index
     @faqs = params[:rfc] ? Faq.rfc : Faq.faq
+    @faqs = Faq.scoped if params[:all]
     @faqs = @faqs.sort_by_vote if params[:by_vote]
   end
 
   def show
+    Rails.logger.debug "show faq session: #{session}"
     @faq = Faq.find(params[:id])
     @details = []
     # special views if still requesting comments

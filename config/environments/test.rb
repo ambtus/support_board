@@ -18,7 +18,7 @@ SupportBoard::Application.configure do
   config.action_dispatch.show_exceptions = false
 
   # request forgery protection in test environment
-  config.action_controller.allow_forgery_protection    = true
+  config.action_controller.allow_forgery_protection    = false
 
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the

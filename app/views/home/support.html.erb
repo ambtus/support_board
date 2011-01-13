@@ -10,9 +10,10 @@
   <li><%= link_to "Open a New Support Ticket", new_support_ticket_path %></li>
   <li><%= link_to "Comments", support_tickets_path(:status => "posted") %> (<%= SupportTicket.posted.count %>)</li>
   <li><%= link_to "Frequently Asked Questions", faqs_path %> (<%= Faq.faq.count %>)</li>
+  <li><%= link_to "FAQs waiting for comments", faqs_path(:rfc => true) %> (<%= Faq.rfc.count %>)</li>
+  <li><%= link_to "All FAQs", faqs_path(:all => true) %> (<%= Faq.count %>)</li>
   <li><%= link_to "Release Notes", release_notes_path %> (<%= ReleaseNote.posted.count %>)</li>
   <li><%= link_to "Open Code Tickets (Known Issues)", code_tickets_path %> (<%= CodeTicket.not_closed.count %>)</li>
-  <li><%= link_to "FAQs waiting for comments", faqs_path(:rfc => true) %> (<%= Faq.rfc.count %>)</li>
   <% if current_user %>
     <li><%= link_to "Open Support Tickets", support_tickets_path %> (<%= SupportTicket.unowned.count %>)</li>
   <% end %>

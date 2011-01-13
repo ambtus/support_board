@@ -86,7 +86,7 @@ class SupportTicketsController < ApplicationController
     if params[:authentication_code]
       session[:authentication_code] = params[:authentication_code]
     end
-    Rails.logger.debug "show session: #{session}"
+    Rails.logger.debug "show support ticket session: #{session}"
     @ticket = SupportTicket.find(params[:id])
     is_owner = @ticket.owner?(session[:authentication_code]) # is viewer owner of ticket?
 

@@ -52,6 +52,14 @@ When /^"([^"]*)" creates a faq from support ticket (\d+)$/ do |login, number|
   faq.update_attribute(:title, "new faq")
 end
 
+When /^"([^"]*)" links support ticket (\d+) to faq (\d+)$/ do |login, arg1, arg2|
+  # " reset quotes for color
+  assert ticket = SupportTicket.all[arg1.to_i - 1]
+  assert faq = Faq.all[arg2.to_i - 1]
+  User.current_user = User.find_by_login(login)
+  assert ticket.answer!(faq.id)
+end
+
 When /^"([^"]*)" creates a code ticket from support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.all[number.to_i - 1]
