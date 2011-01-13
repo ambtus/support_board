@@ -3,12 +3,12 @@ Feature: the support board as seen by guests
 Scenario: guests can view public tickets if they have a link but they can't comment on them so they don't see a link from the support board
   When I am on the support page
     Then I should not see "Open Support Tickets"
-  When I am on the page for the first support ticket
+  When I am on the page for support ticket 1
   Then I should see "some problem"
     But I should not see "Details:"
 
 Scenario: guests can't access private tickets even with a direct link.
-  When I am on the page for the second support ticket
+  When I am on the page for support ticket 2
   Then I should see "Sorry, you don't have permission"
     And I should not see "a personal problem"
 
@@ -37,7 +37,7 @@ Scenario: guests can create a support ticket with a valid email address which is
   But I should not see "guest@ao3.org"
     And I should not see "my user name"
   When I am logged in as "bofh"
-    And I am on the page for the first support ticket
+    And I am on the page for support ticket 1
   Then I should not see "guest@ao3.org"
 
 Scenario: guests can create a support ticket with initial details. the byline for guests is always generic
@@ -177,7 +177,7 @@ Scenario: guests can make their public support tickets private, even to people w
     Then I should see "Ticket will only be visible"
   When I press "Make private"
     And I am logged in as "jim"
-    And I am on the page for the first support ticket
+    And I am on the page for support ticket 1
   Then I should see "Sorry, you don't have permission"
   When "sam" comments on support ticket 1
   Then 1 email should be delivered to "guest@ao3.org"
@@ -185,7 +185,7 @@ Scenario: guests can make their public support tickets private, even to people w
 
 Scenario: email to others shouldn't include the authorization
   When I am logged in as "jim"
-    And I am on the page for the first support ticket
+    And I am on the page for support ticket 1
     And I press "Watch this ticket"
   When I am logged out
     And "sam" comments on support ticket 1
@@ -238,13 +238,13 @@ Scenario: guests can (un)resolve their own support tickets using a support volun
     And I should see "blair (volunteer) wrote: foo bar"
 
 Scenario: guests can view open code tickets, but not vote or comment
-  When I am on the page for the first code ticket
+  When I am on the page for code ticket 1
   Then I should see "Status: open"
   But I should not see "Vote up"
     And I should not see "Details:"
 
 Scenario: guests can view in progress code tickets, but not vote or comment
-  When I am on the page for the second code ticket
+  When I am on the page for code ticket 2
   Then I should see "Status: taken"
   But I should not see "Vote up"
     And I should not see "Details:"
@@ -256,14 +256,14 @@ Scenario: guests can view closed code tickets, but not vote or comment
     And I should not see "Details:"
 
 Scenario: guests reading a draft FAQ can mark it as "this answered my question" (a FAQ vote) but not comment
-  When I am on the page for the second faq
+  When I am on the page for faq 2
   Then I should see "why we don't have enough ZPMs"
   When I press "This FAQ answered my question"
   Then I should see "Votes: 1"
     But I should not see "Details"
 
 Scenario: guests reading a posted FAQ can mark it as "this answered my question" (a FAQ vote) but not comment
-  When I am on the page for the first faq
+  When I am on the page for faq 1
   Then I should see "where to find salt"
   When I press "This FAQ answered my question"
   Then I should see "Votes: 1"
@@ -296,7 +296,7 @@ Scenario: guests can't comment on a posted FAQ when following a link from their 
     Then I should not see "Details"
 
 Scenario: an existing faq should get a vote when linked from a guest support ticket
-  When I am on the page for the second faq
+  When I am on the page for faq 2
     Then I should see "Votes: 0"
   Given I am on the home page
   When I follow "Open a New Support Ticket"
@@ -304,7 +304,7 @@ Scenario: an existing faq should get a vote when linked from a guest support tic
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
   When "rodney" links support ticket 1 to faq 2
-  When I am on the page for the second faq
+  When I am on the page for faq 2
     And I should see "Votes: 1"
 
 Scenario: a faq should get a vote when it's created from a guest support ticket
@@ -318,7 +318,7 @@ Scenario: a faq should get a vote when it's created from a guest support ticket
   Then I should see "Votes: 1"
 
 Scenario: an existing faq should get a vote removed when unlinked from a guest support ticket
-  When I am on the page for the second faq
+  When I am on the page for faq 2
     Then I should see "Votes: 0"
   Given I am on the home page
   When I follow "Open a New Support Ticket"
@@ -333,7 +333,7 @@ Scenario: an existing faq should get a vote removed when unlinked from a guest s
     And I press "Reopen"
   Then I should see "Status: open"
     And I should not see "why we don't have enough ZPMs"
-  When I am on the page for the second faq
+  When I am on the page for faq 2
   Then I should see "Votes: 0"
 
 Scenario: a new faq should get a vote removed when unlinked from a guest support ticket

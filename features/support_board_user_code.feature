@@ -2,7 +2,7 @@ Feature: the support board as seen by logged in users for code tickets
 
 Scenario: users can view open code tickets, and vote and comment
   When I am logged in as "dean"
-    And I am on the page for the first code ticket
+    And I am on the page for code ticket 1
   Then I should see "Status: open"
   When I press "Vote up"
     Then I should see "Votes: 1"
@@ -12,7 +12,7 @@ Scenario: users can view open code tickets, and vote and comment
 
 Scenario: users can view in progress code tickets, and vote but not comment
   When I am logged in as "dean"
-    And I am on the page for the second code ticket
+    And I am on the page for code ticket 2
   Then I should see "Status: taken"
     But I should not see "Details:"
   When I press "Vote up"
@@ -20,7 +20,7 @@ Scenario: users can view in progress code tickets, and vote but not comment
 
 Scenario: guests can view closed code tickets, but not vote or comment
   When I am logged in as "dean"
-    And I am on the page for the last code ticket
+    And I am on the page for code ticket 6
   Then I should see "Status: deployed in 1.0"
     But I should not see "Details:"
     And I should not see "Vote up"
@@ -38,7 +38,7 @@ Scenario: can see all open tickets
 
 Scenario: users can (un)monitor open code tickets
   Given I am logged in as "jim"
-    And I am on the page for the first code ticket
+    And I am on the page for code ticket 1
     And I press "Watch this ticket"
   Then 0 email should be delivered to "jim@ao3.org"
   When "sam" comments on code ticket 1
@@ -48,14 +48,14 @@ Scenario: users can (un)monitor open code tickets
   Then I should see "sam (volunteer) wrote: foo bar"
   # clicking links in email in capybara looses your session
   Given I am logged in as "jim"
-    And I am on the page for the first code ticket
+    And I am on the page for code ticket 1
   When I press "Don't watch this ticket"
     And "sam" comments on code ticket 1
   Then 0 emails should be delivered to "jim@ao3.org"
 
 Scenario: users can (un)monitor worked code tickets
   Given I am logged in as "jim"
-    And I am on the page for the second code ticket
+    And I am on the page for code ticket 2
     And I press "Watch this ticket"
   Then 0 email should be delivered to "jim@ao3.org"
   When "blair" comments on code ticket 2
@@ -65,7 +65,7 @@ Scenario: users can (un)monitor worked code tickets
   Then I should see "blair (volunteer) wrote: foo bar"
   # clicking links in email in capybara looses your session
   Given I am logged in as "jim"
-    And I am on the page for the second code ticket
+    And I am on the page for code ticket 2
   When I press "Don't watch this ticket"
     And "blair" comments on code ticket 2
   Then 0 emails should be delivered to "jim@ao3.org"

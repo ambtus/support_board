@@ -14,31 +14,22 @@ module NavigationHelpers
    when /^(.*)'s user page$/i
       user_path(:id => $1)
 
-   when /^the page for the first support ticket/
-      support_ticket_path(:id => SupportTicket.first.id)
-
-   when /^the page for the second support ticket/
-      support_ticket_path(:id => SupportTicket.all[1].id)
+   when /^the page for support ticket (\d)/
+      support_ticket_path(:id => $1)
 
    when /^the page for the last support ticket/
       support_ticket_path(:id => SupportTicket.last.id)
 
-   when /^the page for the first code ticket/
-      code_ticket_path(:id => CodeTicket.first.id)
-
-   when /^the page for the second code ticket/
-      code_ticket_path(:id => CodeTicket.all[1].id)
+   when /^the page for code ticket (\d)/
+      code_ticket_path(:id => $1)
 
    when /^the page for the last code ticket/
       code_ticket_path(:id => CodeTicket.last.id)
 
-   when /^the page for the first faq/
-      faq_path(:id => Faq.first.id)
+   when /^the page for faq (\d)/
+      faq_path(:id => $1)
 
-   when /^the page for the second faq/
-      faq_path(:id => Faq.all[1].id)
-
-    when /^the page for the last faq/
+   when /^the page for the last faq/
       faq_path(:id => Faq.last.id)
 
    # the following are examples using path_to_pickle

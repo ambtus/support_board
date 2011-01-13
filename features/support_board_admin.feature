@@ -57,7 +57,7 @@ Scenario: when a draft FAQ is marked posted, the comments are no longer visible,
 
 Scenario: admin's can mark an admin ticket admin resolved, volunteers can reopen it
   When I am logged in as "sam"
-    And I go to the page for the first support ticket
+    And I go to the page for support ticket 1
     And I press "Needs admin attention"
   When I am logged in as "bofh"
     And I am on the support page
@@ -176,7 +176,7 @@ Scenario: support admins can edit release notes which have been posted
 
 Scenario: support admins (only - privacy issues) can see the authenticity_token, browser agent and originating IP
   When I am logged in as "bofh"
-    And I am on the page for the first support ticket
+    And I am on the page for support ticket 1
   Then I should see "some problem"
     And I should see "authenticity token: 123456"
     And I should see "user agent: Mozilla/5.0"
