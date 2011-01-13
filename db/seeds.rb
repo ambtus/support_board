@@ -56,6 +56,8 @@ CodeCommit.create(:author => "rodney", :message => "issue 4")
 ct4.reload.stage!
 
 ct5 = CodeTicket.create(:summary => "find a sentinel")
+User.current_user = jim
+ct5.comment!("what's a sentinel?")
 User.current_user = blair
 ct5.take!
 CodeCommit.create(:author => "blair", :message => "closes issue 5")

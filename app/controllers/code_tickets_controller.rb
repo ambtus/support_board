@@ -113,7 +113,7 @@ class CodeTicketsController < ApplicationController
       @ticket.reject!(params[:reason])
     when "Verify"
       @ticket.verify!
-    when "Vote for this ticket"
+    when "Vote up"
       @ticket.vote!
     when "Watch this ticket"
       @ticket.watch!

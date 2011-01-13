@@ -34,7 +34,7 @@
   <p class="submit">
     <% if !@ticket.closed? %>
       <% unless @ticket.voted? %>
-        <%= submit_tag "Vote for this ticket" %>
+        <%= submit_tag "Vote up" %>
       <% end %>
       <% if @ticket.watched? %>
         <%= submit_tag "Don't watch this ticket" %>
