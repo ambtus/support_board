@@ -1,18 +1,18 @@
 code_vote_1:
   code_ticket_id: 3
-  created_at: 2011-01-12 03:24:36 UTC
+  created_at: 2011-01-13 21:36:42 UTC
   id: 1
   support_ticket_id: 4
-  updated_at: 2011-01-12 03:24:36 UTC
+  updated_at: 2011-01-13 21:36:42 UTC
   user_id: 
   vote: 2
 
 code_vote_2:
   code_ticket_id: 5
-  created_at: 2011-01-12 03:24:36 UTC
+  created_at: 2011-01-13 21:36:42 UTC
   id: 2
   support_ticket_id: 7
-  updated_at: 2011-01-12 03:24:36 UTC
+  updated_at: 2011-01-13 21:36:42 UTC
   user_id: 
   vote: 2
 

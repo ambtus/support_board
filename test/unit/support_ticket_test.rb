@@ -25,10 +25,10 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal %Q{unowned -> closed (5)}, six.support_details.last.content
   end
   test "scopes" do
-    assert_equal 1, SupportTicket.unowned.count
+    assert_equal 2, SupportTicket.unowned.count
     assert_equal 1, SupportTicket.taken.count
     assert_equal 2, SupportTicket.waiting.count
-    assert_equal 4, SupportTicket.not_closed.count
+    assert_equal 5, SupportTicket.not_closed.count
     assert_equal 1, SupportTicket.spam.count
     assert_equal 2, SupportTicket.closed.count
   end

@@ -275,7 +275,7 @@ Scenario: guests can comment on a draft FAQ when following a link from their own
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "new question"
     And I press "Create Support ticket"
-  When "sam" creates a faq from support ticket 8
+  When "sam" creates a faq from support ticket 9
     And I reload the page
   Then I should see "Status: closed by sam"
   When I follow "new faq"
@@ -289,7 +289,7 @@ Scenario: guests can't comment on a posted FAQ when following a link from their 
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "where's the salt?"
     And I press "Create Support ticket"
-  When "sam" links support ticket 8 to faq 1
+  When "sam" links support ticket 9 to faq 1
     And I reload the page
   Then I should see "Status: closed by sam"
   When I follow "where to find salt"
@@ -325,7 +325,7 @@ Scenario: an existing faq should get a vote removed when unlinked from a guest s
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
-  When "rodney" links support ticket 8 to faq 2
+  When "rodney" links support ticket 9 to faq 2
     And I reload the page
   Then I should see "why we don't have enough ZPMs"
      And I should see "Status: closed by rodney"
@@ -342,7 +342,7 @@ Scenario: a new faq should get a vote removed when unlinked from a guest support
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
-  When "blair" creates a faq from support ticket 8
+  When "blair" creates a faq from support ticket 9
     And I reload the page
   When I fill in "Reason" with "FAQ not helpful"
     And I press "Reopen"
