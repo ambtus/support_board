@@ -31,27 +31,21 @@ class SupportTicketsController < ApplicationController
       # support volunteer's tickets
       elsif params[:support]
         @tickets = @tickets.where(:support_identity_id => owner.support_identity_id)
-        case params[:status]
-        when "closed"
-          @tickets = @tickets.closed
-        when "waiting"
-          @tickets = @tickets.waiting
-        when "taken"
-          @tickets = @tickets.taken
-        end
-        render :index and return
 
       # tickets I opened
       else
         @tickets = @tickets.where(:user_id => owner.id)
+        @tickets.not_open if params[:closed]
         if current_user != owner
           # if not owner, can only see tickets where name is displayed
           @tickets = @tickets.where(:display_user_name => true)
         end
       end
 
+    end
+
     # specific support tickets
-    elsif params[:status]
+    if params[:status]
       case params[:status]
       when "taken"
         @tickets = @tickets.taken
@@ -71,11 +65,11 @@ class SupportTicketsController < ApplicationController
         @tickets = @tickets.closed
         # render now, because we add not not resolved later
         render :index and return
+      when "unowned"
+        @tickets = @tickets.unowned
+      else
+        raise "no such status"
       end
-
-    # default - unowned tickets
-    else
-      @tickets = @tickets.unowned
     end
 
     # if we haven't rendered before this, rule out closed tickets and spam

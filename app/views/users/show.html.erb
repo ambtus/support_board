@@ -3,15 +3,19 @@
   Support info for <%= @user.support_identity.name %>
   <ul>
   <li>
-    <%= link_to "Support tickets opened by #{@user.login}",
-                user_support_tickets_path(@user) %>
-  </li>
-  <li>
     <%= link_to "Support tickets commented on by #{@user.login}",
                 user_support_tickets_path(@user, :comments => true) %>
     <% if @accepted %>
      (<%= @accepted %> accepted)
     <% end %>
+  </li>
+  <li>
+    <%= link_to "#{@user.login}'s open support tickets",
+                user_support_tickets_path(@user) %>
+  </li>
+  <li>
+    <%= link_to "#{@user.login}'s closed support tickets",
+                user_support_tickets_path(@user, :status => "closed") %>
   </li>
   <% if @user == current_user %>
     <li>

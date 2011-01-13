@@ -124,7 +124,7 @@ class Faq < ActiveRecord::Base
 
   # used in view to determine whether to offer to turn on or off notifications
   def watched?(authentication_code = nil)
-    if authentication_code
+    if !authentication_code.blank?
       email_address = SupportTicket.find_by_authentication_code(authentication_code).try(:email)
     else
       email_address = User.current_user.try(:email)
