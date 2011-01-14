@@ -1,12 +1,13 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
-#   Mayor.create(:name => 'Daley', :city => cities.first)
+# demo seed data. 
+#  load by running
+#  rails runner db/demo_seeds.rb
+# Also used for features:
+#  load and then dump to fixtures, create roles_users.yml by hand
 
 # users
+newbie = User.create(:login => "newbie", :email => "newbie@ao3.org",
+  :password => "secret", :password_confirmation => "secret")
+
 dean = User.create(:login => "dean", :email => "dean@ao3.org",
   :password => "secret", :password_confirmation => "secret")
 dean.support_identity

@@ -36,8 +36,10 @@ class CodeTicketTest < ActiveSupport::TestCase
     reason = "not reproducible"
     ticket = CodeTicket.find(1)
     User.current_user = User.find_by_login("sam")
+    assert_raise(RuntimeError) { ticket.reject!(reason) }
+    User.current_user = User.find_by_login("rodney")
     assert ticket.reject!(reason)
-    assert_equal "closed by sam", ticket.status_line
+    assert_equal "closed by rodney", ticket.status_line
     assert_equal %Q{unowned -> closed (#{reason})}, ticket.code_details.last.content
   end
   test "steal" do

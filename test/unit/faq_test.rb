@@ -18,6 +18,7 @@ class FaqTest < ActiveSupport::TestCase
   test "post" do
     faq = Faq.find(2)
     User.current_user = User.find_by_login("sam")
+    assert_equal false, User.current_user.support_admin?
     assert_raise(RuntimeError) { faq.post! }
     bofh = User.find_by_login("bofh")
     User.current_user = bofh

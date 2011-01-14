@@ -160,27 +160,34 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal 5, ticket.support_details.count
   end
   test "comment on user ticket" do
-    ticket = SupportTicket.find(3)
+    ticket = SupportTicket.find(8)
     assert_equal 1, ticket.support_details.count
     User.current_user = nil
     assert_raise(RuntimeError) { ticket.comment!("something") }
     assert_raise(RuntimeError) { ticket.comment!("something", false, "guest@ao3.org") }
     assert_equal 1, ticket.support_details.count
-    User.current_user = User.find_by_login("dean")
+    User.current_user = User.find_by_login("sam")
     assert ticket.comment!("user owner")
     assert_equal 2, ticket.support_details.count
     assert_match "ticket owner wrote", ticket.support_details.last.byline
     assert_equal "user owner", ticket.support_details.last.content
     User.current_user = User.find_by_login("john")
-    assert_raise(RuntimeError) { ticket.comment!("user on taken ticket") }
-    assert_equal 2, ticket.support_details.count
-    User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("volunteer")
+    assert ticket.comment!("user on open ticket")
     assert_equal 3, ticket.support_details.count
-    assert_match "sam (volunteer) wrote", ticket.support_details.last.byline
+    assert_match "john wrote", ticket.support_details.last.byline
+    User.current_user = User.find_by_login("blair")
+    assert ticket.take!
+    assert_equal 4, ticket.support_details.count
+    User.current_user = User.find_by_login("john")
+    assert_raise(RuntimeError) { ticket.comment!("user on taken ticket") }
+    assert_equal 4, ticket.support_details.count
+    User.current_user = User.find_by_login("rodney")
+    assert ticket.comment!("volunteer")
+    assert_equal 5, ticket.support_details.count
+    assert_match "rodney (volunteer) wrote", ticket.support_details.last.byline
     assert_equal "volunteer", ticket.support_details.last.content
     assert_raise(RuntimeError) { ticket.comment!("unofficial volunteer", false) }
-    assert_equal 3, ticket.support_details.count
+    assert_equal 5, ticket.support_details.count
   end
   test "comment when username visible" do
     ticket = SupportTicket.find(5)
@@ -210,10 +217,10 @@ class SupportTicketTest < ActiveSupport::TestCase
   test "user owner accepts answer" do
     ticket = SupportTicket.find(3)
     assert_equal "taken by sam", ticket.status_line
-    assert_equal 1, ticket.support_details.count
+    assert_equal 2, ticket.support_details.count
     User.current_user = User.find_by_login("rodney")
     assert ticket.comment!("right answer")
-    assert_equal 2, ticket.support_details.count
+    assert_equal 3, ticket.support_details.count
     detail = ticket.support_details.last
     assert_raise(RuntimeError) { ticket.accept!(detail.id) }
     User.current_user = User.find_by_login("sam")

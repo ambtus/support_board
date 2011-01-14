@@ -3,3 +3,10 @@ Setup:
 thor setup:config
 
 you will need to edit the resulting files
+
+Demo:
+
+if you want the demo seed data run
+
+rails runner db/demo_seeds.rb 
+
