@@ -145,6 +145,7 @@ class CodeTicket < ActiveRecord::Base
 
   def reject(reason)
     raise "Couldn't reject. No reason given." if reason.blank?
+    raise "Couldn't reject. Not support admin." unless User.current_user.support_admin?
     self.support_identity_id = User.current_user.support_identity_id
   end
 

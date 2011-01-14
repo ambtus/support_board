@@ -1,61 +1,40 @@
 Feature: volunteers working with code tickets
 
-Scenario: support identities don't have to be unique, but taken tickets should be correct
-  Given a volunteer exists with login: "rodney", id: 1
-    And a volunteer exists with login: "hermione", id: 2
+Scenario: support identities don't have to be unique, but taken tickets should belong to the correct user
   When "rodney" has a support identity "oracle"
-    And "hermione" has a support identity "oracle"
-    And a code ticket exists with id: 1
-    And a code ticket exists with id: 2
-  When "rodney" takes code ticket 1
-    And "hermione" takes code ticket 2
+    And "bofh" has a support identity "oracle"
+  When "rodney" takes support ticket 1
+    And "bofh" takes support ticket 8
   When I am on rodney's user page
-    And I follow "My Open Code Tickets"
-  Then I should see "Code Ticket #1"
-    But I should not see "Code Ticket #2"
-  When I am on hermione's user page
-    And I follow "My Open Code Tickets"
-  Then I should not see "Code Ticket #1"
-    But I should see "Code Ticket #2"
-
-Scenario: identities don't have to be unique, but closed tickets should be correct
-  Given a volunteer exists with login: "rodney", id: 1
-    And a volunteer exists with login: "hermione", id: 2
-  When "rodney" has a support identity "oracle"
-    And "hermione" has a support identity "oracle"
-    And a code ticket exists with id: 1
-    And a code ticket exists with id: 2
-  When "rodney" resolves code ticket 1
-    And "hermione" resolves code ticket 2
-  When I am on rodney's user page
-    And I follow "Closed Code Tickets"
-  Then I should see "Code Ticket #1"
-    But I should not see "Code Ticket #2"
-  When I am on hermione's user page
-    And I follow "Closed Code Tickets"
-  Then I should not see "Code Ticket #1"
-    But I should see "Code Ticket #2"
+    And I follow "Taken Support Tickets"
+  Then I should see "Support Ticket #1"
+    But I should not see "Support Ticket #8"
+  When I am on bofh's user page
+    And I follow "Taken Support Tickets"
+  Then I should not see "Support Ticket #1"
+    But I should see "Support Ticket #8"
 
 Scenario: creating a code ticket from a support ticket should enter referring url in url
-  Given a support ticket exists with url: "/works/1523"
-  When I am logged in as volunteer "oracle"
-    And I am on the first support ticket page
-  Then I should see "referring url: /works/1523"
+  When I am logged in as "sam"
+    And I am on the page for support ticket 8
+  Then I should not see "referring url: /faqs/1"
+    And I should not see "Take"
+  And I follow "view ticket as support volunteer"
+  Then I should see "referring url: /faqs/1"
   When I press "Create new code ticket"
-    And I am on the page for the first code ticket
-  Then I should see "url: /works/1523"
+    And I am on the page for the last code ticket
+  Then I should see "url: /faqs/1"
 
 Scenario: creating a code ticket from a support ticket should enter user agent in browser
-  Given a support ticket exists with user_agent: "Mozilla/5.0"
-  When I am logged in as volunteer "oracle"
-    And I am on the first support ticket page
+  When I am logged in as "blair"
+    And I am on the page for support ticket 1
   Then I should see "user agent: Mozilla/5.0"
   When I press "Create new code ticket"
-    And I am on the page for the first code ticket
+    And I am on the page for the last code ticket
   Then I should see "browser: Mozilla/5.0"
 
 Scenario: creating a new code ticket should have somewhere to enter the browser and url
-  When I am logged in as volunteer "oracle"
+  When I am logged in as "blair"
     And I follow "Support Board"
     And I follow "New Code Ticket"
     And I fill in "Summary" with "something is wrong"
@@ -67,15 +46,13 @@ Scenario: creating a new code ticket should have somewhere to enter the browser 
     And I should see "browser: IE6"
 
 Scenario: volunteers can close a code ticket as a dupe
-  Given a code ticket exists with summary: "original", id: 1
-    And a code ticket exists with summary: "dupe", id: 2
-  When I am logged in as volunteer "oracle"
+  When I am logged in as "sam"
     And I follow "Support Board"
     And I follow "Open Code Tickets"
     And I follow "Code Ticket #2"
     And I select "1" from "Code Ticket"
     And I press "Dupe"
-  Then I should see "Status: closed as duplicate by oracle Code Ticket #1"
+  Then I should see "Status: closed as duplicate by sam Code Ticket #1"
   When I follow "Support Board"
     And I follow "Open Code Tickets"
   Then I should see "Code Ticket #1"
@@ -83,58 +60,42 @@ Scenario: volunteers can close a code ticket as a dupe
   When I follow "Support Board"
     And I follow "Closed Code Tickets"
   Then I should see "Code Ticket #2"
-  When I follow "oracle"
-    And I follow "Closed Code Tickets"
+  When I follow "sam"
+    And I follow "My Closed Code Tickets"
   Then I should see "Code Ticket #2"
 
-Scenario: volunteers can close a code ticket by rejecting it
-  Given a code ticket exists with summary: "original", id: 1
-  When I am logged in as volunteer "oracle"
+Scenario: volunteers can't close a code ticket by rejecting it
+  When I am logged in as "blair"
     And I follow "Support Board"
     And I follow "Open Code Tickets"
     And I follow "Code Ticket #1"
-    And I fill in "reason" with "no longer reproducible"
-    And I press "Reject"
-  Then I should see "Status: closed by oracle"
-  When I follow "Support Board"
-    And I follow "Open Code Tickets"
-  Then I should not see "Code Ticket #1"
-  When I follow "Support Board"
-    And I follow "Closed Code Tickets"
-  Then I should see "Code Ticket #1"
-  When I follow "oracle"
-    And I follow "Closed Code Tickets"
-  Then I should see "Code Ticket #1"
+  Then I should not see "reason"
 
 Scenario: volunteers can re-open a closed code ticket
-  Given a code ticket exists with summary: "original", id: 1
-  When I am logged in as volunteer "oracle"
-    And "oracle" resolves code ticket 1
+  When I am logged in as "blair"
     And I follow "Support Board"
     And I follow "Closed Code Tickets"
-    And I follow "Code Ticket #1"
-  When I fill in "reason" with "oops, that didn't fix it"
+    And I follow "Code Ticket #6"
+  When I fill in "reason" with "try again"
     And I press "Reopen"
   Then I should see "Status: open"
+  When I follow "Support Board"
+    And I follow "Closed Code Tickets"
+  Then I should not see "Code Ticket #6"
 
 Scenario: volunteers can steel a code ticket
-  Given a volunteer exists with login: "rodney"
-    And a code ticket exists with id: 1
-  When "rodney" takes code ticket 1
-    Then 1 email should be delivered to "rodney@ao3.org"
-    And all emails have been delivered
-  When I am logged in as volunteer "hermione"
-    And I am on rodney's user page
+  When I am logged in as "blair"
+    And I am on sam's user page
     And I follow "My Open Code Tickets"
-    And I follow "Code Ticket #1"
+    And I follow "Code Ticket #2"
   When I press "Steal"
-    Then I should see "Status: taken by hermione"
-  And 1 email should be delivered to "rodney@ao3.org"
+    Then I should see "Status: taken by blair"
+  And 1 email should be delivered to "sam@ao3.org"
     And the email should contain "has been stolen by"
-    And the email should contain "hermione"
+    And the email should contain "blair"
 
 Scenario: volunteers can create new release notes
-  When I am logged in as volunteer "oracle"
+  When I am logged in as "blair"
     And I follow "Support Board"
     And I follow "New Release Note"
     And I fill in "Release" with "0.8.4.7"

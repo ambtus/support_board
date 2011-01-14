@@ -1,3 +1,6 @@
+<% if current_user && current_user.support_volunteer? %>
+  <%= link_to "view ticket as support volunteer", support_ticket_path(@ticket, :support => true) %>
+<% end %>
 <%= render "show" %>
 
 <%= form_for(@ticket) do |t| %>

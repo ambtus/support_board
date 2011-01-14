@@ -106,7 +106,7 @@ st3.comment!("and the holy water")
 User.current_user = sam
 st3.take!
 
-st4 = SupportTicket.create(:summary => "repeal DADA", :user_id => john.id, :private =>true)
+st4 = SupportTicket.create(:summary => "repeal DADA", :user_id => john.id, :private =>true, :url => "/faqs/3")
 User.current_user = rodney
 st4.needs_fix!(ct3.id)
 
@@ -121,7 +121,6 @@ st7 = SupportTicket.create(:summary => "where can I find a guide", :user_id => j
 User.current_user = blair
 st7.needs_fix!(ct5.id)
 
-st8 = SupportTicket.create(:summary => "where are you, dean?", :user_id => sam.id)
+st8 = SupportTicket.create(:summary => "where are you, dean?", :user_id => sam.id, :url => "/faqs/1")
 User.current_user = sam
 st8.comment!("don't make me come looking for you!", false)
-

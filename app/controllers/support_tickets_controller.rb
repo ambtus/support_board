@@ -85,7 +85,7 @@ class SupportTicketsController < ApplicationController
       redirect_to support_path and return
     end
 
-    if is_owner
+    if is_owner && !params[:support]
       @details = @ticket.support_details.not_private
       @add_details = true # create a new empty response template
       render :show_owner

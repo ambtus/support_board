@@ -47,7 +47,7 @@
       <%= text_field_tag :reason %>
       <%= submit_tag "Reopen" %>
     <% end %>
-    <% if @ticket.current_state.events.include?(:reject) %>
+    <% if @ticket.current_state.events.include?(:reject) && current_user.support_admin? %>
       <%= label_tag :reason %>
       <%= text_field_tag :reason %>
       <%= submit_tag "Reject" %>
