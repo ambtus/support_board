@@ -100,7 +100,10 @@ st2 = SupportTicket.create(:summary => "a personal problem", :email => "guest@ao
 User.current_user = sam
 st2.spam!
 
-st3 = SupportTicket.create(:summary => "where's the salt?", :user_id => dean.id)
+st3 = SupportTicket.create(:summary => "where's the salt?", :user_id => dean.id, :display_user_name => true)
+User.current_user = dean
+st3.comment!("and the holy water")
+User.current_user = sam
 st3.take!
 
 st4 = SupportTicket.create(:summary => "repeal DADA", :user_id => john.id, :private =>true)
@@ -119,4 +122,6 @@ User.current_user = blair
 st7.needs_fix!(ct5.id)
 
 st8 = SupportTicket.create(:summary => "where are you, dean?", :user_id => sam.id)
+User.current_user = sam
+st8.comment!("don't make me come looking for you!", false)
 

@@ -354,10 +354,12 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def unwatch!(email = nil)
-    raise "Couldn't remove watch. Not watching." unless watched?(email)
     if !email.blank?
+      raise "Couldn't remove watch. Not watching." unless watched?(email)
       self.support_notifications.where(:email => email).delete_all
     else
+      raise "Couldn't remove watch. Not logged in" unless User.current_user
+      raise "Couldn't remove watch. Not watching." unless watched?(User.current_user.email)
       self.support_notifications.where(:email => User.current_user.email).delete_all
     end
   end
