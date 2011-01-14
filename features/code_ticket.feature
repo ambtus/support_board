@@ -1,4 +1,10 @@
-Feature: the support board as seen by logged in users for code tickets
+Feature: code tickets are for when something in the code needs to be fixed
+
+Scenario: guests can view open code tickets, but not vote or comment
+  When I am on the page for code ticket 1
+  Then I should see "Status: open"
+  But I should not see "Vote up"
+    And I should not see "Details:"
 
 Scenario: users can view open code tickets, and vote and comment
   When I am logged in as "dean"
@@ -10,6 +16,12 @@ Scenario: users can view open code tickets, and vote and comment
     And I press "Add details"
   Then I should see "dean wrote: would be great if"
 
+Scenario: guests can view in progress code tickets, but not vote or comment
+  When I am on the page for code ticket 2
+  Then I should see "Status: taken"
+  But I should not see "Vote up"
+    And I should not see "Details:"
+
 Scenario: users can view in progress code tickets, and vote but not comment
   When I am logged in as "dean"
     And I am on the page for code ticket 2
@@ -19,13 +31,19 @@ Scenario: users can view in progress code tickets, and vote but not comment
     Then I should see "Votes: 1"
 
 Scenario: guests can view closed code tickets, but not vote or comment
+  When I am on the page for the last code ticket
+  Then I should see "Status: deployed in 1.0"
+  But I should not see "Vote up"
+    And I should not see "Details:"
+
+Scenario: guests can view closed code tickets, but not vote or comment
   When I am logged in as "dean"
     And I am on the page for code ticket 6
   Then I should see "Status: deployed in 1.0"
     But I should not see "Details:"
     And I should not see "Vote up"
 
-Scenario: can see all open tickets
+Scenario: can see all open code tickets
   Given I am logged in as "jim"
   When I follow "Support Board"
     And I follow "Open Code Tickets (Known Issues)"
@@ -35,6 +53,27 @@ Scenario: can see all open tickets
     And I should see "Code Ticket #3 (2) repeal DADA"
     And I should see "Code Ticket #4 (0) build a zpm"
     And I should see "Code Ticket #5 (2) find a sentinel"
+
+Scenario: code tickets can be sorted by votes
+  Given the following code votes exist
+    | code_ticket_id | vote  |
+    | 1              | 3     |
+    | 2              | 7     |
+    | 3              | 18    |
+  When I am on the home page
+    And I follow "Support Board"
+    And I follow "Open Code Tickets (Known Issues)"
+  Then I should see "1: Code Ticket #1 (3) fix the roof"
+    And I should see "2: Code Ticket #2 (7) save the world "
+    And I should see "3: Code Ticket #3 (20) repeal DADA "
+    And I should see "4: Code Ticket #4 (0) build a zpm "
+    And I should see "5: Code Ticket #5 (2) find a sentinel "
+  When I follow "Sort by vote count"
+  Then I should see "3: Code Ticket #1 (3) fix the roof"
+    And I should see "2: Code Ticket #2 (7) save the world "
+    And I should see "1: Code Ticket #3 (20) repeal DADA "
+    And I should see "5: Code Ticket #4 (0) build a zpm "
+    And I should see "4: Code Ticket #5 (2) find a sentinel "
 
 Scenario: users can (un)monitor open code tickets
   Given I am logged in as "jim"
@@ -101,3 +140,46 @@ Scenario: links to code tickets they're watching, private
     And I should see "Code Ticket #2"
     And I should see "Code Ticket #5"
     But I should not see "Code Ticket #3"
+
+Scenario: creating a code ticket from a support ticket should enter referring url in url
+  When I am logged in as "sam"
+    And I am on the page for support ticket 8
+  Then I should not see "referring url: /users/dean"
+    And I should not see "Take"
+  And I follow "view ticket as support volunteer"
+  Then I should see "referring url: /users/dean"
+  When I press "Create new code ticket"
+    And I am on the page for the last code ticket
+  Then I should see "url: /users/dean"
+
+Scenario: creating a code ticket from a support ticket should enter user agent in browser
+  When I am logged in as "blair"
+    And I am on the page for support ticket 1
+  Then I should see "user agent: Mozilla/5.0"
+  When I press "Create new code ticket"
+    And I am on the page for the last code ticket
+  Then I should see "browser: Mozilla/5.0"
+
+Scenario: creating a new code ticket should have somewhere to enter the browser and url
+  When I am logged in as "blair"
+    And I follow "Support Board"
+    And I follow "New Code Ticket"
+    And I fill in "Summary" with "something is wrong"
+    And I fill in "Url" with "/tags"
+    And I fill in "Browser" with "IE6"
+    And I press "Create Code ticket"
+  Then I should see "Code ticket created"
+    And I should see "url: /tags"
+    And I should see "browser: IE6"
+
+Scenario: volunteers can steel a code ticket
+  When I am logged in as "blair"
+    And I am on sam's user page
+    And I follow "My Open Code Tickets"
+    And I follow "Code Ticket #2"
+  When I press "Steal"
+    Then I should see "Status: taken by blair"
+  And 1 email should be delivered to "sam@ao3.org"
+    And the email should contain "has been stolen by"
+    And the email should contain "blair"
+

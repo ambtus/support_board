@@ -56,5 +56,39 @@ Scenario: automatic official identity when support admin
   Then I should see "Support info for bofh"
     And I should see "Taken Support Tickets"
 
+Scenario: support identities don't have to be unique, but support tickets should belong to the correct user
+  When "rodney" has a support identity "oracle"
+    And "bofh" has a support identity "oracle"
+  When "rodney" takes support ticket 1
+    And "bofh" takes support ticket 8
+  When I am on rodney's user page
+    And I follow "Taken Support Tickets"
+  Then I should see "Support Ticket #1"
+    But I should not see "Support Ticket #8"
+  When I follow "Support Ticket #1"
+    Then I should see "taken by oracle"
+  When I am on bofh's user page
+    And I follow "Taken Support Tickets"
+  Then I should not see "Support Ticket #1"
+    But I should see "Support Ticket #8"
+  When I follow "Support Ticket #8"
+    Then I should see "taken by oracle"
+
+Scenario: support identities don't have to be unique, but code tickets should belong to the correct user
+  When "rodney" has a support identity "oracle"
+    And "blair" has a support identity "oracle"
+  When I am on rodney's user page
+    And I follow "My Open Code Tickets"
+  Then I should see "Code Ticket #3"
+    But I should not see "Code Ticket #5"
+  When I follow "Code Ticket #3"
+    Then I should see "verified by oracle"
+  When I am on blair's user page
+    And I follow "My Open Code Tickets"
+  Then I should see "Code Ticket #5"
+    But I should not see "Code Ticket #3"
+  When I follow "Code Ticket #5"
+    Then I should see "committed by oracle"
+
 # TODO
 Scenario: a user can claim an unowned support identity (created by a github commit)
