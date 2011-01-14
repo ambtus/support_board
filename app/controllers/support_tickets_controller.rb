@@ -59,21 +59,17 @@ class SupportTicketsController < ApplicationController
         @tickets = @tickets.waiting
       when "spam"
         @tickets = @tickets.spam
-        # render now, because we add not spam later
-        render :index and return
       when "closed"
         @tickets = @tickets.closed
-        # render now, because we add not not resolved later
-        render :index and return
       when "unowned"
         @tickets = @tickets.unowned
+      when "all"
       else
         raise "no such status"
       end
+    else
+      @tickets = @tickets.not_closed
     end
-
-    # if we haven't rendered before this, rule out closed tickets and spam
-    @tickets = @tickets.not_closed
   end
 
   def show

@@ -167,7 +167,7 @@ Scenario: guests can't make their private support tickets public
   Then I should see "Access: Private"
     But I should not see "Ticket will only be visible"
 
-Scenario: guests can make their public support tickets private, even to people who already commented who should no longer get email
+Scenario: guests can make their public support tickets private, even to users who already commented who should no longer get email
   When "jim" watches support ticket 1
     And "jim" comments on support ticket 1
   Then 1 email should be delivered to "jim@ao3.org"

@@ -15,7 +15,7 @@
   <li><%= link_to "Release Notes", release_notes_path %> (<%= ReleaseNote.posted.count %>)</li>
   <li><%= link_to "Open Code Tickets (Known Issues)", code_tickets_path %> (<%= CodeTicket.not_closed.count %>)</li>
   <% if current_user %>
-    <li><%= link_to "Open Support Tickets", support_tickets_path %> (<%= SupportTicket.unowned.count %>)</li>
+    <li><%= link_to "Open Support Tickets", support_tickets_path(:status => "unowned") %> (<%= SupportTicket.unowned.count %>)</li>
   <% end %>
   <% if current_user.try(:support_volunteer?) %>
     <li><%= link_to "Support tickets requiring Admin attention", support_tickets_path(:status => "admin") %> (<%= SupportTicket.waiting_on_admin.count %>)</li>

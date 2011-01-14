@@ -4,7 +4,7 @@
   <ul>
   <li>
     <%= link_to "Support tickets commented on by #{@user.login}",
-                user_support_tickets_path(@user, :comments => true) %>
+                user_support_tickets_path(@user, :comments => true, :status => "all") %>
     <% if @accepted %>
      (<%= @accepted %> accepted)
     <% end %>
