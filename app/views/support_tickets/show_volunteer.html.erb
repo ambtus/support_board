@@ -44,7 +44,7 @@
       <%= text_field_tag :reason %>
       <%= submit_tag "Reopen" %>
     <% end %>
-    <% if @ticket.current_state.events.include?(:spam) %>
+    <% if @ticket.current_state.events.include?(:spam) && @ticket.user_id.nil? %>
       <%= submit_tag "Mark as spam" %>
     <% end %>
     <% if @ticket.current_state.events.include?(:ham) %>
