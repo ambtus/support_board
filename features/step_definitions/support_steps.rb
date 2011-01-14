@@ -10,21 +10,21 @@ end
 
 Given /^"([^"]*)" comments on support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = SupportTicket.all[number.to_i - 1]
+  ticket = SupportTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.comment!("foo bar")
 end
 
 Given /^"([^"]*)" watches support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = SupportTicket.all[number.to_i - 1]
+  ticket = SupportTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.watch!
 end
 
 Given /^"([^"]*)" accepts a comment on support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = SupportTicket.all[number.to_i - 1]
+  ticket = SupportTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   detail = ticket.support_details.where(:resolved_ticket => false).first
   assert ticket.accept!(detail.id)
@@ -32,14 +32,14 @@ end
 
 Given /^"([^"]*)" takes support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = SupportTicket.all[number.to_i - 1]
+  ticket = SupportTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.take!
 end
 
 Given /^"([^"]*)" posts support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = SupportTicket.all[number.to_i - 1]
+  ticket = SupportTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.post!
 end

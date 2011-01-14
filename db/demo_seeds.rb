@@ -1,4 +1,4 @@
-# demo seed data. 
+# demo seed data.
 #  load by running
 #  rails runner db/demo_seeds.rb
 # Also used for features:
@@ -122,6 +122,6 @@ st7 = SupportTicket.create(:summary => "where can I find a guide", :user_id => j
 User.current_user = blair
 st7.needs_fix!(ct5.id)
 
-st8 = SupportTicket.create(:summary => "where are you, dean?", :user_id => sam.id, :url => "/faqs/1")
+st8 = SupportTicket.create(:summary => "where are you, dean?", :user_id => sam.id, :url => "/users/dean")
 User.current_user = sam
 st8.comment!("don't make me come looking for you!", false)

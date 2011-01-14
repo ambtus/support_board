@@ -1,29 +1,31 @@
 Feature: volunteers working with code tickets
 
-Scenario: support identities don't have to be unique, but taken tickets should belong to the correct user
+Scenario: support identities don't have to be unique, but code tickets should belong to the correct user
   When "rodney" has a support identity "oracle"
-    And "bofh" has a support identity "oracle"
-  When "rodney" takes support ticket 1
-    And "bofh" takes support ticket 8
+    And "blair" has a support identity "oracle"
   When I am on rodney's user page
-    And I follow "Taken Support Tickets"
-  Then I should see "Support Ticket #1"
-    But I should not see "Support Ticket #8"
-  When I am on bofh's user page
-    And I follow "Taken Support Tickets"
-  Then I should not see "Support Ticket #1"
-    But I should see "Support Ticket #8"
+    And I follow "My Open Code Tickets"
+  Then I should see "Code Ticket #3"
+    But I should not see "Code Ticket #5"
+  When I follow "Code Ticket #3"
+    Then I should see "verified by oracle"
+  When I am on blair's user page
+    And I follow "My Open Code Tickets"
+  Then I should see "Code Ticket #5"
+    But I should not see "Code Ticket #3"
+  When I follow "Code Ticket #5"
+    Then I should see "committed by oracle"
 
 Scenario: creating a code ticket from a support ticket should enter referring url in url
   When I am logged in as "sam"
     And I am on the page for support ticket 8
-  Then I should not see "referring url: /faqs/1"
+  Then I should not see "referring url: /users/dean"
     And I should not see "Take"
   And I follow "view ticket as support volunteer"
-  Then I should see "referring url: /faqs/1"
+  Then I should see "referring url: /users/dean"
   When I press "Create new code ticket"
     And I am on the page for the last code ticket
-  Then I should see "url: /faqs/1"
+  Then I should see "url: /users/dean"
 
 Scenario: creating a code ticket from a support ticket should enter user agent in browser
   When I am logged in as "blair"
