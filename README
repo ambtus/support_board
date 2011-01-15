@@ -9,4 +9,4 @@ Demo:
 if you want the demo seed data run
 
 rails runner db/demo_seeds.rb 
-
+(or rake db:fixtures:load if you have no data which might cause id collisions)

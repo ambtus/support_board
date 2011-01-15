@@ -6,49 +6,70 @@
     </p>
   <% end %>
 <% end %>
-<ul>
+<ul id="user">
   <li><%= link_to "Open a New Support Ticket", new_support_ticket_path %></li>
-  <li><%= link_to "Comments", support_tickets_path(:status => "posted") %> (<%= SupportTicket.posted.count %>)</li>
   <li><%= link_to "Frequently Asked Questions", faqs_path %> (<%= Faq.faq.count %>)</li>
-  <li><%= link_to "FAQs waiting for comments", faqs_path(:rfc => true) %> (<%= Faq.rfc.count %>)</li>
-  <li><%= link_to "All FAQs", faqs_path(:all => true) %> (<%= Faq.count %>)</li>
   <li><%= link_to "Release Notes", release_notes_path %> (<%= ReleaseNote.posted.count %>)</li>
-  <li><%= link_to "Open Code Tickets (Known Issues)", code_tickets_path %> (<%= CodeTicket.not_closed.count %>)</li>
-  <% if current_user %>
-    <li><%= link_to "Open Support Tickets", support_tickets_path(:status => "unowned") %> (<%= SupportTicket.unowned.count %>)</li>
-  <% end %>
-  <% if current_user.try(:support_volunteer?) %>
-    <li><%= link_to "Support tickets requiring Admin attention", support_tickets_path(:status => "admin") %> (<%= SupportTicket.waiting_on_admin.count %>)</li>
-    <li><%= link_to "Support Tickets in progress", support_tickets_path(:status => "taken") %> (<%= SupportTicket.taken.count %>)</li>
-    <li><%= link_to "Support Tickets waiting for Code changes", support_tickets_path(:status => "waiting") %>  (<%= SupportTicket.waiting.count %>)</li>
-    <li><%= link_to "Closed Support Tickets", support_tickets_path(:status => "closed") %> (<%= SupportTicket.closed.count %>)</li>
-    <li><%= link_to "Spam Support Tickets", support_tickets_path(:status => "spam") %> (<%= SupportTicket.spam.count %>)</li>
-
-
-    <li><%= link_to "New Code Ticket", new_code_ticket_path %></li>
-    <li><%= link_to "Taken Code Tickets", code_tickets_path(:status => "taken") %> (<%= CodeTicket.taken.count %>)</li>
-    <li><%= link_to "Committed Code Tickets", code_tickets_path(:status => "committed") %> (<%= CodeTicket.committed.count %>)</li>
-    <li><%= link_to "Staged Code Tickets", code_tickets_path(:status => "staged") %> (<%= CodeTicket.staged.count %>)</li>
-    <li><%= link_to "Verified Code Tickets", code_tickets_path(:status => "verified") %> (<%= CodeTicket.verified.count %>)</li>
-    <li><%= link_to "Closed Code Tickets", code_tickets_path(:status => "closed") %> (<%= CodeTicket.closed.count %>)</li>
-
-    <li><%= link_to "New Release Note", new_release_note_path %></li>
-    <li><%= link_to "Draft Release Notes", release_notes_path(:drafts => true) %> (<%= ReleaseNote.drafts.count %>)</li>
-  <% end %>
-  <% if current_user.try(:support_admin?) %>
-    <li><%= link_to "Unmatched Commits", code_commits_path(:status => "unmatched") %> (<%= CodeCommit.unmatched.count %>)</li>
-    <%= form_tag '/code_tickets' do %>
-      <p class="submit">
-        <%= submit_tag "Stage Committed Code Tickets" %>
-      </p>
-      <p>
-        <%= label_tag :release_note %>
-        <%= select_tag :release_note,
-                     options_from_collection_for_select(ReleaseNote.drafts, "id", "release") %>
-      </p>
-      <p class="submit">
-        <%= submit_tag "Deploy Verified Code Tickets" %>
-      </p>
-    <% end %>
+  <li><%= link_to "Open Code Tickets (Known Issues)", code_tickets_path %> (<%= CodeTicket.filter(:status => "open").count %>)</li>
+  <li><%= link_to "Support Tickets", support_tickets_path %> (<%= SupportTicket.filter(:status => "open").count %>)</li>
+  <li><%= link_to "Comments", comments_path %> (<%= SupportTicket.filter(:status => "posted").count %>)</li>
+  <% if current_user.try(:support_identity_id) %>
+    <li>
+      <%= link_to "Support tickets I am watching",
+                  support_tickets_path(:watching => true) %>
+    </li>
+    <li>
+      <%= link_to "Code tickets I am watching",
+                  code_tickets_path(:watching => true)  %>
+    </li>
   <% end %>
 </ul>
+<% if current_user.try(:support_volunteer?) %>
+  <strong>Support Tickets</strong>
+  <ul id="support_tickets">
+    <li><%= link_to "waiting on admin", support_tickets_path(:status => "waiting_on_admin") %> (<%= SupportTicket.waiting_on_admin.count %>)</li>
+    <li><%= link_to "taken", support_tickets_path(:status => "taken") %> (<%= SupportTicket.taken.count %>)</li>
+    <li><%= link_to "waiting for code changes", support_tickets_path(:status => "waiting") %>  (<%= SupportTicket.waiting.count %>)</li>
+    <li><%= link_to "closed", support_tickets_path(:status => "closed") %> (<%= SupportTicket.closed.count %>)</li>
+    <li><%= link_to "spam", support_tickets_path(:status => "spam") %> (<%= SupportTicket.spam.count %>)</li>
+  </ul>
+  <strong>FAQs</strong>
+  <ul id="faqs">
+    <li><%= link_to "create new faq", new_faq_path %></li>
+    <li><%= link_to "drafts", faqs_path(:rfc => true) %> (<%= Faq.rfc.count %>)</li>
+  </ul>
+  <strong>Code Tickets</strong>
+  <ul id="code_tickets">
+    <li><%= link_to "create new code ticket", new_code_ticket_path %></li>
+    <li><%= link_to "taken", code_tickets_path(:status => "taken") %> (<%= CodeTicket.taken.count %>)</li>
+    <li><%= link_to "committed", code_tickets_path(:status => "committed") %> (<%= CodeTicket.committed.count %>)</li>
+    <li><%= link_to "staged", code_tickets_path(:status => "staged") %> (<%= CodeTicket.staged.count %>)</li>
+    <li><%= link_to "verified", code_tickets_path(:status => "verified") %> (<%= CodeTicket.verified.count %>)</li>
+    <li><%= link_to "closed", code_tickets_path(:status => "closed") %> (<%= CodeTicket.closed.count %>)</li>
+  </ul>
+  <strong>Release Notes</strong>
+  <ul id="release_notes">
+    <li><strong>Release Notes</strong></li>
+    <li><%= link_to "create new release note", new_release_note_path %></li>
+    <li><%= link_to "drafts", release_notes_path(:drafts => true) %> (<%= ReleaseNote.drafts.count %>)</li>
+  </ul>
+<% end %>
+<% if current_user.try(:support_admin?) %>
+  <strong>Admin</strong>
+  <span id="admin">
+  <p><%= link_to "Unmatched Commits", code_commits_path(:status => "unmatched") %> (<%= CodeCommit.unmatched.count %>)</p>
+  <%= form_tag '/code_tickets' do %>
+    <p class="submit">
+      <%= submit_tag "Stage Committed Code Tickets" %>
+    </p>
+    <p>
+      <%= label_tag :release_note %>
+      <%= select_tag :release_note,
+                   options_from_collection_for_select(ReleaseNote.drafts, "id", "release") %>
+    </p>
+    <p class="submit">
+      <%= submit_tag "Deploy Verified Code Tickets" %>
+    </p>
+  <% end %>
+  </span>
+<% end %>

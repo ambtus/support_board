@@ -6,15 +6,13 @@
       <% end %>
     </dd>
     <% @ticket.code_commits.each do |commit| %>
-      <dt>Commit <%= link_to commit.name, commit %></dt>
-        <dd><%= link_to commit.message, commit.url %></dd>
+      <dt>Commit <%= link_to commit.name, commit %> (<%= link_to "Github", commit.url %>):</dt>
+        <dd><%= commit.message %></dd>
     <% end %>
   <dt><%= "Votes" %>:</dt>
     <dd><%= @ticket.vote_count %></dd>
   <dt><%= "Summary" %>:</dt>
     <dd><%= raw @ticket.summary %></dd>
-  <dt><%= "Description" %>:</dt>
-    <dd><%= raw @ticket.description %></dd>
   <% @ticket.code_details.each do |detail| %>
     <dt><%= detail.byline %>:</dt>
       <dd><%= raw detail.content %></dd>

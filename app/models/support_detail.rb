@@ -11,9 +11,13 @@ class SupportDetail < ActiveRecord::Base
     self.support_ticket.user.support_identity == self.support_identity # was the ticket opened and commented on by the same user?
   end
 
+  def show_username?
+    !self.support_ticket.anonymous? && self.support_identity_id
+  end
+
   def byline_name
     if by_owner?
-      (self.support_ticket.display_user_name? && self.support_identity_id) ? self.support_identity.name : "ticket owner"
+      self.show_username? ? self.support_identity.name : "ticket owner"
     else
       self.support_identity.name + (self.support_response? ? " (volunteer)" : "")
     end

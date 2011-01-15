@@ -1,9 +1,5 @@
 SupportBoard::Application.routes.draw do
-  resources :users do
-    resources :support_tickets
-    resources :code_tickets
-  end
-
+  resources :users
   resources :user_sessions
   match 'login' => 'user_sessions#new'
   match 'logout' => 'user_sessions#destroy'
@@ -16,6 +12,7 @@ SupportBoard::Application.routes.draw do
 
   match 'github' => 'github#push', :via => "post"
 
+  match 'comments' => 'support_tickets#comments'
   match 'support' => 'home#support'
   root :to => "home#index"
 end

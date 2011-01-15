@@ -25,6 +25,6 @@
   <% end %>
   <% if @commit.support_identity.user %>
     <dt><%= "User" %>:</dt>
-      <dd><%= link_to @commit.support_identity.user.login, @commit.support_identity.user %>
+      <dd><%= @commit.support_identity.user.login %>
   <% end %>
 </dl>

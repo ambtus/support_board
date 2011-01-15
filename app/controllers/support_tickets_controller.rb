@@ -2,74 +2,20 @@ class SupportTicketsController < ApplicationController
   skip_before_filter :store_location, :only => [:new]
 
   def index
-    # start a scope
-    @tickets = SupportTicket.scoped
-
-    owner = params[:user_id] ? User.find_by_login(params[:user_id]) : false
-
-    # if not support volunteer, and not looking at list of own tickets, rule out private tickets
-    if !current_user.try(:support_volunteer?) && current_user != owner
-      @tickets = @tickets.where(:private => false)
+    begin
+      @tickets = SupportTicket.filter(params)
+    rescue SecurityError
+      flash[:error] = "Please log in"
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Please check your spelling"
     end
-
-    # tickets associated with a user
-    if params[:user_id]
-      raise "no such user" unless owner
-      # tickets I commented on
-      if params[:comments]
-        @tickets = @tickets.joins(:support_details) & SupportDetail.where(:support_identity_id => owner.support_identity_id)
-
-      # tickets I am watching, private
-      elsif params[:watching]
-        if current_user != owner
-          flash[:error] = "Sorry, you don't have permission"
-          redirect_back_or_default
-        else
-          @tickets = @tickets.joins(:support_notifications) & SupportNotification.where(:email => owner.email)
-        end
-
-      # support volunteer's tickets
-      elsif params[:support]
-        @tickets = @tickets.where(:support_identity_id => owner.support_identity_id)
-
-      # tickets I opened
-      else
-        @tickets = @tickets.where(:user_id => owner.id)
-        @tickets.not_open if params[:closed]
-        if current_user != owner
-          # if not owner, can only see tickets where name is displayed
-          @tickets = @tickets.where(:display_user_name => true)
-        end
-      end
-
+    unless @tickets
+      @tickets = []
     end
+  end
 
-    # specific support tickets
-    if params[:status]
-      case params[:status]
-      when "taken"
-        @tickets = @tickets.taken
-      when "admin"
-        @tickets = @tickets.waiting_on_admin
-      when "posted"
-        @tickets = @tickets.posted
-        # render a more friendly index page
-        render :posted_index and return
-      when "waiting"
-        @tickets = @tickets.waiting
-      when "spam"
-        @tickets = @tickets.spam
-      when "closed"
-        @tickets = @tickets.closed
-      when "unowned"
-        @tickets = @tickets.unowned
-      when "all"
-      else
-        raise "no such status"
-      end
-    else
-      @tickets = @tickets.not_closed
-    end
+  def comments
+    @tickets = SupportTicket.filter(:status => "posted")
   end
 
   def show

@@ -16,6 +16,23 @@ class SupportTicket < ActiveRecord::Base
   # must have valid email unless logged in
   validates :email, :email_veracity => {:on => :create, :unless => :user_id}
 
+  before_create :guests_are_already_anonymous
+  def guests_are_already_anonymous
+    self.anonymous = false if self.email
+    true
+  end
+
+  # used for tickets which were posted
+  def post_name
+    if self.email
+      "A guest"
+    elsif self.anonymous
+      "A user"
+    else
+      self.user.login
+    end
+  end
+
   # must have summary
   validates_presence_of :summary
   validates_length_of :summary, :maximum=> 140 # tweet length!
@@ -25,15 +42,94 @@ class SupportTicket < ActiveRecord::Base
     "Support Ticket #" + self.id.to_s
   end
 
-  # used for tickets which were posted
-  def post_name
-    if self.email
-      "A guest"
-    elsif !self.display_user_name
-      "A user"
-    else
-      self.user.login
+  def self.ids
+    select("support_tickets.id").map(&:id)
+  end
+
+  # filter support tickets
+  def self.filter(params = {})
+    tickets = SupportTicket.scoped
+
+    # tickets opened by user
+    if !params[:owned_by_user].blank?
+      user = User.find_by_login(params[:owned_by_user])
+      raise ActiveRecord::RecordNotFound unless user
+      tickets = tickets.where(:user_id => user.id)
+      # if not filtering by own name, rule out private tickets
+      if User.current_user != user
+        tickets = tickets.where(:anonymous => false)
+      end
+      # if not support volunteer or filtering by own name rule out private tickets
+      if !(User.current_user.try(:support_volunteer?) || User.current_user == user)
+        tickets = tickets.where(:private => false)
+      end
     end
+
+    # tickets I am watching, private
+    if !params[:watching].blank?
+      user = User.current_user
+      raise SecurityError unless user
+      tickets = tickets.joins(:support_notifications) & SupportNotification.where(:email => user.email)
+    end
+
+    # if you are filtering by user, the test for private tickets has already been done
+    if params[:owned_by_user].blank? && params[:watching].blank?
+      tickets = tickets.where(:private => false) unless User.current_user.try(:support_volunteer?)
+    end
+
+    # ticket's commented on by user
+    if !params[:comments_by_support_identity].blank?
+      support_identity = SupportIdentity.find_by_name(params[:comments_by_support_identity])
+      raise ActiveRecord::RecordNotFound unless support_identity
+      tickets = tickets.joins(:support_details) & SupportDetail.where(:system_log => false, :support_identity_id => support_identity.id)
+    end
+
+    # tickets owned by volunteer
+    if !params[:owned_by_support_identity].blank?
+      support_identity = SupportIdentity.find_by_name(params[:owned_by_support_identity])
+      raise ActiveRecord::RecordNotFound unless support_identity
+      tickets = tickets.where(:support_identity_id => support_identity.id)
+    end
+
+    # filter by status
+    if !params[:status].blank?
+      case params[:status]
+      when "unowned"
+        tickets = tickets.unowned
+      when "taken"
+        tickets = tickets.taken
+      when "waiting_on_admin"
+        tickets = tickets.waiting_on_admin
+      when "posted"
+        tickets = tickets.posted
+      when "waiting"
+        tickets = tickets.waiting
+      when "spam"
+        tickets = tickets.spam
+      when "closed"
+        tickets = tickets.closed
+      when "all"
+        # no op
+      when "open"
+        tickets = tickets.where('status != "closed"').where('status != "spam"').where('status != "posted"')
+      else
+        raise TypeError
+      end
+    else # default status is not closed (open)
+      tickets = tickets.where('status != "closed"').where('status != "spam"').where('status != "posted"')
+    end
+
+    case params[:order_by]
+    when "recent"
+      tickets = tickets.order("updated_at desc")
+    when "oldest"
+      tickets = tickets.order("updated_at asc")
+    when "earliest"
+      tickets = tickets.order("id desc")
+    else # "newest" by default
+      tickets = tickets.order("id asc")
+    end
+    return tickets
   end
 
   # STATUS/RESOLUTION stuff
@@ -113,10 +209,6 @@ class SupportTicket < ActiveRecord::Base
 
   self.workflow_spec.state_names.each do |state|
     scope state, :conditions => { :status => state.to_s }
-  end
-
-  def self.not_closed
-    where('status != "closed"').where('status != "spam"').where('status != "posted"')
   end
 
   def spam
@@ -286,6 +378,10 @@ class SupportTicket < ActiveRecord::Base
                                 :system_log => true)
   end
 
+  def show_username?
+    !self.anonymous? && !self.email
+  end
+
   def hide_username!
     if self.email
       raise "Couldn't hide username. Guest tickets don't have usernames"
@@ -295,7 +391,7 @@ class SupportTicket < ActiveRecord::Base
         raise "Couldn't hide username. Not owner."
       end
     end
-    self.update_attribute(:display_user_name, false)
+    self.update_attribute(:anonymous, true)
     support_identity_id = User.current_user.try(:support_identity_id)
     official = User.current_user && User.current_user.support_volunteer?
     content = "hide username"
@@ -315,7 +411,7 @@ class SupportTicket < ActiveRecord::Base
         raise "Couldn't show username. Not owner."
       end
     end
-    self.update_attribute(:display_user_name, true)
+    self.update_attribute(:anonymous, false)
     support_identity_id = User.current_user.support_identity_id
     official = User.current_user && User.current_user.support_volunteer?
     content = "show username"

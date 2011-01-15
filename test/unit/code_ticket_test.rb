@@ -11,7 +11,7 @@ class CodeTicketTest < ActiveSupport::TestCase
     assert_equal %Q{unowned -> taken}, two.code_details.last.content
     three = CodeTicket.find(3)
     assert_equal "rodney", three.code_commits.first.support_identity.name
-    assert_equal "verified by rodney", three.status_line
+    assert_equal "verified by bofh", three.status_line
     assert_equal %Q{staged -> verified}, three.code_details.last.content
     four = CodeTicket.find(4)
     assert_equal "waiting for verification", four.status_line
@@ -74,15 +74,12 @@ class CodeTicketTest < ActiveSupport::TestCase
   end
   test "move votes from duplicate" do
     ticket = CodeTicket.find(1)
-    assert_equal 0, ticket.vote_count
+    assert_equal 1, ticket.vote_count
     dupe = CodeTicket.find(2)
-    assert_equal 0, dupe.vote_count
-    User.current_user = User.find_by_login("john")
-    dupe.vote!
-    assert_equal 1, dupe.vote_count
+    assert_equal 3, dupe.vote_count
     User.current_user = User.find_by_login("rodney")
     assert dupe.duplicate!(ticket.id)
-    assert_equal 1, ticket.vote_count
+    assert_equal 4, ticket.vote_count
     assert_equal 0, dupe.vote_count
   end
   test "move support tickets from duplicate" do
@@ -106,16 +103,17 @@ class CodeTicketTest < ActiveSupport::TestCase
   end
   test "vote" do
     ticket = CodeTicket.find(1)
+    assert_equal 1, ticket.vote_count
     User.current_user = nil
     assert_raise(RuntimeError) { ticket.vote! }
     User.current_user = User.find_by_login("dean")
     assert ticket.vote!
     assert_raise(RuntimeError) { ticket.vote! }
-    assert_equal 1, ticket.vote_count
+    assert_equal 2, ticket.vote_count
     User.current_user = User.find_by_login("john")
     assert_nil ticket.voted?
     assert ticket.vote!
-    assert_equal 2, ticket.vote_count
+    assert_equal 3, ticket.vote_count
   end
   test "indirect votes new ticket" do
     support_ticket = SupportTicket.find(1)
@@ -126,9 +124,10 @@ class CodeTicketTest < ActiveSupport::TestCase
   test "indirect votes old ticket" do
     support_ticket = SupportTicket.find(1)
     code_ticket = CodeTicket.find(1)
+    assert_equal 1, code_ticket.vote_count
     User.current_user = User.find_by_login("sam")
     assert code_ticket = support_ticket.needs_fix!(code_ticket.id)
-    assert_equal 2, code_ticket.vote_count
+    assert_equal 3, code_ticket.vote_count
   end
   test "watch" do
     ticket = CodeTicket.find(1)

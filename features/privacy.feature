@@ -57,27 +57,44 @@ Scenario: users can't access private tickets
   When I am on the page for support ticket 4
   Then I should see "Sorry, you don't have permission"
 
-Scenario: links to support tickets users are watching is private
-  Given I am logged in as "jim"
-  When I am on the page for support ticket 1
-    And I press "Watch this ticket"
-  When I follow "jim"
-    And I follow "Support tickets I am watching"
-    Then I should see "Support Ticket #1"
+Scenario: links to support tickets a user is watching are private
+  When I am logged in as "jim"
+    And I am on the support page
+  And I follow "Support tickets I am watching"
+  Then I should be at the url /support_tickets?watching=true
+    And I should see "Support Ticket #7"
+    And I should see "where can I find a guide"
+    But I should not see "Support Ticket #3"
   When I am logged out
-    And I am on jim's user page
+    And I am on the support page
   Then I should not see "Support tickets I am watching"
+  When I go to /support_tickets?watching=true
+  Then I should see "Please log in"
+    And I should not see "Support Ticket #7"
+  When I am logged in as "sam"
+    And I go to /support_tickets?watching=true
+  Then I should see "Support Ticket #3"
+    And I should see "Support Ticket #8"
+    But I should not see "Support Ticket #7"
 
-Scenario: links to code tickets users are watching is private
-  Given I am logged in as "jim"
-  When I am on the page for code ticket 1
-    And I press "Watch this ticket"
-  When I follow "jim"
-    And I follow "Code tickets I am watching"
-    Then I should see "Code Ticket #1"
+Scenario: links to code tickets a user is watching are private
+  When I am logged in as "blair"
+    And I am on the support page
+  And I follow "Code tickets I am watching"
+  Then I should be at the url /code_tickets?watching=true
+    And I should see "Code Ticket #5"
+    And I should see "find a sentinel"
+    But I should not see "Code Ticket #3"
   When I am logged out
-    And I am on jim's user page
+    And I am on the support page
   Then I should not see "Code tickets I am watching"
+  When I go to /code_tickets?watching=true
+  Then I should see "Please log in"
+    And I should not see "Code Ticket #5"
+  When I am logged in as "sam"
+    And I go to /code_tickets?watching=true
+  Then I should see "Code Ticket #2"
+    And I should not see "Code Ticket #5"
 
 Scenario: users can hide their name after creation
   Given I am logged in as "dean"
@@ -97,70 +114,80 @@ Scenario: users can unhide their name after creation
   Then I should see "User: sam"
     And I should see "sam wrote: don't make me come looking for you!"
 
-Scenario: user's tickets should be available from their user page, respecting private and show user name
+Scenario: user's tickets should be available by filtering, respecting private and show user name settings
   Given I am logged out
-  When I am on dean's user page
-    And I follow "dean's open support tickets"
-  Then I should see "Support Ticket #3"
-  When I am on john's user page
-    And I follow "john's open support tickets"
-  Then I should not see "Support Ticket #4"
-  When I am on john's user page
-     And I follow "john's closed support tickets"
-   And I should not see "Support Ticket #5"
-  When I am on jim's user page
-    And I follow "jim's open support tickets"
-  Then I should not see "Support Ticket #7"
+    And I am on the support page
+    And I follow "Support Tickets"
+  Then I should see "Support Ticket #1"
+    And I should see "Support Ticket #3"
+    And I should see "Support Ticket #7"
+    And I should see "Support Ticket #8"
+    And I should see "Support Ticket #9"
+  But I should not see "Support Ticket #4"
+    And I should not see "Support Ticket #16"
 
-  Given I am logged in as "dean"
-  When I am on dean's user page
-    And I follow "dean's open support tickets"
+  When I fill in "Opened by" with "john"
+    And I press "Filter"
+  Then I should see "0 Tickets found"
+  When I fill in "Opened by" with "dean"
+    And I press "Filter"
+  Then I should see "1 Tickets found"
   Then I should see "Support Ticket #3"
-  When I am on john's user page
-    And I follow "john's open support tickets"
-  Then I should not see "Support Ticket #4"
-  When I am on john's user page
-     And I follow "john's closed support tickets"
-    And I should not see "Support Ticket #5"
-  When I am on jim's user page
-    And I follow "jim's open support tickets"
-  Then I should not see "Support Ticket #7"
+  When I fill in "Opened by" with "jim"
+    And I press "Filter"
+  Then I should see "0 Tickets found"
 
   Given I am logged in as "jim"
-  When I am on jim's user page
-    And I follow "jim's open support tickets"
-  Then I should see "Support Ticket #7"
+    And I am on the support page
+    And I follow "Support Tickets"
+  When I fill in "Opened by" with "john"
+    And I press "Filter"
+  Then I should see "0 Tickets found"
+  When I fill in "Opened by" with "jim"
+    And I press "Filter"
+  Then I should see "2 Tickets found"
+    And I should see "Support Ticket #7"
+    And I should see "Support Ticket #16"
 
-  Given I am logged in as "john"
-  When I am on john's user page
-    And I follow "john's open support tickets"
-  Then I should see "Support Ticket #4"
-  When I am on john's user page
-     And I follow "john's closed support tickets"
-    And I should see "Support Ticket #5"
+  Given I am logged in as "dean"
+    And I am on the support page
+    And I follow "Support Tickets"
+  When I fill in "Opened by" with "jim"
+    And I press "Filter"
+  Then I should see "0 Tickets found"
+  When I fill in "Opened by" with "dean"
+    And I press "Filter"
+  Then I should see "2 Tickets found"
+    And I should see "Support Ticket #3"
+    And I should see "Support Ticket #9"
 
   Given I am logged in as "sam"
-  When I am on dean's user page
-    And I follow "dean's open support tickets"
+    And I am on the support page
+    And I follow "Support Tickets"
+  Then I should see "Support Ticket #1"
+    And I should see "Support Ticket #3"
+    And I should see "Support Ticket #4"
+    And I should see "Support Ticket #7"
+    And I should see "Support Ticket #8"
+    And I should see "Support Ticket #9"
+    And I should see "Support Ticket #16"
+
+  When I fill in "Opened by" with "john"
+    And I press "Filter"
+  Then I should see "0 Tickets found"
+  When I fill in "Opened by" with "dean"
+    And I press "Filter"
+  Then I should see "1 Tickets found"
   Then I should see "Support Ticket #3"
-  When I am on john's user page
-    And I follow "john's open support tickets"
-  Then I should not see "Support Ticket #4"
-  When I am on john's user page
-     And I follow "john's closed support tickets"
-    But I should see "Support Ticket #5"
-  When I am on jim's user page
-    And I follow "jim's open support tickets"
-  Then I should not see "Support Ticket #7"
+  When I fill in "Opened by" with "jim"
+    And I press "Filter"
+  Then I should see "0 Tickets found"
 
 Scenario: support board volunteers can access and take private tickets
-  Given the following support tickets exist
-    | summary                           | private | id |
-    | private support ticket            | true    |  9 |
   Given I am logged in as "blair"
   When I follow "Support Board"
-    And I follow "Open Support Tickets"
-    And I follow "Support Ticket #9"
+    And I follow "Support Tickets"
+    And I follow "Support Ticket #16"
   Then I should see "Details"
   When I press "Take"
   Then I should see "Status: taken by blair"
@@ -181,72 +208,35 @@ Scenario: private user support tickets can't be made public by volunteers
     And I should not see "Ticket will only be visible to"
 
 Scenario: visibility on the comment board
-  Given the following support tickets exist
-    | summary               | id  | email         | user_id | display_user_name | private |
-    | You guys rock!        | 11  | happy@ao3.org |         | false             | false   |
-    | thanks for fixing it  | 12  | happy@ao3.org |         | false             | true    |
-    | I like the archive    | 13  |               | 1       | false             | false   |
-    | I'm leaving fandom!   | 14  |               | 2       | true              | false   |
-    | thank you for helping | 15  |               | 3       | true              | true    |
-  When "blair" posts support ticket 11
-    And "rodney" posts support ticket 12
-    And "blair" posts support ticket 13
-    And "rodney" posts support ticket 14
-    And "bofh" posts support ticket 15
-
   # logged out
   When I am logged out
     And I follow "Support Board"
     And I follow "Comments"
   Then I should not see "Support Ticket #"
-  But I should see "You guys rock!"
-    And I should see "I like the archive"
-    And I should see "I'm leaving fandom!"
-    And I should see "dean"
-    And I should see "A guest"
-  But I should not see "happy@ao3.org"
-    And I should not see "john"
+    And I should not see "happy@ao3.org"
     And I should not see "newbie"
+    And I should not see "john"
     And I should not see "thanks for fixing it"
     And I should not see "thank you for helping"
-
-  # logged in as regular user
-  When I am logged in as "dean"
-    And I follow "Support Board"
-    And I follow "Comments"
-  Then I should not see "Support Ticket #"
-  But I should see "You guys rock!"
-    And I should see "I like the archive"
-    And I should see "I'm leaving fandom!"
-    And I should see "dean"
-  But I should not see "happy@ao3.org"
-    And I should not see "john"
-    And I should not see "newbie"
-    And I should not see "thanks for fixing it"
-    And I should not see "thank you for helping"
-  When I follow "#1"
+  But I should see "#10 A guest wrote: You guys rock!"
+    And I should see "#12 A user wrote: you guys suck!"
+    And I should see "#14 dean wrote: I'm leaving fandom forever!"
+  When I follow "#12"
     Then I should not see "Details"
 
+  # logged in as support volunteer can see private comments
   When I am logged in as "sam"
     And I follow "Support Board"
     And I follow "Comments"
-  Then I should see "You guys rock!"
-    And I should see "thanks for fixing it"
-    And I should see "I like the archive"
-    And I should see "I'm leaving fandom!"
-    And I should see "thank you for helping"
-    And I should see "john"
-    And I should see "dean"
-  But I should not see "happy@ao3.org"
+  Then I should not see "Support Ticket #"
+    And I should not see "happy@ao3.org"
     And I should not see "newbie"
-  When I follow "#11"
-    Then I should see "Details"
-  When I fill in "Reason" with "not a comment"
-    And I press "Reopen"
-  Then I should see "Details"
-  When I follow "Support Board"
-    And I follow "Comments"
-  Then I should not see "You guys rock!"
+  But I should see "#10 A guest wrote: You guys rock!"
+    And I should see "#11 A guest wrote: thanks for fixing it"
+    And I should see "#12 A user wrote: you guys suck!"
+    And I should see "#13 A user wrote: I like the archive"
+    And I should see "#14 dean wrote: I'm leaving fandom forever!"
+    And I should see "#15 jim wrote: thank you for helping"
 
 Scenario: support volunteers (only - possible privacy issues) can see the referring URL
   When I am on the page for support ticket 8
@@ -256,6 +246,19 @@ Scenario: support volunteers (only - possible privacy issues) can see the referr
     And I am on the page for support ticket 8
   Then I should see "where are you, dean?"
     And I should see "referring url: /users/dean"
+
+Scenario: links to code tickets they're watching, private
+  Given "jim" watches code ticket 1
+    And "jim" watches code ticket 2
+    And "jim" watches code ticket 5
+  When I am logged in as "jim"
+    And I follow "Support Board"
+    And I follow "Code tickets I am watching"
+  Then I should see "Code Ticket #1"
+    And I should see "Code Ticket #2"
+    And I should see "Code Ticket #5"
+    But I should not see "Code Ticket #3"
+
 
 # TODO
 Scenario: guests and users should not be able to see private support details

@@ -1,4 +1,25 @@
-<% @tickets.each do |ticket| %>
-  <p><%= link_to(ticket.name, ticket) %></p>
-  <%=raw ticket.summary %>
+<%= form_tag '/support_tickets', :method => :get  do %>
+  <%= label_tag :status %>
+  <%= select_tag :status,
+                 options_for_select([:open] + SupportTicket.workflow_spec.state_names, params[:status]) %>
+  <%= label_tag :owned_by_support_identity, "Owned by" %>
+  <%= select_tag :owned_by_support_identity, "<option></option>".html_safe +
+                 options_from_collection_for_select(SupportIdentity.official.all, "name", "name", params[:owned_by_support_identity]) %>
+  <%= label_tag :owned_by_user, "Opened by" %>
+  <%= text_field_tag :owned_by_user, params[:owned_by_user] %>
+  <% if current_user %>
+    <%= label_tag :watching, "Tickets I am watching" %>
+    <%= check_box_tag :watching, params[:watching], params[:watching] %>
+  <% end %>
+  <%= label_tag :comments_by_support_identity, "With comments by"  %>
+  <%= text_field_tag :comments_by_support_identity, params[:comments_by_support_identity] %>
+  <%= submit_tag "Filter" %>
 <% end %>
+<%= link_to "Clear Filters", support_tickets_path %>
+<p><%= @tickets.size %> Tickets found</p>
+<dl>
+<% @tickets.each do |ticket| %>
+  <dt><%= link_to(ticket.name, ticket) %></dt>
+  <dd><%=raw ticket.summary %></dd>
+<% end %>
+</dl>

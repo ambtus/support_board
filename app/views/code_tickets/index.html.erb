@@ -3,9 +3,29 @@
 <% else %>
   <%= link_to "Sort by vote count", code_tickets_path(params.merge :by_vote => true) %>
 <% end %>
+
+<%= form_tag '/code_tickets', :method => :get do %>
+  <%= label_tag :status %>
+  <%= select_tag :status,
+                 options_for_select([:open] + CodeTicket.workflow_spec.state_names, params[:status]) %>
+  <%= label_tag :support_volunteer %>
+  <%= select_tag :support_volunteer, "<option></option>".html_safe +
+                 options_from_collection_for_select(SupportIdentity.official.all, "name", "name", params[:support_volunteer]) %>
+  <%= label_tag :user %>
+  <%= text_field_tag :user, params[:user] %>
+  <%= label_tag :comments_by_support_identity, "With comments by"  %>
+  <%= text_field_tag :comments_by_support_identity, params[:comments_by_support_identity] %>
+  <%= submit_tag "Filter" %>
+<% end %>
+<%= link_to "Clear Filters", code_tickets_path %>
+
 <dl>
 <% @tickets.each_with_index do |ticket, i| %>
-  <dt><%= i + 1 %>: <%= link_to(ticket.name, ticket) %> (<%= ticket.vote_count %>)</dt>
+  <dt><%= i + 1 %>: <%= link_to(ticket.name, ticket) %> (<%= ticket.vote_count %>)
+  <% if params[:status].blank? || params[:status] == "open" %>
+    [<%= ticket.status %>]
+  <% end %>
+  </dt>
   <dd><%=raw ticket.summary %></dd>
 <% end %>
 </dl>

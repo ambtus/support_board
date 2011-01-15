@@ -1,39 +1,15 @@
 class CodeTicketsController < ApplicationController
   def index
-    if params[:status]
-      @tickets = CodeTicket.send(params[:status])
-    else
-      @tickets = CodeTicket.not_closed
+    begin
+      @tickets = CodeTicket.filter(params)
+    rescue SecurityError
+      flash[:error] = "Please log in"
+    rescue ActiveRecord::RecordNotFound
+      flash[:error] = "Please check your spelling"
     end
-
-    # tickets associated with a user
-    if params[:user_id]
-      user = User.find_by_login(params[:user_id])
-
-      # tickets I voted on, public
-      if params[:votes]
-        @tickets = CodeVote.where(:user_id => user.id).includes(:code_ticket).map(&:code_ticket).uniq
-
-      # tickets I commented on, public
-      elsif params[:comments]
-        @tickets = @tickets.joins(:code_details) & CodeDetail.where(:support_identity_id => user.support_identity_id)
-
-      # tickets I am watching, private
-      elsif params[:watching]
-        if current_user != user
-          flash[:error] = "Sorry, you don't have permission"
-          redirect_back_or_default
-        else
-          @tickets = @tickets.joins(:code_notifications) & CodeNotification.where(:email => user.email)
-        end
-
-      # support volunteer's working tickets
-      else
-        @tickets = @tickets.where(:support_identity_id => user.support_identity_id)
-      end
-
+    unless @tickets
+      @tickets = []
     end
-    @tickets = @tickets.sort_by_vote if params[:by_vote]
   end
 
   def show
@@ -123,7 +99,6 @@ class CodeTicketsController < ApplicationController
       @ticket.comment!(params[:content], !params[:unofficial])
     when "Update Code ticket"
       @ticket.update_from_edit!(params[:code_ticket][:summary],
-                      params[:code_ticket][:description],
                       params[:code_ticket][:url],
                       params[:code_ticket][:browser])
     end

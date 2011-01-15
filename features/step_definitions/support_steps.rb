@@ -1,13 +1,3 @@
-# creating and logging in as volunteers and admins
-
-Given /^"([^"]*)" has a support identity "([^"]*)"$/ do |login, name|
-  user = User.find_by_login(login)
-  assert_not_nil user
-  assert user.support_identity.update_attribute(:name, name)
-end
-
-# user actions on tickets.
-
 Given /^"([^"]*)" comments on support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
   ticket = SupportTicket.find(number.to_i)
@@ -46,7 +36,15 @@ end
 
 When /^"([^"]*)" creates a faq from support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = SupportTicket.all[number.to_i - 1]
+  ticket = SupportTicket.find(number.to_i)
+  User.current_user = User.find_by_login(login)
+  assert faq = ticket.answer!
+  faq.update_attribute(:title, "new faq")
+end
+
+When /^"([^"]*)" creates a faq from the last support ticket$/ do |login|
+  # " reset quotes for color
+  ticket = SupportTicket.last
   User.current_user = User.find_by_login(login)
   assert faq = ticket.answer!
   faq.update_attribute(:title, "new faq")
@@ -54,37 +52,45 @@ end
 
 When /^"([^"]*)" links support ticket (\d+) to faq (\d+)$/ do |login, arg1, arg2|
   # " reset quotes for color
-  assert ticket = SupportTicket.all[arg1.to_i - 1]
-  assert faq = Faq.all[arg2.to_i - 1]
+  ticket = SupportTicket.find(arg1.to_i)
+  assert faq = Faq.find(arg2.to_i)
+  User.current_user = User.find_by_login(login)
+  assert ticket.answer!(faq.id)
+end
+
+When /^"([^"]*)" links the last support ticket to faq (\d+)$/ do |login, number|
+  # " reset quotes for color
+  ticket = SupportTicket.last
+  assert faq = Faq.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.answer!(faq.id)
 end
 
 When /^"([^"]*)" creates a code ticket from support ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = SupportTicket.all[number.to_i - 1]
+  ticket = SupportTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.needs_fix!
 end
 
 When /^"([^"]*)" links support ticket (\d+) to code ticket (\d+)$/ do |login, arg1, arg2|
   # " reset quotes for color
-  assert ticket = SupportTicket.all[arg1.to_i - 1]
-  assert code = CodeTicket.all[arg2.to_i - 1]
+  ticket = SupportTicket.find(arg1.to_i)
+  assert code = CodeTicket.find(arg2.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.needs_fix!(code.id)
 end
 
 Given /^"([^"]*)" takes code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = CodeTicket.all[number.to_i - 1]
+  ticket = CodeTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.take!
 end
 
 Given /^"([^"]*)" commits code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = CodeTicket.all[number.to_i - 1]
+  ticket = CodeTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   cc = CodeCommit.create(:author => login)
   ticket.commit!(cc.id)
@@ -92,42 +98,42 @@ end
 
 Given /^"([^"]*)" stages code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = CodeTicket.all[number.to_i - 1]
+  ticket = CodeTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   ticket.stage!
 end
 
 Given /^"([^"]*)" verifies code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = CodeTicket.all[number.to_i - 1]
+  ticket = CodeTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   ticket.verify!
 end
 
 Given /^"([^"]*)" deploys code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = CodeTicket.all[number.to_i - 1]
+  ticket = CodeTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   ticket.deploy!(Factory.first.id)
 end
 
 Given /^"([^"]*)" votes for code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = CodeTicket.all[number.to_i - 1]
+  ticket = CodeTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.vote!
 end
 
 Given /^"([^"]*)" comments on code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = CodeTicket.all[number.to_i - 1]
+  ticket = CodeTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.comment!("foo bar")
 end
 
 Given /^"([^"]*)" watches code ticket (\d+)$/ do |login, number|
   # " reset quotes for color
-  ticket = CodeTicket.all[number.to_i - 1]
+  ticket = CodeTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert ticket.watch!
 end

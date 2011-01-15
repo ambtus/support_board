@@ -5,39 +5,38 @@
 </li>
 <li>FAQ <a href="https://github.com/ambtus/support_board/raw/app/features/faq.feature"> Features</a>
 </li>
-<li>New Support Ticket <a href="https://github.com/ambtus/support_board/raw/app/features/support_ticket_new.feature">Features</a>
+<li>Support Ticket <a href="https://github.com/ambtus/support_board/raw/app/features/support_ticket.feature">Features</a>
 </li>
-<li>Support Ticket Resolution <a href="https://github.com/ambtus/support_board/raw/app/features/support_ticket_resolution.feature">Features</a>
+<li>Support Ticket Life Cycle <a href="https://github.com/ambtus/support_board/raw/app/features/support_ticket_cycle.feature">Features</a>
 </li>
 <li>Code Ticket <a href="https://github.com/ambtus/support_board/raw/app/features/code_ticket.feature">Features</a>
 </li>
+<li>Code Ticket Life Cycle <a href="https://github.com/ambtus/support_board/raw/app/features/code_ticket_cycle.feature">Features</a>
+</li>
 <li>Release Note <a href="https://github.com/ambtus/support_board/raw/app/features/release_note.feature">Features</a>
 </li>
-<li>Support Identity <a href="https://github.com/ambtus/support_board/raw/app/features/support_identity.feature">Features</a>
-</li>
-<li>Notificaton <a href="https://github.com/ambtus/support_board/raw/app/features/notification.feature">Features</a>
+<li>Email Notifications <a href="https://github.com/ambtus/support_board/raw/app/features/notification.feature">Features</a>
 </li>
 <li>Privacy <a href="https://github.com/ambtus/support_board/raw/app/features/privacy.feature">Features</a>
 </li>
 </ul>
 
-Log in as any of the following and click <%= link_to 'Support Board', support_path %> here or in the footer to get started
+Log in as any of the following (password: secret) and click <%= link_to 'Support Board', support_path %> here or in the footer to get started
 <h2>users</h2>
 <ul>
   <% @users.each do |user| %>
-    <li><%= link_to user.login, user %></li>
+    <li><%= user.login %></li>
   <% end %>
 </ul>
 <h2>volunteers</h2>
 <ul>
   <% @volunteers.each do |user| %>
-    <li><%= link_to user.login, user %></li>
+    <li><%= user.login %></li>
   <% end %>
 </ul>
 <h2>support admins</h2>
 <ul>
   <% @support_admins.each do |user| %>
-    <li><%= link_to user.login, user %></li>
+    <li><%= user.login %></li>
   <% end %>
 </ul>
-<h3>all passwords: "secret"</h3>

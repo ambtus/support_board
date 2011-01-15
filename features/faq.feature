@@ -8,7 +8,7 @@ Scenario: support admins can post drafts (aka RFCs)
     And I follow "Frequently Asked Questions"
   Then I should not see "why we don't have enough ZPMs"
   When I am on the support page
-    And I follow "FAQs waiting for comments"
+    And I follow "drafts" within "#faqs"
     And I follow "why we don't have enough ZPMs"
     And I press "Post"
   When I am on the support page
@@ -26,35 +26,31 @@ Scenario: support admins can unpost FAQs
     And I follow "Frequently Asked Questions"
   Then I should not see "where to find salt"
   When I am on the support page
-    And I follow "FAQs waiting for comments"
+    And I follow "drafts" within "#faqs"
   Then I should see "where to find salt"
 
 Scenario: when a draft FAQ is marked posted, the comments are no longer visible, but aren't destroyed
-  When I am logged in as "john"
+  When I am logged in as "rodney"
   When I am on the support page
-    And I follow "FAQs waiting for comments"
+    And I follow "drafts" within "#faqs"
     And I follow "why we don't have enough ZPMs"
     And I fill in "Details" with "please include"
     And I press "Add details"
   When I am logged in as "sam"
-  When I am on the support page
-    And I follow "FAQs waiting for comments"
-    And I follow "why we don't have enough ZPMs"
+    And I am on the page for faq 2
     And I fill in "Details" with "don't forget"
     And I press "Add details"
-  When I am logged in as "rodney"
-  When I am on the support page
-    And I follow "FAQs waiting for comments"
-    And I follow "why we don't have enough ZPMs"
-  Then I should see "john wrote: please include"
+  Then I should see "rodney (volunteer) wrote: please include"
     And I should see "sam (volunteer) wrote: don't forget"
-  When I press "Post"
+  When I am logged in as "bofh"
+    And I am on the page for faq 2
+    And I press "Post"
   Then I should see "why we don't have enough ZPMs"
-    But I should not see "john wrote: please include"
-    And I should not see "sam (volunteer) wrote: don't forget"
+    But I should not see "please include"
+    And I should not see "don't forget"
   When I fill in "Reason" with "Oops, wrong one"
     And I press "Reopen for comments"
-  Then I should see "john wrote: please include"
+  Then I should see "rodney (volunteer) wrote: please include"
     And I should see "sam (volunteer) wrote: don't forget"
 
 Scenario: guests reading a draft FAQ can mark it as "this answered my question" (a FAQ vote) but not comment
@@ -77,7 +73,7 @@ Scenario: guests can comment on a draft FAQ when following a link from their own
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "new question"
     And I press "Create Support ticket"
-  When "sam" creates a faq from support ticket 9
+  When "sam" creates a faq from the last support ticket
     And I reload the page
   Then I should see "Status: closed by sam"
   When I follow "new faq"
@@ -91,7 +87,7 @@ Scenario: guests can't comment on a posted FAQ when following a link from their 
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "where's the salt?"
     And I press "Create Support ticket"
-  When "sam" links support ticket 9 to faq 1
+  When "sam" links the last support ticket to faq 1
     And I reload the page
   Then I should see "Status: closed by sam"
   When I follow "where to find salt"
@@ -127,7 +123,7 @@ Scenario: an existing faq should get a vote removed when unlinked from a guest s
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
-  When "rodney" links support ticket 9 to faq 2
+  When "rodney" links the last support ticket to faq 2
     And I reload the page
   Then I should see "why we don't have enough ZPMs"
      And I should see "Status: closed by rodney"
@@ -144,7 +140,7 @@ Scenario: a new faq should get a vote removed when unlinked from a guest support
     And I fill in "Email" with "guest@ao3.org"
     And I fill in "Summary" with "Archive is very slow"
   When I press "Create Support ticket"
-  When "blair" creates a faq from support ticket 9
+  When "blair" creates a faq from the last support ticket
     And I reload the page
   When I fill in "Reason" with "FAQ not helpful"
     And I press "Reopen"
@@ -153,27 +149,16 @@ Scenario: a new faq should get a vote removed when unlinked from a guest support
   Then I should see "Votes: 0"
 
 Scenario: FAQs can be sorted by votes
-  Given the following faq votes exist
-    | faq_id | vote  |
-    | 1      | 3     |
-    | 2      | 1     |
-    | 3      | 7     |
-    | 4      | 9     |
-    | 5      | 3     |
   When I am on the home page
     And I follow "Support Board"
-    And I follow "All FAQs"
-  Then I should see "1: where to find salt (3)"
-    And I should see "2: why we don't have enough ZPMs (1)"
-    And I should see "3: what's DADA? (7)"
-    And I should see "4: how to recover your password (10)"
-    And I should see "5: what's a sentinel? (4)"
+    And I follow "Frequently Asked Questions"
+  Then I should see "1: where to find salt (0)"
+    And I should see "2: what's DADA? (1)"
+    And I should see "3: how to recover your password (5)"
   When I follow "Sort by vote count"
-  Then I should see "4: where to find salt (3)"
-    And I should see "5: why we don't have enough ZPMs (1)"
-    And I should see "2: what's DADA? (7)"
-    And I should see "1: how to recover your password (10)"
-    And I should see "3: what's a sentinel? (4)"
+  Then I should see "3: where to find salt (0)"
+    And I should see "2: what's DADA? (1)"
+    And I should see "1: how to recover your password (5)"
 
 Scenario: users can view posted FAQs, but not comment
   Given I am logged in as "jim"
@@ -210,9 +195,7 @@ Scenario: a posted faq should get a vote when linked from a user support ticket
 
 Scenario: users can remove a link to a draft FAQ if they don't think it resolves their ticket. also removes the vote.
   Given I am logged in as "jim"
-  When I follow "jim"
-    And I follow "jim's closed support tickets"
-    And I follow "Support Ticket #6"
+  And I am on the page for support ticket 6
   Then I should see "closed by blair what's a sentinel?"
   When I fill in "Reason" with "I am not a freak!"
     And I press "Reopen"
@@ -225,9 +208,12 @@ Scenario: users can remove a link to a draft FAQ if they don't think it resolves
 Scenario: users can remove a link to a posted FAQ if they don't think it resolves their ticket. also removes the vote.
   Given I am logged in as "john"
   When I am on the page for faq 4
-  Then I should see "Votes: 1"
-  When I follow "john"
-    And I follow "john's closed support tickets"
+  Then I should see "Votes: 5"
+  When I follow "Support Board"
+    And I follow "Support Tickets"
+    And I select "closed" from "Status"
+    And I fill in "Opened by" with "john"
+    And I press "Filter"
     And I follow "Support Ticket #5"
   Then I should see "closed by rodney how to recover your password"
   When I fill in "Reason" with "Didn't work"
@@ -235,4 +221,4 @@ Scenario: users can remove a link to a posted FAQ if they don't think it resolve
   Then I should see "Status: open"
     And I should not see "how to recover your password" within "a"
   When I am on the page for faq 4
-  Then I should see "Votes: 0"
+  Then I should see "Votes: 4"

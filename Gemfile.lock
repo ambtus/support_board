@@ -41,6 +41,8 @@ GEM
     arel (2.0.6)
     autotest (4.4.6)
       ZenTest (>= 4.4.1)
+    autotest-rails (4.1.0)
+      ZenTest
     builder (2.1.2)
     capybara (0.4.0)
       celerity (>= 0.7.9)
@@ -155,8 +157,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  ZenTest
   authlogic!
   autotest
+  autotest-rails
   bundler (~> 1.0.0)
   capybara
   cucumber-rails

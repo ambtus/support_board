@@ -3,7 +3,7 @@ Feature: Release notes explain the code tickets which have been deployed
 Scenario: volunteers can create new release notes
   When I am logged in as "blair"
     And I follow "Support Board"
-    And I follow "New Release Note"
+    And I follow "create new release note"
     And I fill in "Release" with "0.8.4.7"
     And I fill in "Content" with "bug fix release"
     And I press "Create Release note"

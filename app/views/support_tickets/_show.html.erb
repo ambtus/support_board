@@ -1,7 +1,7 @@
 <dl>
-  <% if @ticket.display_user_name? %>
+  <% if @ticket.show_username? %>
     <dt><%= "User" %>:</dt>
-      <dd><%= link_to @ticket.user.login, @ticket.user %>
+      <dd><%= @ticket.user.login %>
   <% end %>
   <dt><%= "Status" %>:</dt>
     <dd><%= @ticket.status_line %>

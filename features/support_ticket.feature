@@ -79,11 +79,11 @@ Scenario: guests can create private support tickets
     And I should see "Access: Private"
   When I am logged in as "jim"
     And I follow "Support Board"
-    And I follow "Open Support Tickets"
+    And I follow "Support Tickets"
   Then I should not see "Confidential query"
   When I am logged in as "blair"
     And I follow "Support Board"
-    And I follow "Open Support Tickets"
+    And I follow "Support Tickets"
   Then I should see "Confidential query"
 
 Scenario: guests can create support tickets with no initial notifications
@@ -121,16 +121,15 @@ Scenario: users can create private support tickets
     And 1 email should be delivered to "dean@ao3.org"
   When I am logged in as "sam"
     And I am on the support page
-  When I follow "Open Support Tickets"
+  When I follow "Support Tickets"
     Then I should see "Why are there no results"
   When I am logged out
     And I am on the support page
-  Then I should not see "Open Support Tickets"
   When I am on the page for the last support ticket
   Then I should see "Sorry, you don't have permission"
   When I am logged in as "jim"
     And I am on the support page
-  When I follow "Open Support Tickets"
+  When I follow "Support Tickets"
     Then I should not see "Why are there no results"
   When I am on the page for the last support ticket
   Then I should see "Sorry, you don't have permission"
@@ -140,7 +139,7 @@ Scenario: users can choose to have their name displayed during creation, when th
   When I follow "Open a New Support Ticket"
   When I fill in "Summary" with "Archive is very slow"
     And I fill in "Details" with "For example"
-    And I check "Display my user name"
+    And I uncheck "Anonymous"
     And I press "Create Support ticket"
   Then I should see "Support ticket created"
     And I should see "Summary: Archive is very slow"

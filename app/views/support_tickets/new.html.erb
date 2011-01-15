@@ -3,7 +3,7 @@
     <% if current_user %>
       <%= t.hidden_field :user_id, :value => current_user.id %>
       <p>
-        <%= t.check_box :display_user_name %> <%= t.label :display_user_name, "Display my user name" %>
+        <%= t.check_box :anonymous %> <%= t.label :anonymous %>
       </p>
     <% else %>
       <dl>

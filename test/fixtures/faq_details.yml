@@ -1,36 +1,36 @@
 faq_detail_1:
   content: rfc -> faq
   content_sanitizer_version: 0
-  created_at: 2011-01-14 02:27:22 UTC
+  created_at: 2011-01-15 06:12:32 UTC
   faq_id: 1
   id: 1
   private: false
-  support_identity_id: 7
+  support_identity_id: 4
   support_response: true
   system_log: true
-  updated_at: 2011-01-14 02:27:22 UTC
+  updated_at: 2011-01-15 06:12:32 UTC
 
 faq_detail_2:
   content: rfc -> faq
   content_sanitizer_version: 0
-  created_at: 2011-01-14 02:27:22 UTC
+  created_at: 2011-01-15 06:12:32 UTC
   faq_id: 3
   id: 2
   private: false
-  support_identity_id: 5
+  support_identity_id: 2
   support_response: true
   system_log: true
-  updated_at: 2011-01-14 02:27:22 UTC
+  updated_at: 2011-01-15 06:12:32 UTC
 
 faq_detail_3:
   content: rfc -> faq
   content_sanitizer_version: 0
-  created_at: 2011-01-14 02:27:22 UTC
+  created_at: 2011-01-15 06:12:32 UTC
   faq_id: 4
   id: 3
   private: false
-  support_identity_id: 7
+  support_identity_id: 4
   support_response: true
   system_log: true
-  updated_at: 2011-01-14 02:27:22 UTC
+  updated_at: 2011-01-15 06:12:32 UTC
 

@@ -36,6 +36,7 @@ class CodeCommitTest < ActiveSupport::TestCase
     assert ct1.unowned?
     cc = CodeCommit.create(:author => "sam")
     assert cc.unmatched?
+    User.current_user = User.find_by_login("bofh")
     assert ct1.commit!(cc.id)
     assert cc.reload.matched?
     assert_equal ct1, cc.code_ticket

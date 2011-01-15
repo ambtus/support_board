@@ -14,7 +14,7 @@ class CreateTickets < ActiveRecord::Migration
       t.string :authentication_code
       t.string :summary
       t.boolean :private, :default => false
-      t.boolean :display_user_name, :default => false
+      t.boolean :anonymous, :default => true
       t.string :url
       t.string :user_agent
       t.string :ip_address
@@ -88,7 +88,6 @@ class CreateTickets < ActiveRecord::Migration
 
     create_table :code_tickets do |t|
       t.string :summary
-      t.string :description
       t.string :url
       t.string  :browser
 
@@ -98,7 +97,6 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :release_note_id
 
       t.integer :summary_sanitizer_version, :limit => 2, :default => 0, :null => false
-      t.integer :description_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
     end
     create_table :code_details do |t|

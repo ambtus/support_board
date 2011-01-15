@@ -43,6 +43,87 @@ class CodeTicket < ActiveRecord::Base
     "Code Ticket #" + self.id.to_s
   end
 
+  def self.ids
+    select("code_tickets.id").map(&:id)
+  end
+
+  # filter code tickets
+  def self.filter(params = {})
+    tickets = CodeTicket.scoped
+
+    # tickets I am watching, private
+    if !params[:watching].blank?
+      user = User.current_user
+      raise SecurityError unless user
+      tickets = tickets.joins(:code_notifications) & CodeNotification.where(:email => user.email)
+    end
+
+    # ticket's commented on by user
+    if !params[:comments_by_support_identity].blank?
+      support_identity = SupportIdentity.find_by_name(params[:comments_by_support_identity])
+      raise ActiveRecord::RecordNotFound unless support_identity
+      tickets = tickets.joins(:code_details) & CodeDetail.where(:system_log => false, :support_identity_id => support_identity.id)
+    end
+
+    # tickets owned by volunteer
+    if !params[:owned_by_support_identity].blank?
+      support_identity = SupportIdentity.find_by_name(params[:owned_by_support_identity])
+      raise ActiveRecord::RecordNotFound unless support_identity
+      tickets = tickets.where(:support_identity_id => support_identity.id)
+    end
+
+    # filter by status
+    if !params[:status].blank?
+      case params[:status]
+      when "unowned"
+        tickets = tickets.unowned
+      when "taken"
+        tickets = tickets.taken
+      when "committed"
+        tickets = tickets.committed
+      when "staged"
+        tickets = tickets.staged
+      when "verified"
+        tickets = tickets.verified
+      when "closed"
+        tickets = tickets.closed
+      when "all"
+        # no op
+      when "open"
+        tickets = tickets.where('status != "closed"')
+      else
+        raise TypeError
+      end
+    else # default status is not closed (open)
+      tickets = tickets.where('status != "closed"')
+    end
+
+    if !params[:by_vote].blank?
+      tickets = tickets.sort_by_vote
+    end
+
+# TODO more sorting options
+#     case params[:sort_by]
+#     when "recent"
+#       tickets = tickets.order("updated_at desc")
+#     when "oldest"
+#       tickets = tickets.order("updated_at asc")
+#     when "earliest"
+#       tickets = tickets.order("id desc")
+#     when "vote"
+#       tickets = tickets.sort_by_vote
+#     else # "newest" by default
+#       tickets = tickets.order("id asc")
+#     end
+
+    return tickets
+  end
+
+  # okay until we need to paginate
+  def self.sort_by_vote
+    self.all.sort{|f1,f2|f2.vote_count <=> f1.vote_count}
+  end
+
   # STATUS/RESOLUTION stuff
   include Workflow
   workflow_column :status
@@ -141,12 +222,14 @@ class CodeTicket < ActiveRecord::Base
   def steal
     self.send_steal_notification(User.current_user)
     self.support_identity_id = User.current_user.support_identity_id
+    self.watch! unless self.watched?
   end
 
   def reject(reason)
     raise "Couldn't reject. No reason given." if reason.blank?
     raise "Couldn't reject. Not support admin." unless User.current_user.support_admin?
     self.support_identity_id = User.current_user.support_identity_id
+    self.watch! unless self.watched?
   end
 
   def reopen(reason)
@@ -174,6 +257,7 @@ class CodeTicket < ActiveRecord::Base
     raise "Couldn't verify. Not support volunteer." unless User.current_user.support_volunteer?
     self.code_commits.each {|cc| cc.verify!}
     self.support_identity_id = User.current_user.support_identity_id
+    self.watch! unless self.watched?
   end
 
   def deploy(release_note_id)
@@ -181,7 +265,6 @@ class CodeTicket < ActiveRecord::Base
     self.release_note_id = release_note_id
     self.code_commits.each {|cc| cc.deploy!}
     self.support_tickets.each {|st| st.deploy!}
-    self.support_identity_id = User.current_user.support_identity_id
   end
 
   # VOTES
@@ -203,18 +286,12 @@ class CodeTicket < ActiveRecord::Base
     code_votes.sum(:vote)
   end
 
-  # okay until we need to paginate
-  def self.sort_by_vote
-    self.all.sort{|f1,f2|f2.vote_count <=> f1.vote_count}
-  end
-
-  def update_from_edit!(summary, description, url, browser)
+  def update_from_edit!(summary, url, browser)
     raise "Couldn't update. Not logged in." unless User.current_user
     raise "Couldn't update. Not support volunteer." unless User.current_user.support_volunteer?
     self.summary = summary
-    self.description = description unless description.blank?
-    self.url = url unless url.blank?
-    self.browser = browser unless browser.blank?
+    self.url = url
+    self.browser = browser
     self.support_identity_id = User.current_user.support_identity_id
     self.save!
     self.code_details.create(:content => "ticket edited",
@@ -286,12 +363,9 @@ class CodeTicket < ActiveRecord::Base
 
   # SANITIZER stuff
 
-  attr_protected :summary_sanitizer_version, :description_sanitizer_version
+  attr_protected :summary_sanitizer_version
   def sanitized_summary
     sanitize_field self, :summary
-  end
-  def sanitized_description
-    sanitize_field self, :description
   end
 
 end

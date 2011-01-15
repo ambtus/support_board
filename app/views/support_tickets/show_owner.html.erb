@@ -23,7 +23,7 @@
     <%= submit_tag "Make private"%> (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)
   <% end %>
   <% if current_user %>
-    <%= submit_tag @ticket.display_user_name? ? "Hide my user name" : "Display my user name" %>
+    <%= submit_tag @ticket.anonymous? ? "Display my user name" : "Hide my user name"%>
   <% end %>
   <% if @ticket.watched?(@ticket.email) %>
     <%= submit_tag "Don't watch this ticket" %>
