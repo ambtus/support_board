@@ -85,6 +85,8 @@ class CodeTicketsController < ApplicationController
       @ticket.steal!
     when "Dupe"
       @ticket.duplicate!(params[:code_ticket_id])
+    when "Commit"
+      @ticket.commit!(params[:code_commit_id])
     when "Reopen"
       @ticket.reopen!(params[:reason])
     when "Reject"

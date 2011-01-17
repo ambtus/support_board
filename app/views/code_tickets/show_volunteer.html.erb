@@ -47,10 +47,14 @@
     <% if @ticket.current_state.events.include?(:steal) && @ticket.not_mine? %>
       <%= submit_tag "Steal" %>
     <% end %>
+    <% if @ticket.current_state.events.include?(:commit) %>
+      <%= select_tag :code_commit_id, "<option></option>".html_safe +
+                     options_from_collection_for_select(CodeCommit.unmatched, "id", "name") %>
+      <%= submit_tag "Commit" %>
+    <% end %>
     <% if @ticket.current_state.events.include?(:duplicate) %>
-      <%= label_tag :code_ticket_id, "Code Ticket" %>
-      <%= select_tag :code_ticket_id,
-                     options_from_collection_for_select(CodeTicket.not_closed, "id", "id") %>
+      <%= select_tag :code_ticket_id, "<option></option>".html_safe +
+                     options_from_collection_for_select(CodeTicket.not_closed, "id", "name") %>
       <%= submit_tag "Dupe" %>
     <% end %>
     <% if @ticket.current_state.events.include?(:verify) %>

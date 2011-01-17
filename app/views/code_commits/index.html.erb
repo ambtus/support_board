@@ -10,6 +10,6 @@
 <p><%= @commits.size %> Found</p>
 
 <% @commits.each do |commit| %>
-  <h1><%= link_to_unless_current commit.name, commit %></h1>
+  <h1><%= link_to commit.name, commit %></h1>
   <%= render :partial => "blurb", :locals => { :commit => commit }  %>
 <% end %>

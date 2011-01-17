@@ -160,7 +160,6 @@ class CodeTicket < ActiveRecord::Base
       event :reopen, :transitions_to => :unowned
     end
     state :committed do
-      event :commit, :transitions_to => :committed
       event :duplicate, :transitions_to => :closed
       event :stage, :transitions_to => :staged
       event :reopen, :transitions_to => :unowned
@@ -243,8 +242,9 @@ class CodeTicket < ActiveRecord::Base
 
   def commit(code_commit_id)
     cc = CodeCommit.find(code_commit_id) # will raise unless exists
+    raise "code commit already used" if cc.code_ticket_id
     self.support_identity_id = cc.support_identity_id
-    cc.code_ticket_id = self.id
+    cc.code_ticket_id = self.id 
     cc.status = "matched"
     cc.save!
   end
