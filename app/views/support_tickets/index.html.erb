@@ -14,16 +14,11 @@
   <%= label_tag :comments_by_support_identity, "With comments by"  %>
   <%= text_field_tag :comments_by_support_identity, params[:comments_by_support_identity] %>
   <%= submit_tag "Filter" %>
+  <%= link_to "Clear Filters", support_tickets_path %>
 <% end %>
-<%= link_to "Clear Filters", support_tickets_path %>
+
 <p><%= @tickets.size %> Tickets found</p>
-<dl>
+
 <% @tickets.each do |ticket| %>
-  <dt><%= link_to(ticket.name, ticket) %>
-    <% if params[:status].blank? || ["open", "all"].include?(params[:status]) %>
-      [<%= ticket.status %>]
-    <% end %>
-  </dt>
-  <dd><%=raw ticket.summary %></dd>
+  <%= render :partial => "blurb", :locals => { :ticket => ticket }  %>
 <% end %>
-</dl>

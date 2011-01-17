@@ -1,13 +1,6 @@
 <%= form_for(@faq) do |f| %>
-  <dl>
-  <dt><%= f.label :position %>:</dt>
-    <dd><%= f.text_field :position, :size => 4 %></dd>
-  <dt><%= f.label :summary %>:</dt>
-    <dd><%= f.text_field :summary %></dd>
-  <dt><%= f.label :content %>:</dt>
-    <dd><%= f.text_area :content %></dd>
-  </dl>
-  <p>
-    <%= f.submit %>
-  </p>
+  <p><%= f.text_field :position, :size => 4 %> <%= f.label :position %></p>
+  <p><%= f.text_field :summary, :size => 100 %> <%= f.label :summary %></p>
+  <p><%= f.text_area :content, :size => "72x10" %> <%= f.label :content %></p>
+  <p><%= f.submit %></p>
 <% end %>

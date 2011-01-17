@@ -1,7 +1,8 @@
+<h1><%= link_to_unless_current ticket.name, ticket %></h1>
 <%= render :partial => "blurb", :locals => { :ticket => @ticket }  %>
 
 <% @details.each do |detail| %>
-  <%= render :partial => "code_details/blurb", :locals => { :detail => detail }  %>
+  <%= render :partial => "details/blurb", :locals => { :detail => detail }  %>
 <% end %>
 
 <% @ticket.code_commits.each do |commit| %>

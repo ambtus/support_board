@@ -153,11 +153,11 @@ Scenario: FAQs can be sorted by votes
     And I follow "Support Board"
     And I follow "Frequently Asked Questions"
   Then I should see "1: where to find salt (0)"
-    And I should see "2: what's DADA? (1)"
+    And I should see "2: what's DADT? (1)"
     And I should see "3: how to recover your password (5)"
   When I follow "Sort by vote count"
   Then I should see "3: where to find salt (0)"
-    And I should see "2: what's DADA? (1)"
+    And I should see "2: what's DADT? (1)"
     And I should see "1: how to recover your password (5)"
 
 Scenario: users can view posted FAQs, but not comment
@@ -222,3 +222,6 @@ Scenario: users can remove a link to a posted FAQ if they don't think it resolve
     And I should not see "how to recover your password" within "a"
   When I am on the page for faq 4
   Then I should see "Votes: 4"
+
+# TODO
+Scenario: volunteers can send email to an admin asking them to post a faq

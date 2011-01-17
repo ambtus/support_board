@@ -42,6 +42,7 @@ class ReleaseNotesController < ApplicationController
       flash[:notice] = "Sorry, only support admins can edit posted release notes."
       redirect_to @release_note and return
     end
+    render :new
   end
   def update
     @release_note = ReleaseNote.find(params[:id])

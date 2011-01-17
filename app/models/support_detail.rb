@@ -4,6 +4,7 @@ class SupportDetail < ActiveRecord::Base
 
   scope :resolved, where(:resolved_ticket => true)
   scope :system_log, where(:system_log => true)
+  scope :visible_to_all, where(:private => false)
 
   def self.public_comments
     where(:private => false).where(:system_log => false)

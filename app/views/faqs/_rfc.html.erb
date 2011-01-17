@@ -1,0 +1,24 @@
+<h1><%= @faq.summary %> (draft)</h1>
+
+<blockquote><%= @faq.content %></blockquote>
+
+<% @details.each do |detail| %>
+  <%= render :partial => "details/blurb", :locals => { :detail => detail }  %>
+<% end %>
+
+<% if current_user %>
+  <%= form_for(@faq) do %>
+    <%= text_area_tag :content, nil, :size => "72x10" %>
+    <% if current_user.try(:support_volunteer?) %>
+      <p><%= check_box_tag :official, true, true %> <%= label_tag :official, "Official response?" %></p>
+    <% end %>
+    <p><%= submit_tag "Add details" %></p>
+    <p>
+    <% if @faq.watched?(session[:authentication_code]) %>
+      <%= submit_tag "Don't watch this FAQ" %>
+    <% else %>
+      <%= submit_tag "Watch this FAQ"%>
+    <% end %>
+    </p>
+  <% end %>
+<% end %>

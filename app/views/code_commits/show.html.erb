@@ -1,7 +1,6 @@
-<strong><%= @commit.name %></strong>
-<p><%= @commit.byline %> (<%= @commit.pushed_at %>)<p>
-<blockquote><%= @commit.message %></blockquote>
-<%= link_to "commit details on github", @commit.url %>
+<h1><%= link_to_unless_current commit.name, commit %></h1>
+<%= render :partial => "code_commits/blurb", :locals => { :commit => @commit }  %>
+
 <% if current_user.try(:support_admin?) %>
   <%= form_for(@commit) do %>
     <% if @commit.current_state.events[:unmatch] %>
@@ -13,7 +12,8 @@
     <% end %>
   <% end %>
 <% end %>
+
 <% if @commit.code_ticket_id %>
-  <%= render :partial => "code_tickets/blurb", :locals => { :ticket => ticket }  %>
+  <%= render :partial => "code_tickets/blurb", :locals => { :ticket => @commit.code_ticket }  %>
 <% end %>
 

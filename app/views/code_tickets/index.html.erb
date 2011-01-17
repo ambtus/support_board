@@ -1,3 +1,4 @@
+<% #TODO merge sort into filter %>
 <% if params[:by_vote] %>
   <%= link_to "Sort by position", code_tickets_path(params.merge :by_vote => false) %>
 <% else %>
@@ -11,21 +12,22 @@
   <%= label_tag :owned_by_support_identity %>
   <%= select_tag :owned_by_support_identity, "<option></option>".html_safe +
                  options_from_collection_for_select(SupportIdentity.official.all, "name", "name", params[:owned_by_support_identity]) %>
-  <%= label_tag :user %>
+  <%= label_tag :user, "Opened by" %>
   <%= text_field_tag :user, params[:user] %>
   <%= label_tag :comments_by_support_identity, "With comments by"  %>
   <%= text_field_tag :comments_by_support_identity, params[:comments_by_support_identity] %>
+  <%= label_tag :closed_in_release %>
+  <%= select_tag :closed_in_release, "<option></option>".html_safe +
+                 options_from_collection_for_select(ReleaseNote.posted.all, "id", "release", params[:closed_in_release]) %>
   <%= submit_tag "Filter" %>
+  <%= link_to "Clear Filters", code_tickets_path %>
 <% end %>
-<%= link_to "Clear Filters", code_tickets_path %>
 
-<dl>
-<% @tickets.each_with_index do |ticket, i| %>
-  <dt><%= i + 1 %>: <%= link_to(ticket.name, ticket) %> (<%= ticket.vote_count %>)
-  <% if params[:status].blank? || ["open", "all"].include?(params[:status]) %>
-    [<%= ticket.status %>]
-  <% end %>
-  </dt>
-  <dd><%=raw ticket.summary %></dd>
+<p><%= @tickets.size %> Found</p>
+
+<% @tickets.each do |ticket| %>
+  <h1><%= link_to_unless_current ticket.name, ticket %></h1>
+  <%= render :partial => "blurb", :locals => { :ticket => ticket }  %>
 <% end %>
-</dl>
+
+

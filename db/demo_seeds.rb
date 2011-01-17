@@ -50,7 +50,7 @@ ct2.vote!
 User.current_user = bofh
 ct2.vote!
 
-ct3 = CodeTicket.create!(:summary => "repeal DADA")
+ct3 = CodeTicket.create!(:summary => "repeal DADT")
 User.current_user = rodney
 ct3.take!
 CodeCommit.create!(:author => "rodney", :message => "finally closes issue 3", :pushed_at => Date.today)
@@ -100,24 +100,24 @@ rn = ReleaseNote.create!(:release => "2.0", :content => "new in this release, we
 
 # faqs
 User.current_user = sam
-faq1 = Faq.create!(:summary => "where to find salt")
+faq1 = Faq.create!(:summary => "where to find salt", :content => "in the sea. or the great salt lake. possibly your salt shaker")
 User.current_user = bofh
 faq1.post!
 
 User.current_user = rodney
-faq2 = Faq.create!(:summary => "why we don't have enough ZPMs")
+faq2 = Faq.create!(:summary => "why we don't have enough ZPMs", :content => "this should be self evident")
 faq2.comment!("why do i have to write this?", true, nil, true)
 User.current_user = blair
 faq2.comment!("because nobody else can", true, nil, true)
 
 User.current_user = rodney
-faq3 =Faq.create!(:summary => "what's DADA?")
+faq3 =Faq.create!(:summary => "what's DADT?", :content => "Ask me no questions and I'll tell you no lies")
 faq3.post!
 User.current_user = nil
 faq3.vote!
 
 User.current_user = bofh
-faq4 = Faq.create!(:summary => "how to recover your password")
+faq4 = Faq.create!(:summary => "how to recover your password", :content => "visit the lost password page")
 User.current_user = bofh
 faq4.comment!("hack the database ;)", true, nil, true)
 faq4.post!
@@ -126,9 +126,8 @@ faq4.vote!
 faq4.vote!
 faq4.vote!
 
-
 User.current_user = blair
-faq5 = Faq.create!(:summary => "what's a sentinel?")
+faq5 = Faq.create!(:summary => "what's a sentinel?", :content => "lookout: a person employed to keep watch for some anticipated event")
 
 # support tickets
 st1 = SupportTicket.create!(
@@ -172,7 +171,7 @@ User.current_user = sam
 st3.take!
 
 st4 = SupportTicket.create!(
-  :summary => "repeal DADA",
+  :summary => "repeal DADT",
   :user_id => john.id,
   :private =>true,
   :url => "/faqs/3",

@@ -1,24 +1,5 @@
-<dl>
-  <% if @ticket.show_username? %>
-    <dt><%= "User" %>:</dt>
-      <dd><%= @ticket.user.login %>
-  <% end %>
-  <dt><%= "Status" %>:</dt>
-    <dd><%= @ticket.status_line %>
-      <% if @ticket.code_ticket_id %>
-          <%= link_to @ticket.code_ticket.name, @ticket.code_ticket %>
-      <% end %>
-      <% if @ticket.faq_id %>
-          <%= link_to @ticket.faq.summary, @ticket.faq %>
-      <% end %>
-    </dd>
-  <dt><%= "Access" %>:</dt>
-    <dd><%= @ticket.private? ? "Private" : "Public" %>
-  <dt><%= "Summary" %>:</dt>
-    <dd><%= raw @ticket.summary %></dd>
-  <% @details.each do |detail| %>
-    <dt><%= detail.byline %>:</dt>
-      <dd><%= raw detail.content %></dd>
-  <% end %>
-</dl>
+<%= render :partial => "blurb", :locals => { :ticket => @ticket }  %>
 
+<% @details.each do |detail| %>
+  <%= render :partial => "details/blurb", :locals => { :detail => detail }  %>
+<% end %>

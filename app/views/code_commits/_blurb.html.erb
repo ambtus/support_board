@@ -1,2 +1,2 @@
-<p><%= link_to commit.byline, commit %><p>
+<p><%= link_to "commit", commit.url %> by <%= commit.byline %> on <%= commit.pushed_at %></p>
 <blockquote><%= commit.message %></blockquote>

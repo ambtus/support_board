@@ -100,7 +100,7 @@ Scenario: deploying should close the waiting support tickets
   Then I should see "waiting for code changes (3)"
   When I follow "waiting for code changes"
     And I follow "Support Ticket #4"
-  Then I should see "repeal DADA"
+  Then I should see "repeal DADT"
     And I should see "Status: waiting for a code fix"
   When I am on the support page
   When I follow "staged"

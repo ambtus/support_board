@@ -16,6 +16,9 @@ class Faq < ActiveRecord::Base
   validates_presence_of :summary
   validates_length_of :summary, :maximum=> 140 # tweet length!
 
+  # must have summary
+  validates_presence_of :content
+
   def vote_count
     faq_votes.sum(:vote)
   end

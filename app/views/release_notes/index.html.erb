@@ -1,5 +1,4 @@
-<% @release_notes.each do |form| %>
-  <dt><%= link_to(form.release, form) %></dt>
-  <dd><%=raw form.content %></dd>
+<% @release_notes.each do |note| %>
+  <%= render :partial => "blurb", :locals => { :note => note }  %>
 <% end %>
-</dl>
+

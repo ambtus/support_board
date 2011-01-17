@@ -1,41 +1,18 @@
 <%= form_for(@ticket) do |t| %>
-  <div>
-    <% if current_user %>
-      <%= t.hidden_field :user_id, :value => current_user.id %>
-      <p>
-        <%= t.check_box :anonymous %> <%= t.label :anonymous %>
-      </p>
-    <% else %>
-      <dl>
-        <dt><%= t.label :email, "Email (not visible)" %>:</dt>
-        <dd><%= t.text_field :email %>
-      </dl>
+  <%= t.hidden_field :url, :value => session[:return_to] %>
+  <p><% if current_user %>
+    <%= t.hidden_field :user_id, :value => current_user.id %> <%= t.check_box :anonymous %> <%= t.label :anonymous %>
+  <% else %>
+    <%= t.text_field :email, :size => 30 %> <%= t.label :email, "Email (mandatory. not visible)" %>
+  <% end %></p>
+  <p><%= t.check_box :turn_off_notifications %> <%= t.label :turn_off_notifications, "Don't send me email notifications about this ticket" %></p>
+  <p><%= t.check_box :private %> <%= t.label :private, "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"%></p>
+  <p><%= t.text_field :summary, :size => 100 %> <%= t.label :summary %></p>
+  <% if @add_details %>
+    <%= text_area_tag :content, nil, :size => "72x10" %>
+    <% if current_user.try(:support_volunteer?) %>
+      <p><%= check_box_tag :unofficial, true, true %> <%= label_tag :unofficial, "Unofficial details?" %></p>
     <% end %>
-    <p>
-      <%= t.check_box :turn_off_notifications %> <%= t.label :turn_off_notifications, "Don't send me email notifications about this ticket" %>
-    </p>
-    <p>
-      <%= t.check_box :private %>
-      <%= t.label :private, "Private. (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)"%>
-    </p>
-  </div>
-  <div>
-    <dl>
-      <dt><%= t.label :summary, "Summary" %>:</dt>
-      <dd><%= t.text_field :summary, :size => 100 %>
-    </dl>
-    <%= t.fields_for :support_details do |d| %>
-      <% if current_user %>
-        <%= d.hidden_field :support_identity_id, :value => current_user.support_identity.id %>
-      <% end %>
-      <dt><%= d.label :content, "Details" %>:</dt>
-        <dd><%= d.text_area :content %>
-    <% end %>
-  </div>
-  <div>
-    <%= t.hidden_field :url, :value => session[:return_to] %>
-  </div>
-  <p>
-    <%= t.submit %>
-  </p>
+  <% end %>
+  <p><%= t.submit %></p>
 <% end %>

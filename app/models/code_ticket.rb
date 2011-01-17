@@ -72,8 +72,24 @@ class CodeTicket < ActiveRecord::Base
       tickets = tickets.where(:support_identity_id => support_identity.id)
     end
 
-    # filter by status
-    if !params[:status].blank?
+# TODO more sorting options
+#     case params[:sort_by]
+#     when "recent"
+#       tickets = tickets.order("updated_at desc")
+#     when "oldest"
+#       tickets = tickets.order("updated_at asc")
+#     when "earliest"
+#       tickets = tickets.order("id desc")
+#     when "vote"
+#       tickets = tickets.sort_by_vote
+#     else # "newest" by default
+#       tickets = tickets.order("id asc")
+#     end
+
+    if !params[:closed_in_release].blank?
+      tickets = tickets.where(:release_note_id => params[:closed_in_release])
+      # elsif filter by status because the status must be closed even if they forgot to select it
+    elsif !params[:status].blank?
       case params[:status]
       when "unowned"
         tickets = tickets.unowned
@@ -98,23 +114,10 @@ class CodeTicket < ActiveRecord::Base
       tickets = tickets.where('status != "closed"')
     end
 
+    # has to come last because returns an array
     if !params[:by_vote].blank?
       tickets = tickets.sort_by_vote
     end
-
-# TODO more sorting options
-#     case params[:sort_by]
-#     when "recent"
-#       tickets = tickets.order("updated_at desc")
-#     when "oldest"
-#       tickets = tickets.order("updated_at asc")
-#     when "earliest"
-#       tickets = tickets.order("id desc")
-#     when "vote"
-#       tickets = tickets.sort_by_vote
-#     else # "newest" by default
-#       tickets = tickets.order("id asc")
-#     end
 
     return tickets
   end
@@ -134,9 +137,9 @@ class CodeTicket < ActiveRecord::Base
     elsif self.code_ticket_id
       "closed as duplicate by #{self.support_identity.byline}"
     elsif self.release_note_id
-      "deployed in #{self.release_note.release}"
+      "deployed in #{self.release_note.release} (verified by #{self.support_identity.byline})"
     elsif self.staged?
-      "waiting for verification"
+      "waiting for verification (commited by #{self.support_identity.byline})"
     else
       "#{self.status} by #{self.support_identity.byline}"
     end

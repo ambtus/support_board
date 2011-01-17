@@ -2,14 +2,8 @@
 
 <%= form_for(@ticket) do |t| %>
   <% if @add_details %>
-    <% if @ticket.unowned? %>
-      <dt><%= label_tag :unofficial, "Unofficial response?" %></dt>
-        <dd><%= check_box_tag :unofficial %></dd>
-    <% end %>
-    <%= text_area_tag :content %>
-    <p>
-      <%= submit_tag "Add details" %>
-    </p>
+    <p><%= text_area_tag :content, nil, :size => "72x10" %></p>
+    <p><%= submit_tag "Add details" %></p>
   <% end %>
   <% if @ticket.watched? %>
     <%= submit_tag "Don't watch this ticket" %>

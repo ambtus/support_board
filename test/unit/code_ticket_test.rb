@@ -14,13 +14,13 @@ class CodeTicketTest < ActiveSupport::TestCase
     assert_equal "verified by bofh", three.status_line
     assert_equal %Q{staged -> verified}, three.code_details.last.content
     four = CodeTicket.find(4)
-    assert_equal "waiting for verification", four.status_line
+    assert_equal "waiting for verification (commited by rodney)", four.status_line
     assert_equal %Q{committed -> staged}, four.code_details.last.content
     five = CodeTicket.find(5)
     assert_equal "committed by blair", five.status_line
     assert_equal %Q{taken -> committed (4)}, five.code_details.last.content
     six = CodeTicket.find(6)
-    assert_equal "deployed in 1.0", six.status_line
+    assert_equal "deployed in 1.0 (verified by rodney)", six.status_line
     assert_match %Q{verified -> closed (1)}, six.code_details.last.content
   end
   test "reopen" do

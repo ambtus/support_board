@@ -32,18 +32,18 @@ class SupportTicketsController < ApplicationController
     end
 
     if is_owner && !params[:support]
-      @details = @ticket.support_details.public
+      @details = @ticket.support_details.visible_to_all
       @add_details = true # create a new empty response template
       render :show_owner
     elsif !current_user
-      @details = @ticket.support_details.public
+      @details = @ticket.support_details.visible_to_all
       render :show_guest
     elsif current_user.support_volunteer?
       @details = @ticket.support_details
       @add_details = true # create a new empty response template
       render :show_volunteer
     else # logged in as non-support volunteer
-      @details = @ticket.support_details.public
+      @details = @ticket.support_details.visible_to_all
       if !@ticket.support_identity_id # if support took it, it's not longer open for public comment
         @add_details = true # create a new empty response template
       end
@@ -53,7 +53,7 @@ class SupportTicketsController < ApplicationController
 
   def new
     @ticket = SupportTicket.new
-    @ticket.support_details.build # create a new empty response template
+    @add_details = true # create a new empty response template
   end
 
  def create
@@ -80,8 +80,8 @@ class SupportTicketsController < ApplicationController
         session[:authentication_code] = @ticket.authentication_code
         Rails.logger.debug "create session: #{session}"
       end
+      @ticket.comment!(params[:content], !params[:unofficial])
       redirect_to @ticket
-      @ticket.send_create_notifications
     else
       # reset so don't get field with errors which breaks definition lists
       flash[:error] = @ticket.errors.full_messages.join(", ")

@@ -12,15 +12,14 @@ class FaqsController < ApplicationController
     # special views if still requesting comments
     if @faq.rfc?
       @details = @faq.faq_details
-      if current_user.try(:support_volunteer?)
-        render :show_volunteer
-      elsif current_user || @faq.guest_owner?(session[:authentication_code])
-        @details = @details.where(:private => false)
-        render :show_commentable
-      else # not logged in, can't comment
-        @details = @details.where(:private => false)
-        render :show_guest
+      if current_user.try(:support_admin?)
+        render :show_admin
+      else
+        @details = @details.where(:private => false) if !current_user.try(:support_volunteer?)
+        render :show_rfc
       end
+    else
+      render :show
     end
   end
 

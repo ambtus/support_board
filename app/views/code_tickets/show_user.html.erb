@@ -2,10 +2,8 @@
 
 <%= form_for(@ticket) do %>
   <% if @add_details %>
-    <%= text_area_tag :content %>
-    <p>
-      <%= submit_tag "Add details" %>
-    </p>
+    <%= text_area_tag :content, nil, :size => "72x10" %>
+    <p><%= submit_tag "Add details" %></p>
   <% end %>
   <p>
     <% if !@ticket.closed? %>

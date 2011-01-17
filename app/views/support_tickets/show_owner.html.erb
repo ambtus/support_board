@@ -1,16 +1,18 @@
 <% if current_user && current_user.support_volunteer? %>
   <%= link_to "view ticket as support volunteer", support_ticket_path(@ticket, :support => true) %>
 <% end %>
+
 <%= render "show" %>
 
-<%= form_for(@ticket) do |t| %>
+<%= form_for(@ticket) do %>
   <%= hidden_field_tag :authentication_code, session[:authentication_code] %>
   <%= hidden_field_tag :email, @ticket.email %>
   <% if @add_details %>
-    <%= text_area_tag :content %>
-    <p>
-      <%= submit_tag "Add details" %>
-    </p>
+    <p><%= text_area_tag :content, nil, :size => "72x10" %></p>
+    <% if current_user.try(:support_volunteer?) %>
+      <p><%= check_box_tag :official, true, true %> <%= label_tag :official, "Official details?" %></p>
+    <% end %>
+    <p><%= submit_tag "Add details" %></p>
   <% end %>
   <% unless @ticket.closed? %>
     <%= label_tag :support_detail_id, "Support Detail" %>
@@ -31,7 +33,7 @@
   <% end %>
   <% if @ticket.current_state.events.include?(:reopen) %>
     <%= label_tag :reason %>
-    <%= text_field_tag :reason %>
+    <%= text_field_tag :reason, nil, :size => 100 %>
     <%= submit_tag "Reopen" %>
   <% end %>
 <% end %>

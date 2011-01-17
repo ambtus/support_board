@@ -1,6 +1,4 @@
 <% @tickets.each do |ticket| %>
-  <p>
-  <%= link_to "#" + ticket.id.to_s, ticket%>
-  <%= ticket.post_name %> wrote:<p>
-  <%=raw ticket.summary %>
+  <p><%= link_to "##{ticket.id} (#{ticket.post_name})", ticket %></p>
+  <blockquote><%= ticket.summary %></blockquote>
 <% end %>

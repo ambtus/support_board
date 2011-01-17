@@ -1,35 +1,25 @@
 <% if current_user.support_admin? %>
   <%= link_to "Edit", edit_code_ticket_path(@ticket) %>
-  <dl>
-  <dt>url:</dt>
-    <dd><%= @ticket.url %></dd>
-  <dt>browser:</dt>
-    <dd><%= @ticket.browser %></dd>
-  </dl>
+  <p>url: <%= @ticket.url %></p>
+  <p>browser: <%= @ticket.browser %></p>
 <% end %>
 
 <%= render "show" %>
 
 <% if @ticket.support_tickets.count > 0 %>
-  <dl>
-  <dt>Related Support tickets:</dt>
-  <dd>
+  <h2>Related Support tickets</h2>
   <% @ticket.support_tickets.each do |support_ticket| %>
     <%= link_to support_ticket.id, support_ticket %>
   <% end %>
-  </dd>
-  </dl>
 <% end %>
 
 <%= form_for(@ticket) do %>
   <% if @add_details %>
-    <%= text_area_tag :content %>
+    <%= text_area_tag :content, nil, :size => "72x10" %>
     <% if @ticket.unowned? %>
       <p><%= label_tag :unofficial, "Unofficial response?" %> <%= check_box_tag :unofficial %></p>
     <% end %>
-    <p>
-      <%= submit_tag "Add details" %>
-    </p>
+    <p><%= submit_tag "Add details" %></p>
   <% end %>
   <p>
     <% if !@ticket.closed? %>
@@ -44,12 +34,11 @@
     <% end %>
     <% if @ticket.current_state.events.include?(:reopen) %>
       <%= label_tag :reason %>
-      <%= text_field_tag :reason %>
+      <%= text_field_tag :reason, nil, :size => 100 %>
       <%= submit_tag "Reopen" %>
-    <% end %>
-    <% if @ticket.current_state.events.include?(:reject) && current_user.support_admin? %>
+    <% elsif @ticket.current_state.events.include?(:reject) && current_user.support_admin? %>
       <%= label_tag :reason %>
-      <%= text_field_tag :reason %>
+      <%= text_field_tag :reason, nil, :size => 100 %>
       <%= submit_tag "Reject" %>
     <% end %>
     <% if @ticket.current_state.events.include?(:take) %>

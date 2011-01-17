@@ -43,9 +43,9 @@ class SupportTicket < ActiveRecord::Base
   # used for tickets which were posted
   def post_name
     if self.email
-      "A guest"
+      "guest"
     elsif self.anonymous
-      "A user"
+      "user"
     else
       self.user.login
     end
@@ -309,7 +309,7 @@ class SupportTicket < ActiveRecord::Base
     if faq_id
       faq = Faq.find(faq_id) # will raise if no faq
     else
-      faq = Faq.create!(:summary => self.summary)
+      faq = Faq.create!(:summary => self.summary, :content => "EDIT ME")
       faq_id = faq.id
     end
     self.faq_id = faq_id

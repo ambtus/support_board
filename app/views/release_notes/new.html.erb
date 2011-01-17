@@ -1,1 +1,5 @@
-<%= render "form" %>
+<%= form_for(@release_note) do |t| %>
+  <p><%= t.text_field :release %> <%= t.label :release %></p>
+  <p><%= t.text_area :content, :size => "72x10" %></p>
+  <p><%= t.submit %></p>
+<% end %>

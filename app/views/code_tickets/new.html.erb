@@ -1,1 +1,7 @@
-<%= render "form" %>
+<%= form_for(@ticket) do |t| %>
+  <p><%= t.text_field :summary, :size => 100 %> <%= t.label :summary %></p>
+  <p><%= text_area_tag :content, nil, :size => "72x10" %> <%= label_tag :content %></p>
+  <p><%= t.text_field :url, :size => 100 %> <%= t.label :url %></p>
+  <p><%= t.text_field :browser, :size => 100 %> <%= t.label :browser %></p>
+  <p><%= t.submit %></p>
+<% end %>

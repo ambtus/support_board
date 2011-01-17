@@ -1,12 +1,13 @@
-<% if params[:by_vote] %>
-  <%= link_to "Sort by position", faqs_path(params.merge :by_vote => false) %>
-<% else %>
-  <%= link_to "Sort by vote count", faqs_path(params.merge :by_vote => true) %>
+<% unless params[:rfc] %>
+  <% if params[:by_vote] %>
+    <%= link_to "Sort by position", faqs_path(params.merge :by_vote => false) %>
+  <% else %>
+    <%= link_to "Sort by vote count", faqs_path(params.merge :by_vote => true) %>
+  <% end %>
 <% end %>
-<ul>
-<% @faqs.each_with_index do |faq, i| %>
-  <li>
-    <%= i + 1 %>: <%= link_to faq.summary, faq%> (<%= faq.vote_count %>)
-  </li>
+
+<% @faqs.each do |faq, i| %>
+  <h1><%= link_to faq.summary, faq %>
+    (<% if faq.rfc? %>draft<% else %><%= faq.vote_count %> votes<% end %>)
+  </h1>
 <% end %>
-</ul>

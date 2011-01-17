@@ -3,18 +3,11 @@
     <%= link_to "Edit", edit_release_note_path(@release_note) %>
   <% end %>
 <% end %>
-<dl>
-  <dt><%= "Release" %>:</dt>
-    <dd><%= @release_note.release %></dd>
-  <dt><%= "Deploy Revision" %>:</dt>
-    <dd><%= @release_note.deployed_rev %></dd>
-</dl>
-<%= raw @release_note.content %>
 
-<dt>Related Code tickets:</dt>
-<dd>
+<%= render :partial => "blurb", :locals => { :note => @release_note }  %>
+
 <% @release_note.code_tickets.each do |ticket| %>
-  <%= link_to ticket.id, ticket %>
+  <%= render :partial => "code_tickets/blurb", :locals => { :ticket => ticket }  %>
 <% end %>
-</dd>
+
 
