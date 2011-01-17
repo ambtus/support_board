@@ -2,4 +2,4 @@
 
 <%= render :partial => "support_tickets/blurb", :locals => { :ticket => @ticket }  %>
 
-<%= render :partial => "support_details/blurb", :locals => { :detail => @detail }  %>
+<%= render :partial => "support_details/blurb", :locals => { :detail => @ticket.support_detail.last }  %>

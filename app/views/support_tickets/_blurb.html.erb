@@ -1,14 +1,8 @@
-<h1><%= link_to_unless_current ticket.name, ticket %>
-<% if ticket.private? %>(Private)<% end %>
-<% if ticket.show_username? %>
-  by <%= ticket.user.login %>
-<% end %>
-</h1>
 <p>
-  <%= ticket.summary %>
+  <%= ticket.sanitized_summary %>
   [<%= ticket.status_line %><% if ticket.code_ticket_id %>
   <%= link_to ticket.code_ticket.name, ticket.code_ticket %>
   <% end %><% if ticket.faq_id %>
-  <%= link_to ticket.faq.summary, ticket.faq %>
+  <%= link_to ticket.faq.sanitized_summary, ticket.faq %>
   <% end %>]
 </p>

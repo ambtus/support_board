@@ -26,7 +26,7 @@
 <p><%= @tickets.size %> Found</p>
 
 <% @tickets.each do |ticket| %>
-  <h1><%= link_to_unless_current ticket.name, ticket %></h1>
+  <h1><%= link_to ticket.name, ticket %></h1>
   <%= render :partial => "blurb", :locals => { :ticket => ticket }  %>
 <% end %>
 

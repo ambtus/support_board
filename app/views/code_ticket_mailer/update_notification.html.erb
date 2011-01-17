@@ -2,6 +2,4 @@
 
 <%= render :partial => "code_tickets/blurb", :locals => { :ticket => @ticket }  %>
 
-<% @details.each do |detail| %>
-  <%= render :partial => "details/blurb", :locals => { :detail => detail }  %>
-<% end %>
+<%= render :partial => "details/blurb", :locals => { :detail => @ticket.code_details.last }  %>

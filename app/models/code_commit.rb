@@ -8,9 +8,12 @@ class CodeCommit < ActiveRecord::Base
     "Code Commit ##{self.id}"
   end
 
-  def byline
-    self.support_identity.byline
+  # concise representation of all info except message, url and associated code ticket
+  def info
+    date = self.pushed_at.to_s(:short)
+    "[#{date}] #{self.support_identity.byline} (#{self.status})"
   end
+
 
   before_create :ensure_support_identity
   def ensure_support_identity

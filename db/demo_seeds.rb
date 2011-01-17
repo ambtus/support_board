@@ -40,7 +40,7 @@ ct1.vote!
 ct2 = CodeTicket.create!(:summary => "save the world")
 User.current_user = sam
 ct2.take!
-CodeCommit.create!(:author => "sam", :message => "this should fix it", :pushed_at => Date.today)
+CodeCommit.create!(:author => "sam", :message => "this should fix it", :pushed_at => Time.now)
 User.current_user = dean
 ct2.vote!
 User.current_user = rodney
@@ -53,7 +53,7 @@ ct2.vote!
 ct3 = CodeTicket.create!(:summary => "repeal DADT")
 User.current_user = rodney
 ct3.take!
-CodeCommit.create!(:author => "rodney", :message => "finally closes issue 3", :pushed_at => Date.today)
+CodeCommit.create!(:author => "rodney", :message => "finally closes issue 3", :pushed_at => Time.now)
 ct3.reload.stage!
 User.current_user = bofh
 ct3.verify!
@@ -71,7 +71,7 @@ User.current_user = rodney
 ct4.take!
 User.current_user = bofh
 ct4.comment!("rodney, get the lead out!", true, true)
-CodeCommit.create!(:author => "rodney", :message => "issue 4. run db:migrate afterwards.", :pushed_at => Date.today)
+CodeCommit.create!(:author => "rodney", :message => "issue 4. run db:migrate afterwards.", :pushed_at => Time.now)
 User.current_user = rodney
 ct4.comment!("happy now, master?", true, true)
 User.current_user = blair
@@ -83,13 +83,13 @@ User.current_user = jim
 ct5.comment!("what's a sentinel?")
 User.current_user = blair
 ct5.take!
-CodeCommit.create!(:author => "blair", :message => "related to issue 5", :pushed_at => Date.today)
+CodeCommit.create!(:author => "blair", :message => "related to issue 5", :pushed_at => Time.now)
 
 ct6 = CodeTicket.create!(:summary => "create the world wide web")
 User.current_user = bofh
 ct6.vote!
 ct6.take!
-CodeCommit.create!(:author => "bofh", :message => "issue 6", :pushed_at => Date.today)
+CodeCommit.create!(:author => "bofh", :message => "issue 6", :pushed_at => Time.now)
 ct6.reload.stage!
 User.current_user = rodney
 ct6.verify!
@@ -130,6 +130,7 @@ User.current_user = blair
 faq5 = Faq.create!(:summary => "what's a sentinel?", :content => "lookout: a person employed to keep watch for some anticipated event")
 
 # support tickets
+User.current_user = nil
 st1 = SupportTicket.create!(
   :summary => "some problem",
   :email => "guest@ao3.org",
@@ -139,6 +140,7 @@ st1 = SupportTicket.create!(
   :ip_address => "72.14.204.103"
 )
 
+User.current_user = nil
 st2 = SupportTicket.create!(
   :summary => "a personal problem",
   :email => "guest@ao3.org",
@@ -156,9 +158,9 @@ st2.comment!("your ass is not my problem", true, nil, true)
 User.current_user = bofh
 st2.comment!("cut it out, guys", true, nil, true)
 
+User.current_user = dean
 st3 = SupportTicket.create!(
   :summary => "where's the salt?",
-  :user_id => dean.id,
   :anonymous => false,
   :url => "/bookmarks",
   :authenticity_token => "666555",
@@ -170,9 +172,9 @@ st3.comment!("and the holy water")
 User.current_user = sam
 st3.take!
 
+User.current_user = john
 st4 = SupportTicket.create!(
   :summary => "repeal DADT",
-  :user_id => john.id,
   :private =>true,
   :url => "/faqs/3",
   :authenticity_token => "756756",
@@ -182,9 +184,9 @@ st4 = SupportTicket.create!(
 User.current_user = rodney
 st4.needs_fix!(ct3.id)
 
+User.current_user = john
 st5 = SupportTicket.create!(
   :summary => "what's my password?",
-  :user_id => john.id,
   :private =>true,
   :anonymous => false,
   :url => "/users/john",
@@ -192,13 +194,14 @@ st5 = SupportTicket.create!(
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4",
   :ip_address => "98.223.153.124"
 )
+User.current_user = rodney
 st5.answer!(faq4.id)
 User.current_user = john
 faq4.vote!
 
+User.current_user = jim
 st6 = SupportTicket.create!(
   :summary => "what's wrong with me?",
-  :user_id => jim.id,
   :private =>true,
   :url => "/users/jim/pseuds",
   :authenticity_token => "8889662",
@@ -208,9 +211,9 @@ st6 = SupportTicket.create!(
 User.current_user = blair
 st6.answer!(faq5.id)
 
+User.current_user = jim
 st7 = SupportTicket.create!(
   :summary => "where can I find a guide",
-  :user_id => jim.id,
   :url => "/faqs/5",
   :authenticity_token => "8889662",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; nb-NO; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13",
@@ -219,9 +222,10 @@ st7 = SupportTicket.create!(
 User.current_user = blair
 st7.needs_fix!(ct5.id)
 
+User.current_user = sam
 st8 = SupportTicket.create!(
   :summary => "where are you, dean?",
-  :user_id => sam.id,
+  :anonymous => false,
   :url => "/users/dean",
   :authenticity_token => "22333566",
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
@@ -241,7 +245,7 @@ st9 = SupportTicket.create!(
 User.current_user = bofh
 st9.take!
 
-User.current_user = blair
+User.current_user = nil
 st10 = SupportTicket.create!(
   :summary => "You guys rock!",
   :email => "happy@ao3.org",
@@ -250,8 +254,10 @@ st10 = SupportTicket.create!(
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "24.98.14.241"
 )
+User.current_user = blair
 st10.post!
 
+User.current_user = nil
 st11 = SupportTicket.create!(
   :summary => "thanks for fixing it",
   :email => "happy@ao3.org",
@@ -261,33 +267,35 @@ st11 = SupportTicket.create!(
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "24.98.14.241"
 )
+User.current_user = blair
 st11.post!
 
+User.current_user = newbie
 st12 = SupportTicket.create!(
   :summary => "you guys suck!",
-  :user_id => newbie.id,
   :url => "/users/newbie/preferences",
   :authenticity_token => "1777335002",
   :user_agent => "BlackBerry9330/5.0.0.857 Profile/MIDP-2.1 Configuration/CLDC-1.1 VendorID/105",
   :ip_address => "98.1.153.77"
 )
+User.current_user = blair
 st12.post!
 
-User.current_user = rodney
+User.current_user = john
 st13 = SupportTicket.create!(
   :summary => "I like the archive",
-  :user_id => john.id,
   :private => true,
   :url => "/tags/Calvin%20*a*%20Hobbes/works/",
   :authenticity_token => "756756",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4",
   :ip_address => "98.223.153.124"
 )
+User.current_user = rodney
 st13.post!
 
+User.current_user = dean
 st14 = SupportTicket.create!(
   :summary => "I'm leaving fandom forever!",
-  :user_id => dean.id,
   :anonymous => false,
   :url => "/collections/yuletidemadness2010/",
   :authenticity_token => "666555",
@@ -298,9 +306,9 @@ User.current_user = sam
 st14.comment!("small loss", true, nil, true)
 st14.post!
 
+User.current_user = jim
 st15 = SupportTicket.create!(
   :summary => "thank you for helping",
-  :user_id => jim.id,
   :private => true,
   :anonymous => false,
   :url => "/support_tickets/6",
@@ -311,6 +319,7 @@ st15 = SupportTicket.create!(
 User.current_user = sam
 st15.post!
 
+User.current_user = jim
 st16 = SupportTicket.create!(
   :summary => "embarassing rash",
   :user_id => jim.id,
@@ -329,6 +338,7 @@ st16.comment!("better not be john", true, nil, true)
 User.current_user = bofh
 st16.comment!("stop gossiping about the lusers and get back to work", true, nil, true)
 
+User.current_user = nil
 st17 = SupportTicket.create!(
   :summary => "my account was hacked",
   :email => "happy@ao3.org",
@@ -341,6 +351,7 @@ st17 = SupportTicket.create!(
 User.current_user = blair
 st17.needs_admin!
 
+User.current_user = nil
 st18 = SupportTicket.create!(
   :summary => "tag pages look weird",
   :email => "guest@ao3.org",
@@ -352,6 +363,7 @@ st18 = SupportTicket.create!(
 User.current_user = sam
 ct7 = st18.needs_fix!
 
+User.current_user = nil
 st19 = SupportTicket.create!(
   :summary => "fanfiction.net is down",
   :email => "guest@ao3.org",
@@ -363,18 +375,18 @@ st19 = SupportTicket.create!(
 User.current_user = bofh
 st19.resolve!("not our problem")
 
+User.current_user = john
 st20 = SupportTicket.create!(
   :summary => "anon is my name",
-  :user_id => john.id,
   :url => "/",
   :authenticity_token => "756756",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4",
   :ip_address => "98.223.153.124"
 )
 
+User.current_user = dean
 st21 = SupportTicket.create!(
   :summary => "please give me volunteer status",
-  :user_id => dean.id,
   :anonymous => false,
   :url => "/support",
   :authenticity_token => "666555",

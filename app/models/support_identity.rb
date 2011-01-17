@@ -3,15 +3,8 @@ class SupportIdentity < ActiveRecord::Base
 
   scope :official, :conditions => { :official => true }
 
-  def matched?
-    self.user
+  def byline
+    self.user ? self.user.login : self.name
   end
 
-  def byline
-    if self.matched?
-      self.user.login
-    else
-      self.name
-    end
-  end
 end

@@ -10,39 +10,38 @@ class SupportDetail < ActiveRecord::Base
     where(:private => false).where(:system_log => false)
   end
 
-  def by_owner?
-    return false if self.support_response # official support response
-    return true if self.support_identity.blank?  # only owners can add details without being logged in
-    return false if !self.support_ticket.user # the ticket was opened by a guest but is being commented on by a user
-    self.support_ticket.user.support_identity == self.support_identity # was the ticket opened and commented on by the same user?
+  # use a generic "ticket owner" in the byline if
+  # support detail created by a guest OR
+  # support detail is by the same user as opened the ticket AND the ticket is anonymous
+  def show_generic?
+    return true unless self.support_identity_id # guest comment on own ticket
+    return true if (self.support_identity_id == self.support_ticket.support_identity_id) && self.support_ticket.anonymous?
+    return false
   end
 
-  def show_username?
-    !self.support_ticket.anonymous? && self.support_identity_id
-  end
-
-  def byline_name
-    if by_owner?
-      self.show_username? ? self.support_identity.name : "ticket owner"
-    else
-      self.support_identity.name + (self.support_response? ? " (volunteer)" : "")
-    end
-  end
-
+  # "ticket owner" if show_generic? OR
+  # support_identity name, with volunteer designation if support response
   def byline
+    return "ticket owner" if self.show_generic?
+    parens = self.support_response? ? " (volunteer)" : ""
+    self.support_identity.name + parens
+  end
+
+  # concise representation of all info except content
+  def info
     date = self.updated_at.to_s(:short)
-    name = self.byline_name
-    system = self.system_log? ? "" : " wrote"
+    wrote = self.system_log? ? "" : " wrote"
     accepted = self.resolved_ticket? ? " (accepted)" : ""
     private = self.private? ? " [private]" : ""
-    "[#{date}] #{name}#{system}#{accepted}#{private}"
+    "[#{date}] #{self.byline}#{wrote}#{accepted}#{private}"
   end
 
   # SANITIZER stuff
-
   attr_protected :content_sanitizer_version
   def sanitized_content
-    sanitize_field self, :content
+    # FIXME add sanitizer library and change sanitized_summary to summary in views
+    #sanitize_field self, :content
+    content.html_safe
   end
 
 end

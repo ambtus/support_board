@@ -1,3 +1,5 @@
 <p><%= link_to(@ticket.name, @url) %> has been stolen by <%= @stealer.support_identity.name %>.</p>
 
 <%= render :partial => "code_tickets/blurb", :locals => { :ticket => @ticket }  %>
+
+<%= render :partial => "details/blurb", :locals => { :detail => @ticket.code_details.last }  %>

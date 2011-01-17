@@ -1,11 +1,12 @@
-<p>Please consider taking <%= link_to(@ticket.name, @url) %>
-<%=raw @ticket.summary %>
-<% @details.each do |detail| %>
-  <% if detail.resolved_ticket? %>
-    <dt><%= detail.byline %> (accepted):</dt>
-  <% else %>
-    <dt><%= detail.byline %></dt>
-  <% end %>
-      <dd><%= raw detail.content %></dd>
+<p>Dear <%= @user.login %>,</p>
+
+<p>Please consider <%= @ticket.unowned? ? "taking" : "stealing" %> <%= link_to(@ticket.name, @url) %>
+
+<%= render :partial => "support_tickets/blurb", :locals => { :ticket => @ticket }  %>
+
+<% @ticket.support_details.each do |detail| %>
+  <%= render :partial => "support_details/blurb", :locals => { :detail => detail }  %>
 <% end %>
-<p>Thank you, <%= @requestor.support_identity.name %>
+
+<p>Thank you,<br />
+<%= @requestor.support_identity.name %></p>

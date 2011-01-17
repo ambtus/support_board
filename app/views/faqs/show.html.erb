@@ -1,6 +1,6 @@
-<h1><%= @faq.summary %> (<%= @faq.vote_count %> votes)</h1>
+<h1><%= @faq.sanitized_summary %> (<%= @faq.vote_count %> votes)</h1>
 
-<blockquote><%= @faq.content %></blockquote>
+<blockquote><%= @faq.sanitized_content %></blockquote>
 
 <%= form_for(@faq) do %>
   <p><%= submit_tag "This FAQ answered my question" %></p>

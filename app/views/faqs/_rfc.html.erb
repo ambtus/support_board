@@ -1,6 +1,6 @@
-<h1><%= @faq.summary %> (draft)</h1>
+<h1><%= @faq.sanitized_summary %> (draft)</h1>
 
-<blockquote><%= @faq.content %></blockquote>
+<blockquote><%= @faq.sanitized_content %></blockquote>
 
 <% @details.each do |detail| %>
   <%= render :partial => "details/blurb", :locals => { :detail => detail }  %>

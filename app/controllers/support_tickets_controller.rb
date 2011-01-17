@@ -105,7 +105,7 @@ class SupportTicketsController < ApplicationController
     when "This answer resolves my issue"
       @ticket.accept!(params[:support_detail_id], params[:email])
     when "Watch this ticket"
-      @ticket.watch!(params[:email])
+      @ticket.watch!
     when "Don't watch this ticket"
       @ticket.unwatch!(params[:email])
     when "Make private"

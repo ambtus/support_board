@@ -178,4 +178,19 @@ class Faq < ActiveRecord::Base
     end
   end
 
+  # SANITIZER stuff
+  attr_protected :summary_sanitizer_version
+  def sanitized_summary
+    # FIXME add sanitizer library and change sanitized_summary to summary in views
+    #sanitize_field self, :summary
+    summary.html_safe
+  end
+
+  attr_protected :content_sanitizer_version
+  def sanitized_content
+    # FIXME add sanitizer library and change sanitized_summary to summary in views
+    #sanitize_field self, :content
+    content.html_safe
+  end
+
 end

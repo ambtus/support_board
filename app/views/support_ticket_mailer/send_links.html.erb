@@ -1,4 +1,3 @@
 <% @tickets.each do |ticket| %>
-  <p><%= link_to(ticket.name, support_ticket_url(ticket, :authentication_code => ticket.authentication_code)) %></p>
-  <%=raw ticket.summary %>
+  <p><%= link_to(ticket.sanitized_summary, support_ticket_url(ticket, :authentication_code => ticket.authentication_code)) %></p>
 <% end %>

@@ -1,4 +1,4 @@
-<p><%= ticket.summary %>
+<p><%= ticket.sanitized_summary %>
 [<%= ticket.status_line %><% if ticket.code_ticket_id %>
   <%= link_to ticket.code_ticket.name, ticket.code_ticket %>
 <% end %>]

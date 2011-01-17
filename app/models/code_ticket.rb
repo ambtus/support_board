@@ -183,6 +183,7 @@ class CodeTicket < ActiveRecord::Base
       self.code_details.create(:content => content,
                                :support_identity_id => User.current_user.support_identity_id,
                                :system_log => true)
+      # TODO FIXME: sends notifications with ticket in previous state
       self.send_update_notifications unless [:steal].include?(triggering_event)
     end
   end
@@ -204,9 +205,11 @@ class CodeTicket < ActiveRecord::Base
     self.watch! unless self.watched?
   end
 
-  def not_mine?
-    raise "Couldn't check ownership. Not logged in." unless User.current_user
-    self.support_identity_id != User.current_user.support_identity_id
+  # test if ticket is one I can steal (used in volunteer views)
+  def stealable?
+    raise SecurityError, "Couldn't check stealable. Not logged in." unless User.current_user
+    self.support_identity_id != User.current_user.support_identity_id &&
+      self.current_state.events.include?(:steal)
   end
 
   def duplicate(original_id)
@@ -244,7 +247,7 @@ class CodeTicket < ActiveRecord::Base
     cc = CodeCommit.find(code_commit_id) # will raise unless exists
     raise "code commit already used" if cc.code_ticket_id
     self.support_identity_id = cc.support_identity_id
-    cc.code_ticket_id = self.id 
+    cc.code_ticket_id = self.id
     cc.status = "matched"
     cc.save!
   end
@@ -370,7 +373,9 @@ class CodeTicket < ActiveRecord::Base
 
   attr_protected :summary_sanitizer_version
   def sanitized_summary
-    sanitize_field self, :summary
+    # FIXME add sanitizer library and change sanitized_summary to summary in views
+    #sanitize_field self, :summary
+    summary.html_safe
   end
 
 end

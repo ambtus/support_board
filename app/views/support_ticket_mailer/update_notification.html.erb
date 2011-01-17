@@ -1,10 +1,5 @@
-<p><%= link_to(@ticket.name, @url) %> has been updated.</p>
-<%=raw @ticket.summary %>
-<% @details.each do |detail| %>
-  <% if detail.resolved_ticket? %>
-    <dt><%= detail.byline %> (accepted):</dt>
-  <% else %>
-    <dt><%= detail.byline %></dt>
-  <% end %>
-      <dd><%= raw detail.content %></dd>
-<% end %>
+<p><%= link_to @ticket.name, support_ticket_url(@ticket) %> has been updated.</p>
+
+<%= render :partial => "support_tickets/blurb", :locals => { :ticket => @ticket }  %>
+
+<%= render :partial => "details/blurb", :locals => { :detail => @ticket.support_details.last }  %>

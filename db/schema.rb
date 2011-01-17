@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "author"
     t.string   "url"
     t.string   "message"
-    t.date     "pushed_at"
+    t.datetime "pushed_at"
     t.integer  "code_ticket_id"
     t.integer  "support_identity_id"
     t.string   "status"
@@ -46,14 +46,14 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   end
 
   create_table "code_tickets", :force => true do |t|
-    t.string   "summary"
+    t.string   "summary",                   :limit => 256
     t.string   "url"
     t.string   "browser"
     t.string   "status"
     t.integer  "support_identity_id"
     t.integer  "code_ticket_id"
     t.integer  "release_note_id"
-    t.integer  "summary_sanitizer_version", :limit => 2, :default => 0, :null => false
+    t.integer  "summary_sanitizer_version", :limit => 2,   :default => 0, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -96,12 +96,13 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   end
 
   create_table "faqs", :force => true do |t|
-    t.string   "summary"
+    t.string   "summary",                   :limit => 256
     t.text     "content"
     t.integer  "position"
     t.string   "status"
     t.integer  "support_identity_id"
-    t.integer  "content_sanitizer_version", :limit => 2, :default => 0, :null => false
+    t.integer  "content_sanitizer_version", :limit => 2,   :default => 0, :null => false
+    t.integer  "summary_sanitizer_version", :limit => 2,   :default => 0, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -165,9 +166,9 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "user_id"
     t.string   "email"
     t.string   "authentication_code"
-    t.string   "summary"
-    t.boolean  "private",                                :default => false
-    t.boolean  "anonymous",                              :default => true
+    t.string   "summary",                   :limit => 256
+    t.boolean  "private",                                  :default => false
+    t.boolean  "anonymous",                                :default => true
     t.string   "url"
     t.string   "user_agent"
     t.string   "ip_address"
@@ -177,7 +178,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "support_identity_id"
     t.integer  "faq_id"
     t.integer  "code_ticket_id"
-    t.integer  "summary_sanitizer_version", :limit => 2, :default => 0,     :null => false
+    t.integer  "summary_sanitizer_version", :limit => 2,   :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

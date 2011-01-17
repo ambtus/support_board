@@ -2,6 +2,7 @@ class FaqDetail < ActiveRecord::Base
   belongs_to :faq
   belongs_to :support_identity
 
+  scope :resolved, where(:resolved_ticket => true)
   scope :system_log, where(:system_log => true)
   scope :visible_to_all, where(:private => false)
 
@@ -9,23 +10,34 @@ class FaqDetail < ActiveRecord::Base
     where(:private => false).where(:system_log => false)
   end
 
+  # we use a generic "ticket owner" in the byline if detail was written by a guest (linked in from support ticket)
+  def show_generic?
+    return true unless self.support_identity_id # guest comment on own ticket
+    return false
+  end
+
+  # "ticket owner" if show_generic? OR
+  # support_identity name, with volunteer designation if support response
   def byline
-    if self.support_identity_id.blank? # only owners of support tickets can add details to faqs without a support identity
-      name = "support ticket owner"
-      system = " wrote"
-    else
-      name = self.support_identity.name + (self.support_response? ? " (volunteer)" : "")
-      system = self.system_log? ? "" : " wrote"
-    end
+    return "ticket owner" if self.show_generic?
+    parens = self.support_response? ? " (volunteer)" : ""
+    self.support_identity.name + parens
+  end
+
+  # concise representation of all info except content
+  def info
+    date = self.updated_at.to_s(:short)
+    wrote = self.system_log? ? "" : " wrote"
     private = self.private? ? " [private]" : ""
-    "[#{self.updated_at.to_s(:short)}] #{name}#{system}#{private}"
+    "[#{date}] #{self.byline}#{wrote}#{private}"
   end
 
   # SANITIZER stuff
-
   attr_protected :content_sanitizer_version
   def sanitized_content
-    sanitize_field self, :content
+    # FIXME add sanitizer library and change sanitized_summary to summary in views
+    #sanitize_field self, :content
+    content.html_safe
   end
 
 end

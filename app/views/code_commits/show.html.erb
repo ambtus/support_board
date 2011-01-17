@@ -1,5 +1,6 @@
-<h1><%= link_to_unless_current @commit.name, @commit %></h1>
-<%= render :partial => "code_commits/blurb", :locals => { :commit => @commit }  %>
+<h1><%= @commit.name %></h1>
+
+<%= render :partial => "blurb", :locals => { :commit => @commit }  %>
 
 <% if current_user.try(:support_admin?) %>
   <%= form_for(@commit) do %>
@@ -7,13 +8,14 @@
       <%= submit_tag "Unmatch" %>
     <% elsif @commit.current_state.events[:match] %>
       <%= select_tag :code_ticket_id, '<option></option>'.html_safe +
-                   options_from_collection_for_select(CodeTicket.for_commit, "id", "summary") %>
+                   options_from_collection_for_select(CodeTicket.for_commit, "id", "sanitized_summary") %>
       <%= submit_tag "Match" %>
     <% end %>
   <% end %>
 <% end %>
 
 <% if @commit.code_ticket_id %>
+  <h2><%= link_to @commit.code_ticket.name, @commit.code_ticket %></h2>
   <%= render :partial => "code_tickets/blurb", :locals => { :ticket => @commit.code_ticket }  %>
 <% end %>
 

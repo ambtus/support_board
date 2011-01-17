@@ -8,7 +8,6 @@ class SupportTicketMailer < ActionMailer::Base
     else
       @url = support_ticket_url(@ticket)
     end
-    @detail = @ticket.support_details.first
     mail(
       :to => recipient,
       :subject => "[AO3] New #{ticket.name}"
@@ -22,7 +21,6 @@ class SupportTicketMailer < ActionMailer::Base
     else
       @url = support_ticket_url(@ticket)
     end
-    @details = (@ticket.support_details.count > 0) ? @ticket.support_details : []
     mail(
       :to => recipient,
       :subject => "[AO3] Updated #{ticket.name}"
@@ -41,7 +39,6 @@ class SupportTicketMailer < ActionMailer::Base
     @ticket = ticket
     @stealer = stealer
     @url = support_ticket_url(@ticket)
-    @details = (@ticket.support_details.count > 0) ? @ticket.support_details : []
     mail(
       :to => @ticket.support_identity.user.email,
       :subject => "[AO3] Stolen #{ticket.name}"
@@ -52,7 +49,7 @@ class SupportTicketMailer < ActionMailer::Base
     @ticket = ticket
     @url = support_ticket_url(@ticket)
     @requestor = requestor
-    @details = (@ticket.support_details.count > 0) ? @ticket.support_details : []
+    @user = user
     mail(
       :to => user.email,
       :subject => "[AO3] Please take #{ticket.name}"

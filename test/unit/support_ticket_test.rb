@@ -77,7 +77,6 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert ticket.unwatch!("guest@ao3.org")
     assert_equal 0, ticket.reload.mail_to.size
     assert !ticket.watched?("guest@ao3.org")
-    assert_raise(SecurityError) { ticket.watch!("someone@ao3.org") }
     User.current_user = User.find_by_login("dean")
     assert_nil ticket.watched?
     assert_raise(RuntimeError) { ticket.unwatch! }
@@ -91,7 +90,8 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert ticket.unwatch!
     assert_equal 1, ticket.reload.mail_to.size
     assert_nil ticket.watched?
-    assert ticket.watch!("guest@ao3.org")
+    User.current_user = nil
+    assert ticket.watch!
     assert_equal 2, ticket.mail_to.size
     assert ticket.make_private!("guest@ao3.org")
     assert_equal 1, ticket.reload.mail_to.size
@@ -111,7 +111,6 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal 2, ticket.mail_to.size
     User.current_user = nil
     assert_raise(SecurityError) { ticket.watch! }
-    assert_raise(SecurityError) { ticket.watch!("guest@ao3.org") }
     assert_equal 2, ticket.mail_to.size
     User.current_user = User.find_by_login("dean")
     assert ticket.watched?

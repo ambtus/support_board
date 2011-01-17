@@ -44,7 +44,7 @@
     <% if @ticket.current_state.events.include?(:take) %>
       <%= submit_tag "Take" %>
     <% end %>
-    <% if @ticket.current_state.events.include?(:steal) && @ticket.not_mine? %>
+    <% if @ticket.stealable? %>
       <%= submit_tag "Steal" %>
     <% end %>
     <% if @ticket.current_state.events.include?(:commit) %>

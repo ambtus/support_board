@@ -9,62 +9,135 @@ class SupportTicket < ActiveRecord::Base
   has_many :support_notifications  # a bunch of email addresses for update notifications
   has_many :support_details  # like comments, except non-threaded and with extra attributes
 
-  # don't save new empty details
-  accepts_nested_attributes_for :support_details, :reject_if => proc { |attributes|
-                                          attributes['content'].blank? && attributes['id'].blank? }
+  ### VALIDATIONS and CALLBACKS
+
+  before_validation(:on => :create) do
+    if !self.email.blank?
+      self.anonymous = false # guests are already anonymous
+      self.authentication_code = SecureRandom.hex(10)
+    else
+      self.user = User.current_user
+    end
+    return true
+  end
 
   # must have valid email unless logged in
   validates :email, :email_veracity => {:on => :create, :unless => :user_id}
-
-  before_create :guests_are_already_anonymous
-  def guests_are_already_anonymous
-    self.anonymous = false if self.email
-    true
-  end
-
-  before_create :turn_agent_into_browser_hash_string
-  def turn_agent_into_browser_hash_string
-    hash = JSON.parse(Net::HTTP.post_form(URI.parse('http://www.useragentstring.com/'),
-                                          {'uas' => self.user_agent, 'getJSON' => "all"}
-                                          ).body)
-    hash.delete_if {|key, value| value.blank? || value == "unknown" || value == "Null"}
-    self.browser = YAML.dump(hash) unless hash.blank?
-    true
-  end
-  # recreate hash out of saved string
-  def browser_hash
-    return {} if self.browser.blank?
-    YAML.load(self.browser).symbolize_keys
-  end
-  def browser_string
-    "#{self.browser_hash[:agent_name]} #{self.browser_hash[:agent_version]} (#{self.browser_hash[:os_name]})"
-  end
-
-  # used for tickets which were posted
-  def post_name
-    if self.email
-      "guest"
-    elsif self.anonymous
-      "user"
-    else
-      self.user.login
-    end
-  end
 
   # must have summary
   validates_presence_of :summary
   validates_length_of :summary, :maximum=> 140 # tweet length!
 
-  # used in lists
+  attr_accessor :turn_off_notifications
+
+  # add a default set of watchers to new tickets
+  # TODO at the moment, this is just the owner
+  after_create :add_default_watchers
+  def add_default_watchers
+    # Add owner
+    # when you create a ticket you should be added to the notifications unless you indicate otherwise
+    # add the email supplied in the ticket, or the email of the user who opened it
+    email = self.email
+    Rails.logger.debug "adding owner as watcher"
+    self.watch! unless turn_off_notifications == "1"
+
+    # TODO make default groups. e.g. testers, that people can add and remove themselves to
+    # so that when tickets are created the notifications are populated with these groups.
+  end
+
+  # TODO make this a delayed job so it's asyncronous and can be retried
+  before_create :get_browser_hash_string_from_agent
+  def get_browser_hash_string_from_agent
+    Rails.logger.debug "querying useragent"
+    url = URI.parse('http://www.useragentstring.com/')
+    request = Net::HTTP::Post.new(url.path)
+    request.set_form_data({'uas' => self.user_agent, 'getJSON' => "all"})
+    response = Net::HTTP.new(url.host, url.port).start do |http|
+      http.read_timeout = 5
+      http.request(request)
+    end
+
+    case response
+    when Net::HTTPSuccess, Net::HTTPRedirection
+      hash =JSON.parse(response.body)
+      hash.delete_if {|key, value| value.blank? || value == "unknown" || value == "Null"}
+      Rails.logger.debug "found useragent: #{hash}"
+    else
+      Rails.logger.debug "problem with useragent request: #{response}"
+      hash = {}
+    end
+    self.browser = YAML.dump(hash) unless hash.blank?
+    hash
+  end
+
+  ### HELPER METHODS
+
+  # recreate hash out of saved string
+  def browser_hash
+    return {} if self.browser.blank?
+    YAML.load(self.browser).symbolize_keys
+  end
+
+  # browser information moved to code tickets
+  def browser_string
+    "#{self.browser_hash[:agent_name]} #{self.browser_hash[:agent_version]} (#{self.browser_hash[:os_name]})"
+  end
+
+  # name, for when summary isn't practical
   def name
     "Support Ticket #" + self.id.to_s
   end
 
-  def self.ids
-    select("support_tickets.id").map(&:id)
+  # basic information, usually put after the name or summary
+  def parens
+    "(" +
+    (self.email ? "a guest" : (self.anonymous? ? "a user" : self.user.login)) +
+    (self.private? ? " [Private]" : "") +
+    ")"
   end
 
-  # filter support tickets
+  # used in controller to determine whether to show owner view
+  def owner?(code=nil)
+    if User.current_user.nil? # not logged in
+      return false if self.authentication_code.blank? # not a guest ticket
+      code == self.authentication_code # does ticket authentication match authentication code?
+    else # logged in
+      User.current_user.id == self.user_id  # does ticket owner match current user?
+    end
+  end
+
+  # test if ticket is one I can steal (used in volunteer views)
+  def stealable?
+    raise SecurityError, "Couldn't check stealable. Not logged in." unless User.current_user
+    self.support_identity_id != User.current_user.support_identity_id &&
+      self.current_state.events.include?(:steal)
+  end
+
+  # is the ticket's user's name visible? returns false for guest tickets
+  def show_username?
+    !self.anonymous? && !self.email
+  end
+
+  # list of email addresses for notifications
+  def mail_to(private = false)
+    notifications = self.support_notifications
+    notifications = notifications.official if private
+    notifications.map(&:email).uniq
+  end
+
+  # used in watch! so don't get duplicate notifications
+  # also used in view to determine whether to offer to turn on or off notifications
+  # TODO? add a preference that always makes this return true (for someone who never wants email)
+  # returns the support notification if it exists, nil otherwise
+  def watched?
+    if User.current_user
+      self.support_notifications.where(:email => User.current_user.email).first
+    else
+      self.support_notifications.where(:email => self.email).first
+    end
+  end
+
+  ### FILTER
   def self.filter(params = {})
     tickets = SupportTicket.scoped
 
@@ -150,7 +223,7 @@ class SupportTicket < ActiveRecord::Base
     return tickets
   end
 
-  # STATUS/RESOLUTION stuff
+  # WORKFLOW / STATE MACHINE
   include Workflow
   workflow_column :status
 
@@ -218,13 +291,24 @@ class SupportTicket < ActiveRecord::Base
       self.support_details.create(:content => content,
                                :support_identity_id => User.current_user.try(:support_identity_id),
                                :system_log => true)
+      # TODO FIXME: sends notifications with ticket in previous state
       self.send_update_notifications unless [:spam, :ham, :steal].include?(triggering_event)
     end
   end
 
+  ### SCOPES and ARRAYS
+  # scopes based on workflow states
   self.workflow_spec.state_names.each do |state|
     scope state, :conditions => { :status => state.to_s }
   end
+
+  # returns an array of support ticket ids
+  def self.ids
+    select("support_tickets.id").map(&:id)
+  end
+
+  ### WORKFLOW methods (call with ! to change state) send notifications via workflow on_transition
+  # some workflow methods add you to the watcher list
 
   def spam
     raise SecurityError, "Couldn't mark as spam, not logged in." unless User.current_user
@@ -232,6 +316,10 @@ class SupportTicket < ActiveRecord::Base
     # don't submit spam reports unless in production mode
     Rails.env.production? && Akismetor.submit_spam(akismet_attributes)
     self.support_identity_id = User.current_user.support_identity_id
+    # marking a ticket spam adds you to the watcher list
+    # so someone gets the reply if the owner comments that it was not spam
+    # you can always take yourself off if the ticket itself is spammed by the spammer
+    self.watch!
   end
 
   def ham
@@ -246,12 +334,8 @@ class SupportTicket < ActiveRecord::Base
     raise SecurityError, "Couldn't take, not logged in." unless User.current_user
     raise SecurityError, "Couldn't take, not a support volunteer." unless User.current_user.support_volunteer?
     self.support_identity_id = User.current_user.support_identity_id
-    self.watch! unless self.watched?
-  end
-
-  def not_mine?
-    raise SecurityError, "Couldn't check ownership. Not logged in." unless User.current_user
-    self.support_identity_id != User.current_user.support_identity_id
+    # taking a ticket adds you to the watcher list
+    self.watch!
   end
 
   def steal
@@ -259,12 +343,8 @@ class SupportTicket < ActiveRecord::Base
     raise SecurityError, "Couldn't steal, not a support volunteer." unless User.current_user.support_volunteer?
     self.send_steal_notification(User.current_user)
     self.support_identity_id = User.current_user.support_identity_id
-  end
-
-  def give!(support_id)
-    raise SecurityError, "Couldn't give, not logged in." unless User.current_user
-    raise SecurityError, "Couldn't give, not a support volunteer." unless User.current_user.support_volunteer?
-    SupportTicketMailer.request_to_take(self, SupportIdentity.find(support_id).user, User.current_user).deliver
+    # stealing a ticket adds you to the watcher list
+    self.watch!
   end
 
   def reopen(reason, email=nil)
@@ -284,6 +364,9 @@ class SupportTicket < ActiveRecord::Base
     raise SecurityError, "Couldn't post, not logged in." unless User.current_user
     raise SecurityError, "Couldn't post, not a support volunteer." unless User.current_user.support_volunteer?
     self.support_identity = User.current_user.support_identity
+    # posting a ticket adds you to the watcher list
+    # so someone gets the reply if the owner comments that they don't want it posted
+    self.watch!
   end
 
   def needs_fix(code_ticket_id=nil)
@@ -326,7 +409,32 @@ class SupportTicket < ActiveRecord::Base
     self.support_identity = User.current_user.support_identity
   end
 
-  # SUPPORT DETAILS stuff
+  def accept(detail_id, email = nil)
+    detail = self.support_details.find(detail_id) # will raise if no detail
+    if !email.blank?
+      raise SecurityError, "Couldn't accept answer. not owner!" unless (self.email == email)
+    else
+      raise SecurityError, "Couldn't accept answer. Not logged in." unless User.current_user
+      raise SecurityError, "Couldn't accept answer. not owner!" unless (self.user == User.current_user)
+    end
+    detail.update_attribute(:resolved_ticket, true)
+    self.support_identity_id = nil
+  end
+
+  ### NON-WORKFLOW but similar methods.
+  # call mailers directly to get notifications.
+  # create support details directly to get system_log details
+
+  # send a notification to another volunteer requesting that they take (or steal) the ticket
+  def give!(support_id)
+    raise SecurityError, "Couldn't give, not logged in." unless User.current_user
+    raise SecurityError, "Couldn't give, not a support volunteer." unless User.current_user.support_volunteer?
+    new_support_volunteer = SupportIdentity.find(support_id) # will raise if doesn't exist
+    raise SecurityError, "can't give to someone who's not a volunteer" unless new_support_volunteer.official?
+    SupportTicketMailer.request_to_take(self, new_support_volunteer.user, User.current_user).deliver
+  end
+
+  # leaves a non-system_log comment on the ticket. sends notifications.
   def comment!(content, official=true, email=nil, private = false)
     # only logged in users or the ticket owner can comment
     if !User.current_user && email
@@ -349,29 +457,8 @@ class SupportTicket < ActiveRecord::Base
     end
   end
 
-  def accept(detail_id, email = nil)
-    detail = self.support_details.find(detail_id) # will raise if no detail
-    if !email.blank?
-      raise SecurityError, "Couldn't accept answer. not owner!" unless (self.email == email)
-    else
-      raise SecurityError, "Couldn't accept answer. Not logged in." unless User.current_user
-      raise SecurityError, "Couldn't accept answer. not owner!" unless (self.user == User.current_user)
-    end
-    detail.update_attribute(:resolved_ticket, true)
-    self.support_identity_id = nil
-  end
-
-  # NOTIFICATION stuff
-  attr_accessor :turn_off_notifications
-
-  after_create :add_owner_as_watcher
-  def add_owner_as_watcher
-    # unless they've asked you not too
-    return true if turn_off_notifications == "1"
-    # otherwise, add the email supplied in the ticket, or the email of the user who opened it
-    self.support_notifications.create(:email => self.email || self.user.email)
-  end
-
+  # makes a ticket private (visible only to volunteers). can't be undone.
+  # removes notifications from watchers who are not the owner or volunteers
   def make_private!(email = nil)
     if !email.blank?
       raise SecurityError, "Couldn't make private. not owner!" unless (self.email == email)
@@ -393,10 +480,7 @@ class SupportTicket < ActiveRecord::Base
                                 :system_log => true)
   end
 
-  def show_username?
-    !self.anonymous? && !self.email
-  end
-
+  # makes anonymous.
   def hide_username!
     if self.email
       raise "Couldn't hide username. Guest tickets don't have usernames"
@@ -417,6 +501,7 @@ class SupportTicket < ActiveRecord::Base
 
   end
 
+  # remove anonymity
   def show_username!
     if self.email
       raise "Couldn't show username. Guest tickets don't have usernames"
@@ -437,46 +522,29 @@ class SupportTicket < ActiveRecord::Base
 
   end
 
-  def mail_to(private = false)
-    notifications = self.support_notifications
-    notifications = notifications.official if private
-    notifications.map(&:email).uniq
-  end
-
-  # used in view to determine whether to offer to turn on or off notifications
-  def watched?(email = nil)
-    email_address = email || User.current_user.try(:email)
-    raise ArgumentError, "Couldn't check watch. No email address to check." unless email_address
-    # if there's no watcher with that email, this will be nil which acts as false
-    self.support_notifications.where(:email => email_address).first
-  end
-
-  def watch!(email = nil)
-    if !email.blank?
-      raise SecurityError, "Couldn't watch. not owner!" unless (self.email == email)
-      self.support_notifications.create(:email => email)
-    else
-      raise SecurityError, "Couldn't watch. Not logged in." unless User.current_user
-      raise "Couldn't watch. Already watching." if watched?
-      public = !User.current_user.support_volunteer?
-      raise SecurityError, "Couldn't watch. ticket private!" if (self.private? && public)
-      # create a support identity for tracking purposes
+  # add current user or ticket owner to watchers
+  def watch!
+    if User.current_user
+      public_watcher = !User.current_user.support_volunteer?
+      raise SecurityError, "Couldn't watch. ticket private!" if (public_watcher && self.private? && !owner?)
+      # create a support identity if one doesn't exist
       User.current_user.support_identity unless User.current_user.support_identity_id
-      self.support_notifications.create(:email => User.current_user.email, :public_watcher => public)
-    end
-  end
-
-  def unwatch!(email = nil)
-    if !email.blank?
-      raise "Couldn't remove watch. Not watching." unless watched?(email)
-      self.support_notifications.where(:email => email).delete_all
+      self.support_notifications.create(:email => User.current_user.email, :public_watcher => public_watcher)
     else
-      raise SecurityError, "Couldn't remove watch. Not logged in" unless User.current_user
-      raise "Couldn't remove watch. Not watching." unless watched?(User.current_user.email)
-      self.support_notifications.where(:email => User.current_user.email).delete_all
+      self.support_notifications.create(:email => self.email)
     end
   end
 
+  # add current user or ticket owner from watchers
+  def unwatch!
+    notification = self.watched?
+    raise "Couldn't remove watch. Not watching." unless notification
+    notification.destroy
+  end
+
+  ### SEND NOTIFICATIONS
+
+  # on create
   def send_create_notifications
     self.mail_to.each do |recipient|
       SupportTicketMailer.create_notification(self, recipient).deliver
@@ -491,22 +559,6 @@ class SupportTicket < ActiveRecord::Base
 
   def send_steal_notification(current_user)
     SupportTicketMailer.steal_notification(self, current_user).deliver
-  end
-
-  # AUTHENTICATION stuff
-
-  before_create :create_authentication_code
-  def create_authentication_code
-    self.authentication_code = SecureRandom.hex(10) if self.email
-  end
-
-  def owner?(code=nil)
-    if User.current_user.nil? # not logged in
-      return false if self.authentication_code.blank? # not a guest ticket
-      code == self.authentication_code # does ticket authentication match authentication code?
-    else # logged in
-      User.current_user.id == self.user_id  # does ticket owner match current user?
-    end
   end
 
   # SPAM stuff
@@ -536,7 +588,9 @@ class SupportTicket < ActiveRecord::Base
 
   attr_protected :summary_sanitizer_version
   def sanitized_summary
-    sanitize_field self, :summary
+    # FIXME add sanitizer library and change sanitized_summary to summary in views
+    #sanitize_field self, :summary
+    summary.html_safe
   end
 
 end

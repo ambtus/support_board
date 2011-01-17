@@ -17,7 +17,7 @@
   <% unless @ticket.closed? %>
     <%= label_tag :support_detail_id, "Support Detail" %>
         <%= select_tag :support_detail_id,
-                       options_from_collection_for_select(@ticket.support_details, "id", "byline") %>
+                       options_from_collection_for_select(@ticket.support_details, "id", "info") %>
         <%= submit_tag "This answer resolves my issue" %>
   <% end %>
   <% unless @ticket.private? %>
@@ -26,7 +26,7 @@
   <% if current_user %>
     <%= submit_tag @ticket.anonymous? ? "Display my user name" : "Hide my user name"%>
   <% end %>
-  <% if @ticket.watched?(@ticket.email) %>
+  <% if @ticket.watched? %>
     <%= submit_tag "Don't watch this ticket" %>
   <% else %>
     <%= submit_tag "Watch this ticket"%>

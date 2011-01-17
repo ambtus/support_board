@@ -3,10 +3,9 @@ class FaqMailer < ActionMailer::Base
 
   def update_notification(faq, recipient)
     @faq = ticket
-    @details = (@faq.faq_details.count > 0) ? @faq.code_details : []
     mail(
       :to => recipient,
-      :subject => "[AO3] Updated FAQ #{faq.summary}"
+      :subject => "[AO3] Updated FAQ #{faq.sanitized_summary}"
     )
   end
 

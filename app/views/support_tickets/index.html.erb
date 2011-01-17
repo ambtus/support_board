@@ -17,8 +17,9 @@
   <%= link_to "Clear Filters", support_tickets_path %>
 <% end %>
 
-<p><%= @tickets.size %> Tickets found</p>
+<p><%= @tickets.size %> Found</p>
 
 <% @tickets.each do |ticket| %>
+  <h1><%= link_to ticket.name, ticket %></h1>
   <%= render :partial => "blurb", :locals => { :ticket => ticket }  %>
 <% end %>

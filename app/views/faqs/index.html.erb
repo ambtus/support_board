@@ -7,7 +7,7 @@
 <% end %>
 
 <% @faqs.each do |faq, i| %>
-  <h1><%= link_to faq.summary, faq %>
+  <h1><%= link_to faq.sanitized_summary, faq %>
     (<% if faq.rfc? %>draft<% else %><%= faq.vote_count %> votes<% end %>)
   </h1>
 <% end %>

@@ -12,7 +12,7 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :user_id
       t.string :email
       t.string :authentication_code
-      t.string :summary
+      t.string :summary, :limit => 256
       t.boolean :private, :default => false
       t.boolean :anonymous, :default => true
       t.string :url
@@ -51,13 +51,14 @@ class CreateTickets < ActiveRecord::Migration
     end
 
     create_table :faqs, :force => true do |t|
-      t.string   :summary
+      t.string   :summary, :limit => 256
       t.text     :content
       t.integer  :position
       t.string   :status
       t.integer  :support_identity_id
 
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
+      t.integer :summary_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
     end
 
@@ -89,7 +90,7 @@ class CreateTickets < ActiveRecord::Migration
     end
 
     create_table :code_tickets do |t|
-      t.string :summary
+      t.string :summary, :limit => 256
       t.string :url
       t.string  :browser
 
@@ -132,7 +133,7 @@ class CreateTickets < ActiveRecord::Migration
       t.string :author
       t.string :url
       t.string :message
-      t.date :pushed_at
+      t.timestamp :pushed_at
       t.integer :code_ticket_id
       t.integer :support_identity_id
       t.string  :status

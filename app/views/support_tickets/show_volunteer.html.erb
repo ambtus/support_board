@@ -60,13 +60,11 @@
     <% end %>
   </p>
   <p>
-    <% if @ticket.not_mine? %>
-      <% if @ticket.current_state.events.include?(:take) %>
-        <%= submit_tag "Take" %>
-      <% end %>
-      <% if @ticket.current_state.events.include?(:steal) %>
-        <%= submit_tag "Steal" %>
-      <% end %>
+    <% if @ticket.current_state.events.include?(:take) %>
+      <%= submit_tag "Take" %>
+    <% end %>
+    <% if @ticket.stealable? %>
+      <%= submit_tag "Steal" %>
     <% end %>
     <% if [:unowned, :taken].include?(@ticket.current_state) %>
       <%= select_tag :support_identity_id,
@@ -76,13 +74,13 @@
   </p>
   <% if @ticket.current_state.events.include?(:needs_fix) %>
     <p><%= select_tag :code_ticket_id,
-                   options_from_collection_for_select(CodeTicket.not_closed, "id", "summary") %>
+                   options_from_collection_for_select(CodeTicket.not_closed, "id", "sanitized_summary") %>
     <%= submit_tag "Needs this fix" %>
     <%= submit_tag "Create new code ticket" %></p>
   <% end %>
   <% if @ticket.current_state.events.include?(:answer) %>
     <p><%= select_tag :faq_id,
-                   options_from_collection_for_select(Faq.all, "id", "summary") %>
+                   options_from_collection_for_select(Faq.all, "id", "sanitized_summary") %>
     <%= submit_tag "Answered by this FAQ" %>
     <%= submit_tag "Create new FAQ" %></p>
   <% end %>
