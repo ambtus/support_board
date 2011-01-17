@@ -146,3 +146,6 @@ Scenario: users can choose to have their name displayed during creation, when th
     And I should see "dean wrote: For example"
     And I should see "User: dean"
 
+# FIXME
+
+Scenario: ignore if enter an empty comment  (probably meant to click a different button)

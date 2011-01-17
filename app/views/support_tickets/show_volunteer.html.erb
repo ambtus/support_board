@@ -1,15 +1,16 @@
-<% if current_user.support_volunteer? %>
-  <dl>
-    <% if current_user.support_admin? %>
-      <dt>authenticity token:</dt>
-        <dd><%= @ticket.authenticity_token %></dd>
-      <dt>remote IP:</dt>
-        <dd><%= @ticket.ip_address %></dd>
-    <% end %>
+<% if @ticket.user == current_user %>
+  <%= link_to "view ticket as owner", support_ticket_path(@ticket) %>
+<% end %>
+
+<% if current_user.support_admin? %>
+    <dt>authenticity token:</dt>
+      <dd><%= @ticket.authenticity_token %></dd>
+    <dt>remote IP:</dt>
+      <dd><%= @ticket.ip_address %></dd>
     <dt>user agent:</dt>
-      <dd><%= @ticket.user_agent %></dd>
+      <dd><%= @ticket.browser_hash %></dd>
     <dt>referring url:</dt>
-      <dd><%= @ticket.url %></dd>
+      <dd><%= link_to @ticket.url, @ticket.url %></dd>
   </dl>
   <%= link_to "Edit", edit_support_ticket_path(@ticket) %>
 <% end %>
@@ -24,13 +25,12 @@
     <% else %>
       <%= hidden_field_tag :official, true %>
     <% end %>
-    <dt><%= label_tag :content, "Details" %>:</dt>
-      <dd><%= text_area_tag :content %></dd>
-    <p class="submit">
+    <%= text_area_tag :content %>
+    <p>
       <%= submit_tag "Add details" %>
     </p>
   <% end %>
-  <p class="submit">
+  <p>
     <% unless @ticket.private? %>
       <%= submit_tag "Make private"%> (Ticket will only be visible to owner and official Support volunteers. This cannot be undone.)
     <% end %>
@@ -83,7 +83,7 @@
     <% if @ticket.current_state.events.include?(:answer) %>
       <%= label_tag :faq_id, "FAQ" %>
       <%= select_tag :faq_id,
-                     options_from_collection_for_select(Faq.all, "id", "title") %>
+                     options_from_collection_for_select(Faq.all, "id", "summary") %>
       <%= submit_tag "Answered by this FAQ" %>
       <%= submit_tag "Create new FAQ" %>
     <% end %>

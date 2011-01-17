@@ -1,0 +1,6 @@
+<% if detail.system_log %>
+  <p><%= detail.byline %>: <%= detail.content %><p>
+<% else %>
+  <p><%= detail.byline %><p>
+  <blockquote><%= detail.content %></blockquote>
+<% end %>

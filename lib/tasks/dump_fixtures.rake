@@ -15,40 +15,20 @@ namespace :db do
         next if m == "user_session"
         begin
           puts "Dumping model: " + m
+          model_file = RAILS_ROOT + '/test/fixtures/' + m.pluralize + '.yml'
+          File.delete(model_file) if File.exists?(model_file)
+
           model = m.camelize.constantize
           entries = model.find(:all, :order => 'id ASC')
-
-          formatted, increment, tab = '', 1, '  '
-          entries.each do |a|
-            formatted += m + '_' + increment.to_s + ':' + "\n"
-            increment += 1
-
-            a.attributes.each do |column, value|
-              formatted += tab
-
-              match = value.to_s.match(/\n/)
-              if match
-                formatted += column + ': |' + "\n"
-
-                value.to_a.each do |v|
-                  formatted += tab + tab + v
-                end
-              else
-                formatted += column + ': ' + value.to_s
-              end
-
-              formatted += "\n"
-            end
-
-            formatted += "\n"
+          hash = {}
+          entries.each do |entry|
+            hash["#{m}_#{entry.id}"] = entry.attributes
           end
 
-          model_file = RAILS_ROOT + '/test/fixtures/' + m.pluralize + '.yml'
+          File.open(model_file, 'w') { |f| f.write(hash.to_yaml) }
 
-          File.exists?(model_file) ? File.delete(model_file) : nil
-          File.open(model_file, 'w') {|f| f << formatted}
         rescue
-          puts "problem with #{m}"
+          puts "  problem with #{m}"
         end
       end
       puts "update roles_users.yml manually"

@@ -1,6 +1,5 @@
 <p>A new support ticket has been created: <%= link_to @ticket.name, code_ticket_url(@ticket) %></p>
-<%=raw @ticket.summary %>
-<% if @detail %>
-  <dt>Details:</dt>
-    <dd><%= raw @detail.content %></dd>
-<% end %>
+
+<%= render :partial => "code_tickets/blurb", :locals => { :ticket => @ticket }  %>
+
+<%= render :partial => "code_details/blurb", :locals => { :detail => @detail }  %>

@@ -1,9 +1,0 @@
-<div id=header>
-  <% if current_user %>
-    <%= render :partial => 'user_sessions/greeting' %>
-  <% else %>
-    <%= render :partial => 'user_sessions/login' %>
-  <% end %>
-</div>
-<div id=flash_notice><%= notice %></div>
-<div id=flash_error><%= flash[:error] %></div>

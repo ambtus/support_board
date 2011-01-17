@@ -1,8 +1,3 @@
-<p><%= link_to(@ticket.name, @url) %> has been stolen by <%= link_to(@stealer.support_identity.name, @stealer) %>.</p>
-<%=raw @ticket.summary %>
-<dl>
-<% @details.each do |detail| %>
-  <dt><%= detail.byline %>:</dt>
-    <dd><%= raw detail.content %></dd>
-<% end %>
-</dl>
+<p><%= link_to(@ticket.name, @url) %> has been stolen by <%= @stealer.support_identity.name %>.</p>
+
+<%= render :partial => "code_tickets/blurb", :locals => { :ticket => @ticket }  %>

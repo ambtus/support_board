@@ -1,6 +1,7 @@
 <p><%= link_to @ticket.name, code_ticket_url(@ticket) %> has been updated.</p>
-<%=raw @ticket.summary %>
+
+<%= render :partial => "code_tickets/blurb", :locals => { :ticket => @ticket }  %>
+
 <% @details.each do |detail| %>
-  <dt><%= detail.byline %>:</dt>
-    <dd><%= raw detail.content %></dd>
+  <%= render :partial => "code_details/blurb", :locals => { :detail => detail }  %>
 <% end %>

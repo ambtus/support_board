@@ -51,7 +51,7 @@ class FaqsController < ApplicationController
       @faq.unwatch!(params[:email])
     when "Update Faq"
       @faq.update_from_edit!(params[:faq][:position],
-                             params[:faq][:title],
+                             params[:faq][:summary],
                              params[:faq][:content])
     end
     redirect_to @faq and return

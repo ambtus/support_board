@@ -18,7 +18,7 @@ end
 Factory.define :faq do |faq|
   faq.sequence(:position) { |n| n }
   faq.after_build { |faq| User.current_user = Factory.create(:volunteer)}
-  faq.title { |a| "faq #{a.position}" }
+  faq.summary { |a| "faq #{a.position}" }
 end
 
 Factory.define :volunteer, :parent => :user do |volunteer|

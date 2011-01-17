@@ -12,6 +12,10 @@ class Faq < ActiveRecord::Base
 
   default_scope :order => 'position ASC'
 
+  # must have summary
+  validates_presence_of :summary
+  validates_length_of :summary, :maximum=> 140 # tweet length!
+
   def vote_count
     faq_votes.sum(:vote)
   end
@@ -35,7 +39,7 @@ class Faq < ActiveRecord::Base
 
   # FAQ DETAILS stuff
   # only logged in users or guest owners can comment
-  def comment!(content, official=true, authentication_code=nil)
+  def comment!(content, official=true, authentication_code=nil, private = false)
     raise "not open for comments" unless self.rfc?
     if !User.current_user
       raise "Couldn't comment. not logged in and not guest owner!" unless guest_owner?(authentication_code)
@@ -43,11 +47,13 @@ class Faq < ActiveRecord::Base
       raise "Couldn't comment. Not logged in."
     end
     support_response = (official && User.current_user.support_volunteer?)
+    raise ArgumentError, "Only official comments can be private" if private && !support_response
     self.faq_details.create(:content => content,
                             :support_identity_id => User.current_user.try(:support_identity).try(:id),
                             :support_response => support_response,
-                            :system_log => false)
-    self.send_update_notifications
+                            :system_log => false,
+                            :private => private)
+      self.send_update_notifications(private)
   end
 
   # are any of the associated support tickets owned by the current user?
@@ -102,11 +108,11 @@ class Faq < ActiveRecord::Base
     FaqVote.create(:faq_id => self.id)
   end
 
-  def update_from_edit!(position, title, content)
+  def update_from_edit!(position, summary, content)
     raise "Couldn't update. Not logged in." unless User.current_user
     raise "Couldn't update. Not support volunteer." unless User.current_user.support_volunteer?
     self.position = position
-    self.title = title
+    self.summary = summary
     self.content = content
     self.support_identity_id = User.current_user.support_identity_id
     self.save!
@@ -117,9 +123,10 @@ class Faq < ActiveRecord::Base
     self.send_update_notifications
   end
 
-  # NOTIFICATION stuff
-  def mail_to
-    self.faq_notifications.map(&:email).uniq
+  def mail_to(private = false)
+    notifications = self.faq_notifications
+    notifications = notifications.official if private
+    notifications.map(&:email).uniq
   end
 
   # used in view to determine whether to offer to turn on or off notifications
@@ -162,8 +169,8 @@ class Faq < ActiveRecord::Base
     self.faq_notifications.where(:email => email_address).delete_all
   end
 
-  def send_update_notifications
-    self.mail_to.each do |recipient|
+  def send_update_notifications(private = false)
+    self.mail_to(private).each do |recipient|
       FaqMailer.update_notification(self, recipient).deliver
     end
   end

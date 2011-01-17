@@ -32,16 +32,18 @@ class SupportTicketsController < ApplicationController
     end
 
     if is_owner && !params[:support]
-      @details = @ticket.support_details.not_private
+      @details = @ticket.support_details.public
       @add_details = true # create a new empty response template
       render :show_owner
     elsif !current_user
-      @details = @ticket.support_details.not_private
+      @details = @ticket.support_details.public
       render :show_guest
     elsif current_user.support_volunteer?
+      @details = @ticket.support_details
       @add_details = true # create a new empty response template
       render :show_volunteer
     else # logged in as non-support volunteer
+      @details = @ticket.support_details.public
       if !@ticket.support_identity_id # if support took it, it's not longer open for public comment
         @add_details = true # create a new empty response template
       end
@@ -69,6 +71,9 @@ class SupportTicketsController < ApplicationController
 
     # new support ticket
     @ticket = SupportTicket.new(params[:support_ticket])
+    @ticket.authenticity_token = params[:authenticity_token]
+    @ticket.ip_address = request.remote_ip
+    @ticket.user_agent = request.user_agent
     if @ticket.save
       flash[:notice] = "Support ticket created"
       if @ticket.authentication_code

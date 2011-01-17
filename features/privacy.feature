@@ -118,11 +118,14 @@ Scenario: user's tickets should be available by filtering, respecting private an
   Given I am logged out
     And I am on the support page
     And I follow "Support Tickets"
-  Then I should see "Support Ticket #1"
-    And I should see "Support Ticket #3"
-    And I should see "Support Ticket #7"
-    And I should see "Support Ticket #8"
-    And I should see "Support Ticket #9"
+  Then I should see "Support Ticket #1 [unowned]"
+    And I should see "Support Ticket #3 [taken]"
+    And I should see "Support Ticket #7 [waiting]"
+    And I should see "Support Ticket #8 [unowned]"
+    And I should see "Support Ticket #9 [taken]"
+    And I should see "Support Ticket #18 [waiting]"
+    And I should see "Support Ticket #20 [unowned]"
+    And I should see "Support Ticket #21 [waiting_on_admin]"
   But I should not see "Support Ticket #4"
     And I should not see "Support Ticket #16"
 
@@ -131,8 +134,9 @@ Scenario: user's tickets should be available by filtering, respecting private an
   Then I should see "0 Tickets found"
   When I fill in "Opened by" with "dean"
     And I press "Filter"
-  Then I should see "1 Tickets found"
-  Then I should see "Support Ticket #3"
+  Then I should see "2 Tickets found"
+    And I should see "Support Ticket #3"
+    And I should see "Support Ticket #21"
   When I fill in "Opened by" with "jim"
     And I press "Filter"
   Then I should see "0 Tickets found"
@@ -157,9 +161,10 @@ Scenario: user's tickets should be available by filtering, respecting private an
   Then I should see "0 Tickets found"
   When I fill in "Opened by" with "dean"
     And I press "Filter"
-  Then I should see "2 Tickets found"
+  Then I should see "3 Tickets found"
     And I should see "Support Ticket #3"
     And I should see "Support Ticket #9"
+    And I should see "Support Ticket #21"
 
   Given I am logged in as "sam"
     And I am on the support page
@@ -177,8 +182,9 @@ Scenario: user's tickets should be available by filtering, respecting private an
   Then I should see "0 Tickets found"
   When I fill in "Opened by" with "dean"
     And I press "Filter"
-  Then I should see "1 Tickets found"
-  Then I should see "Support Ticket #3"
+  Then I should see "2 Tickets found"
+    And I should see "Support Ticket #3"
+    And I should see "Support Ticket #21"
   When I fill in "Opened by" with "jim"
     And I press "Filter"
   Then I should see "0 Tickets found"
@@ -261,6 +267,9 @@ Scenario: links to code tickets they're watching, private
 
 
 # TODO
-Scenario: guests and users should not be able to see private support details
-Scenario: guests and users should not receive notifications for private details
+Scenario: guests and users should not be able to see private details (support, code or faq)
+Scenario: guests and users should not receive notifications when private details are added (support, code or faq)
+Scenario: guest and user notifications should not include private details (support, code or faq)
+Scenario: support volunteers can be unofficial after the support ticket is unowned if they opened the ticket (they are the owner)
+Scenario: support comments can only be private if they are official (so offer one or the other - and the show ticket as support volunteer needs a corresponding show ticket as owner)
 

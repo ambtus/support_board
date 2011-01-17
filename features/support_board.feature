@@ -112,13 +112,13 @@ Scenario: users can view taken code tickets, and vote but not comment
   When I am logged in as "john"
     And I am on the page for code ticket 2
   Then I should see "Status: taken by sam"
-    Then I should see "Votes: 3"
+    Then I should see "Votes: 4"
     But I should not see "Details:"
   When I press "Vote up"
-    Then I should see "Votes: 4"
+    Then I should see "Votes: 5"
 
 Scenario: guests can view closed code tickets, but not vote or comment
-  When I am on the page for the last code ticket
+  When I am on the page for code ticket 6
   Then I should see "Status: deployed in 1.0"
   But I should not see "Vote up"
     And I should not see "Details:"
@@ -136,21 +136,23 @@ Scenario: can see all open code tickets
     And I follow "Open Code Tickets (Known Issues)"
   Then I should not see "Code Ticket #6"
     But I should see "1: Code Ticket #1 (1) [unowned] fix the roof"
-    And I should see "2: Code Ticket #2 (3) [taken] save the world"
+    And I should see "2: Code Ticket #2 (4) [taken] save the world"
     And I should see "3: Code Ticket #3 (5) [verified] repeal DADA"
     And I should see "4: Code Ticket #4 (0) [staged] build a zpm"
     And I should see "5: Code Ticket #5 (2) [committed] find a sentinel"
+    And I should see "6: Code Ticket #7 (3) [unowned] tag page broken in ie6"
 
 Scenario: code tickets can be sorted by votes
   When I am on the home page
     And I follow "Support Board"
     And I follow "Open Code Tickets (Known Issues)"
   When I follow "Sort by vote count"
-  Then I should see "4: Code Ticket #1 (1) [unowned] fix the roof"
-    And I should see "2: Code Ticket #2 (3) [taken] save the world"
+  Then I should see "5: Code Ticket #1 (1) [unowned] fix the roof"
+    And I should see "2: Code Ticket #2 (4) [taken] save the world"
     And I should see "1: Code Ticket #3 (5) [verified] repeal DADA"
-    And I should see "5: Code Ticket #4 (0) [staged] build a zpm"
-    And I should see "3: Code Ticket #5 (2) [committed] find a sentinel"
+    And I should see "6: Code Ticket #4 (0) [staged] build a zpm"
+    And I should see "4: Code Ticket #5 (2) [committed] find a sentinel"
+    And I should see "3: Code Ticket #7 (3) [unowned] tag page broken in ie6"
 
 Scenario: can find code tickets a user has commented on
   When I am on the home page

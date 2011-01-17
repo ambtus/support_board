@@ -8,30 +8,31 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal "open", SupportTicket.find(1).status_line
     two = SupportTicket.find(2)
     assert_equal "spam", two.status_line
-    assert_equal %Q{unowned -> spam}, two.support_details.last.content
+    assert_equal %Q{unowned -> spam}, two.support_details.system_log.last.content
     assert_equal "sam", two.support_identity.name
     three = SupportTicket.find(3)
     assert_equal "taken by sam", three.status_line
-    assert_equal %Q{unowned -> taken}, three.support_details.last.content
+    assert_equal %Q{unowned -> taken}, three.support_details.system_log.last.content
     four = SupportTicket.find(4)
     assert_equal "waiting for a code fix", four.status_line
-    assert_equal %Q{unowned -> waiting (3)}, four.support_details.last.content
+    assert_equal %Q{unowned -> waiting (3)}, four.support_details.system_log.last.content
     assert_equal "rodney", four.support_identity.name
     five = SupportTicket.find(5)
     assert_equal "closed by rodney", five.status_line
-    assert_equal %Q{unowned -> closed (4)}, five.support_details.last.content
+    assert_equal %Q{unowned -> closed (4)}, five.support_details.system_log.last.content
     six = SupportTicket.find(6)
     assert_equal "closed by blair", six.status_line
-    assert_equal %Q{unowned -> closed (5)}, six.support_details.last.content
+    assert_equal %Q{unowned -> closed (5)}, six.support_details.system_log.last.content
   end
   test "scopes" do
-    assert_equal 16, SupportTicket.count
-    assert_equal 3, SupportTicket.unowned.count
-    assert_equal 2, SupportTicket.taken.count
-    assert_equal 2, SupportTicket.waiting.count
-    assert_equal 1, SupportTicket.spam.count
-    assert_equal 2, SupportTicket.closed.count
-    assert_equal 6, SupportTicket.posted.count
+    assert_equal 21, SupportTicket.count
+    assert_equal [1, 8, 16, 20], SupportTicket.unowned.ids
+    assert_equal [3, 9], SupportTicket.taken.ids
+    assert_equal [4, 7, 18], SupportTicket.waiting.ids
+    assert_equal [17, 21], SupportTicket.waiting_on_admin.ids
+    assert_equal [2], SupportTicket.spam.ids
+    assert_equal [5, 6, 19], SupportTicket.closed.ids
+    assert_equal [10, 11, 12, 13, 14, 15], SupportTicket.posted.ids
   end
   test "reopen by user" do
     reason = "the faq didn't work"
@@ -71,13 +72,14 @@ class SupportTicketTest < ActiveSupport::TestCase
     ticket = SupportTicket.find(1)
     assert_equal 1, ticket.mail_to.size
     User.current_user = nil
-    assert_raise(RuntimeError) { ticket.watch! }
+    assert_raise(SecurityError) { ticket.watch! }
     assert_equal 1, ticket.mail_to.size
     assert ticket.unwatch!("guest@ao3.org")
     assert_equal 0, ticket.reload.mail_to.size
     assert !ticket.watched?("guest@ao3.org")
-    assert_raise(RuntimeError) { ticket.watch!("someone@ao3.org") }
+    assert_raise(SecurityError) { ticket.watch!("someone@ao3.org") }
     User.current_user = User.find_by_login("dean")
+    assert_nil ticket.watched?
     assert_raise(RuntimeError) { ticket.unwatch! }
     assert ticket.watch!
     assert_raise(RuntimeError) { ticket.watch! }
@@ -96,7 +98,7 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal "made private", ticket.support_details.last.content
     User.current_user = User.find_by_login("john")
     assert_nil ticket.watched?
-    assert_raise(RuntimeError) { ticket.watch! }
+    assert_raise(SecurityError) { ticket.watch! }
     User.current_user = User.find_by_login("sam")
     assert_nil ticket.watched?
     assert ticket.watch!
@@ -108,8 +110,8 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert ticket.watched?
     assert_equal 2, ticket.mail_to.size
     User.current_user = nil
-    assert_raise(RuntimeError) { ticket.watch! }
-    assert_raise(RuntimeError) { ticket.watch!("guest@ao3.org") }
+    assert_raise(SecurityError) { ticket.watch! }
+    assert_raise(SecurityError) { ticket.watch!("guest@ao3.org") }
     assert_equal 2, ticket.mail_to.size
     User.current_user = User.find_by_login("dean")
     assert ticket.watched?
@@ -126,82 +128,7 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal "made private", ticket.support_details.last.content
     User.current_user = User.find_by_login("john")
     assert_nil ticket.watched?
-    assert_raise(RuntimeError) { ticket.watch! }
-  end
-  test "comment on guest ticket" do
-    ticket = SupportTicket.find(1)
-    User.current_user = nil
-    assert_raise(RuntimeError) { ticket.comment!("something") }
-    assert_raise(RuntimeError) { ticket.comment!("something", false, "someone@ao3.org") }
-    assert_equal 0, ticket.support_details.count
-    assert ticket.comment!("owner comment", false, "guest@ao3.org")
-    assert_match "owner comment", ticket.support_details.last.content
-    assert_match "ticket owner wrote", ticket.support_details.last.byline
-    assert_equal 1, ticket.support_details.count
-    User.current_user = User.find_by_login("dean")
-    assert ticket.comment!("user")
-    assert_equal 2, ticket.support_details.count
-    assert_match "dean wrote", ticket.support_details.last.byline
-    assert_equal "user", ticket.support_details.last.content
-    User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("volunteer")
-    assert_equal 3, ticket.support_details.count
-    assert_match "sam (volunteer) wrote", ticket.support_details.last.byline
-    assert_equal "volunteer", ticket.support_details.last.content
-    assert ticket.comment!("unofficial volunteer", false)
-    assert_equal 4, ticket.support_details.count
-    assert_match "sam wrote", ticket.support_details.last.byline
-    assert_equal "unofficial volunteer", ticket.support_details.last.content
-    assert ticket.take!
-    assert_match "taken by sam", ticket.status_line
-    assert_equal 5, ticket.support_details.count
-    assert_raise(RuntimeError) { ticket.comment!("unofficial volunteer", false) }
-    User.current_user = User.find_by_login("dean")
-    assert_raise(RuntimeError) { ticket.comment!("comment after taken") }
-    assert_equal 5, ticket.support_details.count
-  end
-  test "comment on user ticket" do
-    ticket = SupportTicket.find(8)
-    assert_equal 1, ticket.support_details.count
-    User.current_user = nil
-    assert_raise(RuntimeError) { ticket.comment!("something") }
-    assert_raise(RuntimeError) { ticket.comment!("something", false, "guest@ao3.org") }
-    assert_equal 1, ticket.support_details.count
-    User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("user owner")
-    assert_equal 2, ticket.support_details.count
-    assert_match "ticket owner wrote", ticket.support_details.last.byline
-    assert_equal "user owner", ticket.support_details.last.content
-    User.current_user = User.find_by_login("john")
-    assert ticket.comment!("user on open ticket")
-    assert_equal 3, ticket.support_details.count
-    assert_match "john wrote", ticket.support_details.last.byline
-    User.current_user = User.find_by_login("blair")
-    assert ticket.take!
-    assert_equal 4, ticket.support_details.count
-    User.current_user = User.find_by_login("john")
-    assert_raise(RuntimeError) { ticket.comment!("user on taken ticket") }
-    assert_equal 4, ticket.support_details.count
-    User.current_user = User.find_by_login("rodney")
-    assert ticket.comment!("volunteer")
-    assert_equal 5, ticket.support_details.count
-    assert_match "rodney (volunteer) wrote", ticket.support_details.last.byline
-    assert_equal "volunteer", ticket.support_details.last.content
-    assert_raise(RuntimeError) { ticket.comment!("unofficial volunteer", false) }
-    assert_equal 5, ticket.support_details.count
-  end
-  test "comment when username visible" do
-    ticket = SupportTicket.find(5)
-    assert_equal 1, ticket.support_details.count
-    User.current_user = User.find_by_login("john")
-    assert ticket.comment!("user owner")
-    assert_equal 2, ticket.support_details.count
-    assert_match "john wrote", ticket.support_details[1].byline
-    assert_equal "user owner", ticket.support_details[1].content
-    assert ticket.hide_username!
-    assert_match "ticket owner wrote", ticket.reload.support_details[1].byline
-    assert_equal "user owner", ticket.support_details[1].content
-    assert_match "ticket owner", ticket.support_details[2].byline
+    assert_raise(SecurityError) { ticket.watch! }
   end
   test "guest owner accepts answer" do
     ticket = SupportTicket.find(1)
@@ -211,7 +138,7 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert ticket.comment!("right answer")
     assert_equal 1, ticket.support_details.count
     detail = ticket.support_details.first
-    assert_raise(RuntimeError) { ticket.accept!(detail.id) }
+    assert_raise(SecurityError) { ticket.accept!(detail.id) }
     assert ticket.accept!(detail.id, "guest@ao3.org")
     assert_equal "closed by owner", ticket.status_line
   end
@@ -223,9 +150,9 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert ticket.comment!("right answer")
     assert_equal 3, ticket.support_details.count
     detail = ticket.support_details.last
-    assert_raise(RuntimeError) { ticket.accept!(detail.id) }
+    assert_raise(SecurityError) { ticket.accept!(detail.id) }
     User.current_user = User.find_by_login("sam")
-    assert_raise(RuntimeError) { ticket.accept!(detail.id) }
+    assert_raise(SecurityError) { ticket.accept!(detail.id) }
     User.current_user = User.find_by_login("dean")
     assert ticket.accept!(detail.id)
     assert_equal "closed by owner", ticket.status_line

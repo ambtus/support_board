@@ -34,12 +34,8 @@
   </div>
   <div>
     <%= t.hidden_field :url, :value => session[:return_to] %>
-    <%= t.hidden_field :user_agent, :value => request.user_agent %>
-    <%= t.hidden_field :revision, :value => app_version %>
-    <%= t.hidden_field :ip_address, :value => request.remote_ip %>
-    <%= t.hidden_field :authenticity_token, :value => session[:authenticity_token] %>
   </div>
-  <p class="submit">
+  <p>
     <%= t.submit %>
   </p>
 <% end %>

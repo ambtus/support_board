@@ -1,195 +1,349 @@
-support_detail_1:
-  content: unowned -> spam
+--- 
+support_detail_1: 
+  content: a personal problem, my ass
   content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:32 UTC
+  created_at: 2011-01-17 01:22:16 Z
   id: 1
-  private: false
+  private: true
   resolved_ticket: false
   support_identity_id: 1
   support_response: true
   support_ticket_id: 2
+  system_log: false
+  updated_at: 2011-01-17 01:22:16 Z
+support_detail_2: 
+  content: unowned -> spam
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:16 Z
+  id: 2
+  private: false
+  resolved_ticket: false
+  support_identity_id: 1
+  support_response: false
+  support_ticket_id: 2
   system_log: true
-  updated_at: 2011-01-15 06:12:32 UTC
-
-support_detail_2:
+  updated_at: 2011-01-17 01:22:16 Z
+support_detail_3: 
+  content: your ass is not my problem
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:19 Z
+  id: 3
+  private: true
+  resolved_ticket: false
+  support_identity_id: 2
+  support_response: true
+  support_ticket_id: 2
+  system_log: false
+  updated_at: 2011-01-17 01:22:19 Z
+support_detail_4: 
+  content: cut it out, guys
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:19 Z
+  id: 4
+  private: true
+  resolved_ticket: false
+  support_identity_id: 4
+  support_response: true
+  support_ticket_id: 2
+  system_log: false
+  updated_at: 2011-01-17 01:22:19 Z
+support_detail_5: 
   content: and the holy water
   content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
-  id: 2
+  created_at: 2011-01-17 01:22:20 Z
+  id: 5
   private: false
   resolved_ticket: false
   support_identity_id: 7
   support_response: false
   support_ticket_id: 3
   system_log: false
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_3:
+  updated_at: 2011-01-17 01:22:20 Z
+support_detail_6: 
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
-  id: 3
-  private: false
-  resolved_ticket: false
-  support_identity_id: 1
-  support_response: true
-  support_ticket_id: 3
-  system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_4:
-  content: unowned -> waiting (3)
-  content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
-  id: 4
-  private: false
-  resolved_ticket: false
-  support_identity_id: 2
-  support_response: true
-  support_ticket_id: 4
-  system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_5:
-  content: unowned -> closed (4)
-  content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
-  id: 5
-  private: false
-  resolved_ticket: false
-  support_identity_id: 2
-  support_response: true
-  support_ticket_id: 5
-  system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_6:
-  content: unowned -> closed (5)
-  content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
+  created_at: 2011-01-17 01:22:20 Z
   id: 6
   private: false
   resolved_ticket: false
-  support_identity_id: 3
-  support_response: true
-  support_ticket_id: 6
+  support_identity_id: 1
+  support_response: false
+  support_ticket_id: 3
   system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_7:
-  content: unowned -> waiting (5)
+  updated_at: 2011-01-17 01:22:20 Z
+support_detail_7: 
+  content: unowned -> waiting (3)
   content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
+  created_at: 2011-01-17 01:22:22 Z
   id: 7
   private: false
   resolved_ticket: false
+  support_identity_id: 2
+  support_response: false
+  support_ticket_id: 4
+  system_log: true
+  updated_at: 2011-01-17 01:22:22 Z
+support_detail_8: 
+  content: unowned -> closed (4)
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:24 Z
+  id: 8
+  private: false
+  resolved_ticket: false
+  support_identity_id: 2
+  support_response: false
+  support_ticket_id: 5
+  system_log: true
+  updated_at: 2011-01-17 01:22:24 Z
+support_detail_9: 
+  content: unowned -> closed (5)
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:25 Z
+  id: 9
+  private: false
+  resolved_ticket: false
   support_identity_id: 3
-  support_response: true
+  support_response: false
+  support_ticket_id: 6
+  system_log: true
+  updated_at: 2011-01-17 01:22:25 Z
+support_detail_10: 
+  content: unowned -> waiting (5)
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:25 Z
+  id: 10
+  private: false
+  resolved_ticket: false
+  support_identity_id: 3
+  support_response: false
   support_ticket_id: 7
   system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_8:
+  updated_at: 2011-01-17 01:22:25 Z
+support_detail_11: 
   content: don't make me come looking for you!
   content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
-  id: 8
+  created_at: 2011-01-17 01:22:26 Z
+  id: 11
   private: false
   resolved_ticket: false
   support_identity_id: 1
   support_response: false
   support_ticket_id: 8
   system_log: false
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_9:
+  updated_at: 2011-01-17 01:22:26 Z
+support_detail_12: 
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
-  id: 9
-  private: false
-  resolved_ticket: false
-  support_identity_id: 4
-  support_response: true
-  support_ticket_id: 9
-  system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_10:
-  content: unowned -> posted
-  content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
-  id: 10
-  private: false
-  resolved_ticket: false
-  support_identity_id: 3
-  support_response: true
-  support_ticket_id: 10
-  system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_11:
-  content: unowned -> posted
-  content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
-  id: 11
-  private: false
-  resolved_ticket: false
-  support_identity_id: 3
-  support_response: true
-  support_ticket_id: 11
-  system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_12:
-  content: unowned -> posted
-  content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
+  created_at: 2011-01-17 01:22:27 Z
   id: 12
   private: false
   resolved_ticket: false
-  support_identity_id: 3
-  support_response: true
-  support_ticket_id: 12
+  support_identity_id: 4
+  support_response: false
+  support_ticket_id: 9
   system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_13:
+  updated_at: 2011-01-17 01:22:27 Z
+support_detail_13: 
   content: unowned -> posted
   content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
+  created_at: 2011-01-17 01:22:30 Z
   id: 13
   private: false
   resolved_ticket: false
-  support_identity_id: 2
-  support_response: true
-  support_ticket_id: 13
+  support_identity_id: 3
+  support_response: false
+  support_ticket_id: 10
   system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_14:
+  updated_at: 2011-01-17 01:22:30 Z
+support_detail_14: 
   content: unowned -> posted
   content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
+  created_at: 2011-01-17 01:22:31 Z
   id: 14
   private: false
   resolved_ticket: false
-  support_identity_id: 2
-  support_response: true
-  support_ticket_id: 14
+  support_identity_id: 3
+  support_response: false
+  support_ticket_id: 11
   system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
-support_detail_15:
+  updated_at: 2011-01-17 01:22:31 Z
+support_detail_15: 
   content: unowned -> posted
   content_sanitizer_version: 0
-  created_at: 2011-01-15 06:12:33 UTC
+  created_at: 2011-01-17 01:22:32 Z
   id: 15
   private: false
   resolved_ticket: false
+  support_identity_id: 3
+  support_response: false
+  support_ticket_id: 12
+  system_log: true
+  updated_at: 2011-01-17 01:22:32 Z
+support_detail_16: 
+  content: unowned -> posted
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:32 Z
+  id: 16
+  private: false
+  resolved_ticket: false
+  support_identity_id: 2
+  support_response: false
+  support_ticket_id: 13
+  system_log: true
+  updated_at: 2011-01-17 01:22:32 Z
+support_detail_17: 
+  content: small loss
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:33 Z
+  id: 17
+  private: true
+  resolved_ticket: false
   support_identity_id: 1
   support_response: true
+  support_ticket_id: 14
+  system_log: false
+  updated_at: 2011-01-17 01:22:33 Z
+support_detail_18: 
+  content: unowned -> posted
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:33 Z
+  id: 18
+  private: false
+  resolved_ticket: false
+  support_identity_id: 1
+  support_response: false
+  support_ticket_id: 14
+  system_log: true
+  updated_at: 2011-01-17 01:22:33 Z
+support_detail_19: 
+  content: unowned -> posted
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:34 Z
+  id: 19
+  private: false
+  resolved_ticket: false
+  support_identity_id: 1
+  support_response: false
   support_ticket_id: 15
   system_log: true
-  updated_at: 2011-01-15 06:12:33 UTC
-
+  updated_at: 2011-01-17 01:22:34 Z
+support_detail_20: 
+  content: i bet this is jim
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:35 Z
+  id: 20
+  private: true
+  resolved_ticket: false
+  support_identity_id: 3
+  support_response: true
+  support_ticket_id: 16
+  system_log: false
+  updated_at: 2011-01-17 01:22:35 Z
+support_detail_21: 
+  content: nah, must be dean
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:35 Z
+  id: 21
+  private: true
+  resolved_ticket: false
+  support_identity_id: 1
+  support_response: true
+  support_ticket_id: 16
+  system_log: false
+  updated_at: 2011-01-17 01:22:35 Z
+support_detail_22: 
+  content: better not be john
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:35 Z
+  id: 22
+  private: true
+  resolved_ticket: false
+  support_identity_id: 2
+  support_response: true
+  support_ticket_id: 16
+  system_log: false
+  updated_at: 2011-01-17 01:22:35 Z
+support_detail_23: 
+  content: stop gossiping about the lusers and get back to work
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:35 Z
+  id: 23
+  private: true
+  resolved_ticket: false
+  support_identity_id: 4
+  support_response: true
+  support_ticket_id: 16
+  system_log: false
+  updated_at: 2011-01-17 01:22:35 Z
+support_detail_24: 
+  content: unowned -> waiting_on_admin
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:36 Z
+  id: 24
+  private: false
+  resolved_ticket: false
+  support_identity_id: 3
+  support_response: false
+  support_ticket_id: 17
+  system_log: true
+  updated_at: 2011-01-17 01:22:36 Z
+support_detail_25: 
+  content: unowned -> waiting
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:38 Z
+  id: 25
+  private: false
+  resolved_ticket: false
+  support_identity_id: 1
+  support_response: false
+  support_ticket_id: 18
+  system_log: true
+  updated_at: 2011-01-17 01:22:38 Z
+support_detail_26: 
+  content: unowned -> closed (not our problem)
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:39 Z
+  id: 26
+  private: false
+  resolved_ticket: false
+  support_identity_id: 4
+  support_response: false
+  support_ticket_id: 19
+  system_log: true
+  updated_at: 2011-01-17 01:22:39 Z
+support_detail_27: 
+  content: i thought he was leaving fandom forever
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:41 Z
+  id: 27
+  private: true
+  resolved_ticket: false
+  support_identity_id: 3
+  support_response: true
+  support_ticket_id: 21
+  system_log: false
+  updated_at: 2011-01-17 01:22:41 Z
+support_detail_28: 
+  content: unowned -> waiting_on_admin
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:41 Z
+  id: 28
+  private: false
+  resolved_ticket: false
+  support_identity_id: 3
+  support_response: false
+  support_ticket_id: 21
+  system_log: true
+  updated_at: 2011-01-17 01:22:41 Z
+support_detail_29: 
+  content: forever is a long time
+  content_sanitizer_version: 0
+  created_at: 2011-01-17 01:22:41 Z
+  id: 29
+  private: true
+  resolved_ticket: false
+  support_identity_id: 1
+  support_response: true
+  support_ticket_id: 21
+  system_log: false
+  updated_at: 2011-01-17 01:22:41 Z

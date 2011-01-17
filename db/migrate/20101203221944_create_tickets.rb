@@ -19,9 +19,9 @@ class CreateTickets < ActiveRecord::Migration
       t.string :user_agent
       t.string :ip_address
       t.string :authenticity_token
+      t.string :browser
 
       t.string :status
-      t.string :revision
       t.integer :support_identity_id
       t.integer :faq_id
       t.integer :code_ticket_id
@@ -45,12 +45,13 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :support_ticket_id
       t.boolean :public_watcher, :default => false
       t.string :email
+      t.boolean :official, :default => false
 
       t.timestamps
     end
 
     create_table :faqs, :force => true do |t|
-      t.string   :title
+      t.string   :summary
       t.text     :content
       t.integer  :position
       t.string   :status
@@ -82,6 +83,7 @@ class CreateTickets < ActiveRecord::Migration
     create_table :faq_notifications do |t|
       t.integer :faq_id
       t.string :email
+      t.boolean :official, :default => false
 
       t.timestamps
     end
@@ -122,6 +124,7 @@ class CreateTickets < ActiveRecord::Migration
     create_table :code_notifications do |t|
       t.integer :code_ticket_id
       t.string :email
+      t.boolean :official, :default => false
 
       t.timestamps
     end
@@ -129,7 +132,7 @@ class CreateTickets < ActiveRecord::Migration
       t.string :author
       t.string :url
       t.string :message
-      t.string :pushed_at
+      t.date :pushed_at
       t.integer :code_ticket_id
       t.integer :support_identity_id
       t.string  :status

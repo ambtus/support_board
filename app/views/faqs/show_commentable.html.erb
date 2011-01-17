@@ -1,8 +1,7 @@
 <%= render "show" %>
 <%= form_for(@faq) do %>
-  <dt><%= label_tag :content, "Details" %>:</dt>
-    <dd><%= text_area_tag :content %></dd>
-  <p class="submit">
+  <%= text_area_tag :content %>
+  <p>
     <%= submit_tag "Add details" %>
     <% if @faq.watched?(session[:authentication_code]) %>
       <%= submit_tag "Don't watch this FAQ" %>

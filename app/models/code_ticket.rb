@@ -62,7 +62,7 @@ class CodeTicket < ActiveRecord::Base
     if !params[:comments_by_support_identity].blank?
       support_identity = SupportIdentity.find_by_name(params[:comments_by_support_identity])
       raise ActiveRecord::RecordNotFound unless support_identity
-      tickets = tickets.joins(:code_details) & CodeDetail.where(:system_log => false, :support_identity_id => support_identity.id)
+      tickets = tickets.joins(:code_details) & CodeDetail.public_comments.where(:support_identity_id => support_identity.id)
     end
 
     # tickets owned by volunteer
@@ -129,16 +129,16 @@ class CodeTicket < ActiveRecord::Base
   workflow_column :status
 
   def status_line
-    if self.code_ticket_id
-      "closed as duplicate by #{self.support_identity.name}"
+    if self.unowned? || self.support_identity_id.blank?
+      "open"
+    elsif self.code_ticket_id
+      "closed as duplicate by #{self.support_identity.byline}"
     elsif self.release_note_id
       "deployed in #{self.release_note.release}"
-    elsif self.unowned?
-      "open"
     elsif self.staged?
       "waiting for verification"
     else
-      "#{self.status} by #{self.support_identity.name}"
+      "#{self.status} by #{self.support_identity.byline}"
     end
   end
 
@@ -180,7 +180,6 @@ class CodeTicket < ActiveRecord::Base
       content += " (#{event_args.first})" unless event_args.blank?
       self.code_details.create(:content => content,
                                :support_identity_id => User.current_user.support_identity_id,
-                               :support_response => true,
                                :system_log => true)
       self.send_update_notifications unless [:steal].include?(triggering_event)
     end
@@ -292,7 +291,6 @@ class CodeTicket < ActiveRecord::Base
     self.summary = summary
     self.url = url
     self.browser = browser
-    self.support_identity_id = User.current_user.support_identity_id
     self.save!
     self.code_details.create(:content => "ticket edited",
                              :support_identity_id => User.current_user.support_identity_id,
@@ -304,15 +302,17 @@ class CodeTicket < ActiveRecord::Base
   # CODE DETAILS stuff
   # only logged in users can comment
   # only support volunteers can comment on non-open tickets
-  def comment!(content, official=true)
+  def comment!(content, official=true, private = false)
     raise "Couldn't comment. Not logged in." unless User.current_user
     support_response = (official && User.current_user.support_volunteer?)
+    raise ArgumentError, "Only official comments can be private" if private && !support_response
     if self.unowned? || support_response
       self.code_details.create(:content => content,
                                :support_identity_id => User.current_user.support_identity.id,
                                :support_response => support_response,
-                               :system_log => false)
-      self.send_update_notifications
+                               :system_log => false,
+                               :private => private)
+      self.send_update_notifications(private)
     else
       raise "Couldn't comment. Only official comments allowed."
     end
@@ -341,8 +341,10 @@ class CodeTicket < ActiveRecord::Base
   end
 
   # returns an array of email addresses. [] if none
-  def mail_to
-    self.code_notifications.map(&:email).uniq
+  def mail_to(private = false)
+    notifications = self.code_notifications
+    notifications = notifications.official if private
+    notifications.map(&:email).uniq
   end
 
   def send_create_notifications
@@ -351,8 +353,8 @@ class CodeTicket < ActiveRecord::Base
     end
   end
 
-  def send_update_notifications
-    self.mail_to.each do |recipient|
+  def send_update_notifications(private = false)
+    self.mail_to(private).each do |recipient|
       CodeTicketMailer.update_notification(self, recipient).deliver
     end
   end

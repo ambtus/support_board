@@ -22,6 +22,24 @@ class SupportTicket < ActiveRecord::Base
     true
   end
 
+  before_create :turn_agent_into_browser_hash_string
+  def turn_agent_into_browser_hash_string
+    hash = JSON.parse(Net::HTTP.post_form(URI.parse('http://www.useragentstring.com/'),
+                                          {'uas' => self.user_agent, 'getJSON' => "all"}
+                                          ).body)
+    hash.delete_if {|key, value| value.blank? || value == "unknown" || value == "Null"}
+    self.browser = YAML.dump(hash) unless hash.blank?
+    true
+  end
+  # recreate hash out of saved string
+  def browser_hash
+    return {} if self.browser.blank?
+    YAML.load(self.browser).symbolize_keys
+  end
+  def browser_string
+    "#{self.browser_hash[:agent_name]} #{self.browser_hash[:agent_version]} (#{self.browser_hash[:os_name]})"
+  end
+
   # used for tickets which were posted
   def post_name
     if self.email
@@ -68,7 +86,7 @@ class SupportTicket < ActiveRecord::Base
     # tickets I am watching, private
     if !params[:watching].blank?
       user = User.current_user
-      raise SecurityError unless user
+      raise SecurityError, "can't filter on watching if not logged in" unless user
       tickets = tickets.joins(:support_notifications) & SupportNotification.where(:email => user.email)
     end
 
@@ -77,11 +95,11 @@ class SupportTicket < ActiveRecord::Base
       tickets = tickets.where(:private => false) unless User.current_user.try(:support_volunteer?)
     end
 
-    # ticket's commented on by user
+    # ticket's commented on by user (don't include system logs or private comments)
     if !params[:comments_by_support_identity].blank?
       support_identity = SupportIdentity.find_by_name(params[:comments_by_support_identity])
       raise ActiveRecord::RecordNotFound unless support_identity
-      tickets = tickets.joins(:support_details) & SupportDetail.where(:system_log => false, :support_identity_id => support_identity.id)
+      tickets = tickets.joins(:support_details) & SupportDetail.public_comments.where(:support_identity_id => support_identity.id)
     end
 
     # tickets owned by volunteer
@@ -113,7 +131,7 @@ class SupportTicket < ActiveRecord::Base
       when "open"
         tickets = tickets.where('status != "closed"').where('status != "spam"').where('status != "posted"')
       else
-        raise TypeError
+        raise ArgumentError, "no such status"
       end
     else # default status is not closed (open)
       tickets = tickets.where('status != "closed"').where('status != "spam"').where('status != "posted"')
@@ -195,13 +213,10 @@ class SupportTicket < ActiveRecord::Base
 
     on_transition do |from, to, triggering_event, *event_args|
       next if self.new_record?
-      support_identity_id = User.current_user.try(:support_identity_id)
-      official = User.current_user && User.current_user.support_volunteer?
       content = "#{from} -> #{to}"
       content += " (#{event_args.first})" unless event_args.blank?
       self.support_details.create(:content => content,
-                               :support_identity_id => support_identity_id,
-                               :support_response => official,
+                               :support_identity_id => User.current_user.try(:support_identity_id),
                                :system_log => true)
       self.send_update_notifications unless [:spam, :ham, :steal].include?(triggering_event)
     end
@@ -212,52 +227,52 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def spam
-    raise "Couldn't mark as spam, not logged in." unless User.current_user
-    raise "Couldn't mark as spam, not a support volunteer." unless User.current_user.support_volunteer?
+    raise SecurityError, "Couldn't mark as spam, not logged in." unless User.current_user
+    raise SecurityError, "Couldn't mark as spam, not a support volunteer." unless User.current_user.support_volunteer?
     # don't submit spam reports unless in production mode
     Rails.env.production? && Akismetor.submit_spam(akismet_attributes)
     self.support_identity_id = User.current_user.support_identity_id
   end
 
   def ham
-    raise "Couldn't mark as ham, not logged in." unless User.current_user
-    raise "Couldn't mark as ham, not a support volunteer." unless User.current_user.support_volunteer?
+    raise SecurityError, "Couldn't mark as ham, not logged in." unless User.current_user
+    raise SecurityError, "Couldn't mark as ham, not a support volunteer." unless User.current_user.support_volunteer?
     # don't submit ham reports unless in production mode
     Rails.env.production? && Akismetor.submit_ham(akismet_attributes)
     self.support_identity_id = nil
   end
 
   def take
-    raise "Couldn't take, not logged in." unless User.current_user
-    raise "Couldn't take, not a support volunteer." unless User.current_user.support_volunteer?
+    raise SecurityError, "Couldn't take, not logged in." unless User.current_user
+    raise SecurityError, "Couldn't take, not a support volunteer." unless User.current_user.support_volunteer?
     self.support_identity_id = User.current_user.support_identity_id
     self.watch! unless self.watched?
   end
 
   def not_mine?
-    raise "Couldn't check ownership. Not logged in." unless User.current_user
+    raise SecurityError, "Couldn't check ownership. Not logged in." unless User.current_user
     self.support_identity_id != User.current_user.support_identity_id
   end
 
   def steal
-    raise "Couldn't steal, not logged in." unless User.current_user
-    raise "Couldn't steal, not a support volunteer." unless User.current_user.support_volunteer?
+    raise SecurityError, "Couldn't steal, not logged in." unless User.current_user
+    raise SecurityError, "Couldn't steal, not a support volunteer." unless User.current_user.support_volunteer?
     self.send_steal_notification(User.current_user)
     self.support_identity_id = User.current_user.support_identity_id
   end
 
   def give!(support_id)
-    raise "Couldn't give, not logged in." unless User.current_user
-    raise "Couldn't give, not a support volunteer." unless User.current_user.support_volunteer?
+    raise SecurityError, "Couldn't give, not logged in." unless User.current_user
+    raise SecurityError, "Couldn't give, not a support volunteer." unless User.current_user.support_volunteer?
     SupportTicketMailer.request_to_take(self, SupportIdentity.find(support_id).user, User.current_user).deliver
   end
 
   def reopen(reason, email=nil)
-    raise "Couldn't reopen. No reason given." if reason.blank?
+    raise ArgumentError, "Couldn't reopen. No reason given." if reason.blank?
     if !email.blank? || !User.current_user
-      raise "Couldn't reopen. not owner!" unless (self.email == email)
+      raise SecurityError, "Couldn't reopen. not owner!" unless (self.email == email)
     elsif !User.current_user.support_volunteer?
-      raise "Couldn't reopen. not owner!" unless (User.current_user.id == self.user_id)
+      raise SecurityError, "Couldn't reopen. not owner!" unless (User.current_user.id == self.user_id)
     end
     self.code_ticket_id = self.faq_id = self.support_identity_id = nil
     self.faq_vote.destroy if self.faq_vote
@@ -266,20 +281,20 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def post
-    raise "Couldn't post, not logged in." unless User.current_user
-    raise "Couldn't post, not a support volunteer." unless User.current_user.support_volunteer?
+    raise SecurityError, "Couldn't post, not logged in." unless User.current_user
+    raise SecurityError, "Couldn't post, not a support volunteer." unless User.current_user.support_volunteer?
     self.support_identity = User.current_user.support_identity
   end
 
   def needs_fix(code_ticket_id=nil)
-    raise "Couldn't set to waiting, not logged in." unless User.current_user
-    raise "Couldn't set to waiting, not a support volunteer." unless User.current_user.support_volunteer?
+    raise SecurityError, "Couldn't set to waiting, not logged in." unless User.current_user
+    raise SecurityError, "Couldn't set to waiting, not a support volunteer." unless User.current_user.support_volunteer?
     if code_ticket_id
       code_ticket = CodeTicket.find code_ticket_id # will raise error if no ticket
-      raise "can't assign to a duplicate" if code_ticket.code_ticket_id
+      raise ArgumentError, "can't assign to a duplicate" if code_ticket.code_ticket_id
       CodeVote.create(:code_ticket_id => code_ticket_id, :support_ticket_id => self.id, :vote => 2)
     else
-      code_ticket = CodeTicket.create(:summary => self.summary, :url => self.url, :browser => self.user_agent)
+      code_ticket = CodeTicket.create(:summary => self.summary, :url => self.url, :browser => self.browser_string)
       code_ticket_id = code_ticket.id
       CodeVote.create(:code_ticket_id => code_ticket_id, :support_ticket_id => self.id, :vote => 3)
     end
@@ -289,13 +304,12 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def answer(faq_id=nil)
-    raise "Couldn't set to answered, not logged in." unless User.current_user
-    raise "Couldn't set to answered, not a support volunteer." unless User.current_user.support_volunteer?
+    raise SecurityError, "Couldn't set to answered, not logged in." unless User.current_user
+    raise SecurityError, "Couldn't set to answered, not a support volunteer." unless User.current_user.support_volunteer?
     if faq_id
-      faq = Faq.find_by_id(faq_id)
-      raise "Couldn't set to waiting: no faq with id: #{faq_id}" unless faq
+      faq = Faq.find(faq_id) # will raise if no faq
     else
-      faq = Faq.create
+      faq = Faq.create!(:summary => self.summary)
       faq_id = faq.id
     end
     self.faq_id = faq_id
@@ -305,42 +319,43 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def resolve(resolution)
-    raise "Couldn't resolve. No resolution given." if resolution.blank?
+    raise ArgumentError, "Couldn't resolve. No resolution given." if resolution.blank?
     if !User.current_user.try(:support_admin?)
-      raise "Couldn't resolve. Not a support admin."
+      raise SecurityError, "Couldn't resolve. Not a support admin."
     end
     self.support_identity = User.current_user.support_identity
   end
 
   # SUPPORT DETAILS stuff
-  # only logged in users or the ticket owner can comment
-  # only support volunteers can comment on non-open tickets
-  def comment!(content, official=true, email=nil)
+  def comment!(content, official=true, email=nil, private = false)
+    # only logged in users or the ticket owner can comment
     if !User.current_user && email
-      raise "Couldn't comment. not owner!" unless (self.email == email)
+      raise SecurityError, "Couldn't comment. not owner!" unless (self.email == email)
     elsif User.current_user.nil?
-      raise "Couldn't comment. Not logged in."
+      raise SecurityError, "Couldn't comment. Not logged in."
     end
     support_response = (official && User.current_user.support_volunteer?)
-    if self.unowned? || support_response || (User.current_user == self.user)
+    raise ArgumentError, "Only official comments can be private" if private && !support_response
+    # only support volunteers or owners can comment on non-unowned or private tickets
+    if (self.unowned? && !self.private?) || support_response || (User.current_user == self.user)
       self.support_details.create(:content => content,
                                :support_identity_id => User.current_user.try(:support_identity).try(:id),
                                :support_response => support_response,
-                               :system_log => false)
-      self.send_update_notifications
+                               :system_log => false,
+                               :private => private)
+      self.send_update_notifications(private)
     else
-      raise "Couldn't comment. Only official comments allowed."
+      raise SecurityError, "Couldn't comment. Only official comments allowed."
     end
   end
 
   def accept(detail_id, email = nil)
-    detail = self.support_details.find_by_id(detail_id)
-    raise "Couldn't accept answer. No detail with id: #{detail_id}" unless detail
+    detail = self.support_details.find(detail_id) # will raise if no detail
     if !email.blank?
-      raise "Couldn't accept answer. not owner!" unless (self.email == email)
+      raise SecurityError, "Couldn't accept answer. not owner!" unless (self.email == email)
     else
-      raise "Couldn't accept answer. Not logged in." unless User.current_user
-      raise "Couldn't accept answer. not owner!" unless (self.user == User.current_user)
+      raise SecurityError, "Couldn't accept answer. Not logged in." unless User.current_user
+      raise SecurityError, "Couldn't accept answer. not owner!" unless (self.user == User.current_user)
     end
     detail.update_attribute(:resolved_ticket, true)
     self.support_identity_id = nil
@@ -359,11 +374,11 @@ class SupportTicket < ActiveRecord::Base
 
   def make_private!(email = nil)
     if !email.blank?
-      raise "Couldn't make private. not owner!" unless (self.email == email)
+      raise SecurityError, "Couldn't make private. not owner!" unless (self.email == email)
     else
-      raise "Couldn't make private. Not logged in." unless User.current_user
+      raise SecurityError, "Couldn't make private. Not logged in." unless User.current_user
       if !User.current_user.support_volunteer? && (User.current_user != self.user)
-        raise "Couldn't make private. Not owner."
+        raise SecurityError, "Couldn't make private. Not owner."
       end
     end
     self.update_attribute(:private, true)
@@ -386,9 +401,9 @@ class SupportTicket < ActiveRecord::Base
     if self.email
       raise "Couldn't hide username. Guest tickets don't have usernames"
     else
-      raise "Couldn't hide username. Not logged in." unless User.current_user
+      raise SecurityError, "Couldn't hide username. Not logged in." unless User.current_user
       if !User.current_user.support_volunteer? && (User.current_user != self.user)
-        raise "Couldn't hide username. Not owner."
+        raise SecurityError, "Couldn't hide username. Not owner."
       end
     end
     self.update_attribute(:anonymous, true)
@@ -406,9 +421,9 @@ class SupportTicket < ActiveRecord::Base
     if self.email
       raise "Couldn't show username. Guest tickets don't have usernames"
     else
-      raise "Couldn't show username. Not logged in." unless User.current_user
+      raise SecurityError, "Couldn't show username. Not logged in." unless User.current_user
       if !User.current_user.support_volunteer? && (User.current_user != self.user)
-        raise "Couldn't show username. Not owner."
+        raise SecurityError, "Couldn't show username. Not owner."
       end
     end
     self.update_attribute(:anonymous, false)
@@ -422,27 +437,29 @@ class SupportTicket < ActiveRecord::Base
 
   end
 
-  def mail_to
-    self.support_notifications.map(&:email).uniq
+  def mail_to(private = false)
+    notifications = self.support_notifications
+    notifications = notifications.official if private
+    notifications.map(&:email).uniq
   end
 
   # used in view to determine whether to offer to turn on or off notifications
   def watched?(email = nil)
     email_address = email || User.current_user.try(:email)
-    raise "Couldn't check watch. No email address to check." unless email_address
+    raise ArgumentError, "Couldn't check watch. No email address to check." unless email_address
     # if there's no watcher with that email, this will be nil which acts as false
     self.support_notifications.where(:email => email_address).first
   end
 
   def watch!(email = nil)
     if !email.blank?
-      raise "Couldn't watch. not owner!" unless (self.email == email)
+      raise SecurityError, "Couldn't watch. not owner!" unless (self.email == email)
       self.support_notifications.create(:email => email)
     else
-      raise "Couldn't watch. Not logged in." unless User.current_user
+      raise SecurityError, "Couldn't watch. Not logged in." unless User.current_user
       raise "Couldn't watch. Already watching." if watched?
       public = !User.current_user.support_volunteer?
-      raise "Couldn't watch. ticket private!" if (self.private? && public)
+      raise SecurityError, "Couldn't watch. ticket private!" if (self.private? && public)
       # create a support identity for tracking purposes
       User.current_user.support_identity unless User.current_user.support_identity_id
       self.support_notifications.create(:email => User.current_user.email, :public_watcher => public)
@@ -454,7 +471,7 @@ class SupportTicket < ActiveRecord::Base
       raise "Couldn't remove watch. Not watching." unless watched?(email)
       self.support_notifications.where(:email => email).delete_all
     else
-      raise "Couldn't remove watch. Not logged in" unless User.current_user
+      raise SecurityError, "Couldn't remove watch. Not logged in" unless User.current_user
       raise "Couldn't remove watch. Not watching." unless watched?(User.current_user.email)
       self.support_notifications.where(:email => User.current_user.email).delete_all
     end
@@ -466,8 +483,8 @@ class SupportTicket < ActiveRecord::Base
     end
   end
 
-  def send_update_notifications
-    self.mail_to.each do |recipient|
+  def send_update_notifications(private = false)
+    self.mail_to(private).each do |recipient|
       SupportTicketMailer.update_notification(self, recipient).deliver
     end
   end

@@ -2,13 +2,12 @@
 
 <%= form_for(@ticket) do %>
   <% if @add_details %>
-    <dt><%= label_tag :content, "Details" %>:</dt>
-      <dd><%= text_area_tag :content %></dd>
-    <p class="submit">
+    <%= text_area_tag :content %>
+    <p>
       <%= submit_tag "Add details" %>
     </p>
   <% end %>
-  <p class="submit">
+  <p>
     <% if !@ticket.closed? %>
       <% unless @ticket.voted? %>
         <%= submit_tag "Vote up" %>

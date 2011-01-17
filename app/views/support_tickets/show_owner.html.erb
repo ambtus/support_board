@@ -7,9 +7,8 @@
   <%= hidden_field_tag :authentication_code, session[:authentication_code] %>
   <%= hidden_field_tag :email, @ticket.email %>
   <% if @add_details %>
-    <dt><%= label_tag :content, "Details" %>:</dt>
-      <dd><%= text_area_tag :content %></dd>
-    <p class="submit">
+    <%= text_area_tag :content %>
+    <p>
       <%= submit_tag "Add details" %>
     </p>
   <% end %>

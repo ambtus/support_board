@@ -3,7 +3,7 @@ class GithubController < ApplicationController
   def push
     payload = JSON.parse(params[:payload])
     render :nothing => true
-    pushed_at = payload["repository"]["pushed_at"].to_time
+    pushed_at = payload["repository"]["pushed_at"].to_date
     commits = payload["commits"]
     commits.each do |commit|
       cc = CodeCommit.new

@@ -1,60 +1,56 @@
-code_commit_1:
+--- 
+code_commit_1: 
   author: sam
   code_ticket_id: 
-  created_at: 2011-01-15 06:12:31 UTC
+  created_at: 2011-01-17 01:22:06 Z
   id: 1
-  message: no issue number
-  pushed_at: 2011-01-15 06:12:31
+  message: this should fix it
+  pushed_at: 2011-01-16
   status: unmatched
   support_identity_id: 1
-  updated_at: 2011-01-15 06:12:31 UTC
+  updated_at: 2011-01-17 01:22:06 Z
   url: 
-
-code_commit_2:
+code_commit_2: 
   author: rodney
   code_ticket_id: 3
-  created_at: 2011-01-15 06:12:31 UTC
+  created_at: 2011-01-17 01:22:07 Z
   id: 2
-  message: closes issue 3
-  pushed_at: 2011-01-15 06:12:31
+  message: finally closes issue 3
+  pushed_at: 2011-01-16
   status: verified
   support_identity_id: 2
-  updated_at: 2011-01-15 06:12:32 UTC
+  updated_at: 2011-01-17 01:22:07 Z
   url: 
-
-code_commit_3:
+code_commit_3: 
   author: rodney
   code_ticket_id: 4
-  created_at: 2011-01-15 06:12:32 UTC
+  created_at: 2011-01-17 01:22:08 Z
   id: 3
-  message: issue 4
-  pushed_at: 2011-01-15 06:12:32
+  message: issue 4. run db:migrate afterwards.
+  pushed_at: 2011-01-16
   status: staged
   support_identity_id: 2
-  updated_at: 2011-01-15 06:12:32 UTC
+  updated_at: 2011-01-17 01:22:08 Z
   url: 
-
-code_commit_4:
+code_commit_4: 
   author: blair
   code_ticket_id: 5
-  created_at: 2011-01-15 06:12:32 UTC
+  created_at: 2011-01-17 01:22:08 Z
   id: 4
-  message: fixed issue 5
-  pushed_at: 2011-01-15 06:12:32
+  message: related to issue 5
+  pushed_at: 2011-01-16
   status: matched
   support_identity_id: 3
-  updated_at: 2011-01-15 06:12:32 UTC
+  updated_at: 2011-01-17 01:22:08 Z
   url: 
-
-code_commit_5:
+code_commit_5: 
   author: bofh
   code_ticket_id: 6
-  created_at: 2011-01-15 06:12:32 UTC
+  created_at: 2011-01-17 01:22:08 Z
   id: 5
   message: issue 6
-  pushed_at: 2011-01-15 06:12:32
+  pushed_at: 2011-01-16
   status: deployed
   support_identity_id: 4
-  updated_at: 2011-01-15 06:12:32 UTC
+  updated_at: 2011-01-17 01:22:11 Z
   url: 
-

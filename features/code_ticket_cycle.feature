@@ -97,7 +97,7 @@ Scenario: admins can deploy the code tickets once they have all been verified an
 Scenario: deploying should close the waiting support tickets
   When I am logged in as "bofh"
     And I am on the support page
-  Then I should see "waiting for code changes (2)"
+  Then I should see "waiting for code changes (3)"
   When I follow "waiting for code changes"
     And I follow "Support Ticket #4"
   Then I should see "repeal DADA"

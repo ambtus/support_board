@@ -107,7 +107,7 @@ Scenario: admin's can mark an admin ticket admin resolved
   Then I should see "Status: closed by bofh"
   When I am on the support page
     And I follow "waiting on admin"
-  Then I should not see "Support Ticket #1"
+  Then I should not see "Support Ticket #1 some problem"
 
   # volunteers can reopen any ticket, even those closed by an admin
   When I am logged in as "sam"
@@ -119,38 +119,38 @@ Scenario: admin's can mark an admin ticket admin resolved
   Then I should see "Status: open"
   When I am on the support page
     And I follow "waiting on admin"
-  Then I should not see "Support Ticket #1"
+  Then I should not see "Support Ticket #1 some problem"
   When I am on the support page
     And I follow "Support Tickets"
-  Then I should see "Support Ticket #1"
+  Then I should see "Support Ticket #1 [unowned] some problem"
 
 Scenario: volunteers can mark a support ticket for an Admin to resolve
   When I am logged in as "blair"
   When I follow "Support Board"
-  Then I should see "waiting on admin (0)"
+  Then I should see "waiting on admin (2)"
   When I follow "Support Tickets"
     And I follow "Support Ticket #1"
     And I press "Needs admin attention"
   When I follow "Support Board"
-  Then I should see "waiting on admin (1)"
+  Then I should see "waiting on admin (3)"
     And I follow "waiting on admin"
     And I follow "Support Ticket #1"
   When I fill in "Reason" with "oops"
     And I press "Reopen"
   When I follow "Support Board"
-  Then I should see "waiting on admin (0)"
+  Then I should see "waiting on admin (2)"
 
 Scenario: volunteers can (un)post a support ticket as a Comment
   When I am logged in as "blair"
   When I follow "Support Board"
   Then I should see "Comments (6)"
-    And I should see "Support Tickets (7)"
+    And I should see "Support Tickets (11)"
   When I follow "Support Tickets"
     And I follow "Support Ticket #1"
     And I press "Post as comment"
   When I follow "Support Board"
   Then I should see "Comments (7)"
-    And I should see "Support Tickets (6)"
+    And I should see "Support Tickets (10)"
   When I follow "Support Tickets"
   Then I should not see "some problem"
   When I follow "Support Board"
@@ -161,7 +161,7 @@ Scenario: volunteers can (un)post a support ticket as a Comment
     And I press "Reopen"
   When I follow "Support Board"
   Then I should see "Comments (6)"
-    And I should see "Support Tickets (7)"
+    And I should see "Support Tickets (11)"
 
 Scenario: volunteers can (un)link a support ticket to an existing code ticket
   When I am logged in as "blair"
@@ -261,7 +261,7 @@ Scenario: volunteers can create a new (draft) FAQ and link to it in one step
     And I follow "Support Ticket #1"
     And I press "Create new FAQ"
   Then 1 emails should be delivered to "guest@ao3.org"
-  When I fill in "Title" with "New question"
+  When I fill in "Summary" with "New question"
     And I press "Update Faq"
   When I follow "Support Board"
     And I follow "Frequently Asked Questions"

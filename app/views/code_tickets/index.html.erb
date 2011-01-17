@@ -7,10 +7,10 @@
 <%= form_tag '/code_tickets', :method => :get do %>
   <%= label_tag :status %>
   <%= select_tag :status,
-                 options_for_select([:open] + CodeTicket.workflow_spec.state_names, params[:status]) %>
-  <%= label_tag :support_volunteer %>
-  <%= select_tag :support_volunteer, "<option></option>".html_safe +
-                 options_from_collection_for_select(SupportIdentity.official.all, "name", "name", params[:support_volunteer]) %>
+                 options_for_select([:open, :all] + CodeTicket.workflow_spec.state_names, params[:status]) %>
+  <%= label_tag :owned_by_support_identity %>
+  <%= select_tag :owned_by_support_identity, "<option></option>".html_safe +
+                 options_from_collection_for_select(SupportIdentity.official.all, "name", "name", params[:owned_by_support_identity]) %>
   <%= label_tag :user %>
   <%= text_field_tag :user, params[:user] %>
   <%= label_tag :comments_by_support_identity, "With comments by"  %>
@@ -22,7 +22,7 @@
 <dl>
 <% @tickets.each_with_index do |ticket, i| %>
   <dt><%= i + 1 %>: <%= link_to(ticket.name, ticket) %> (<%= ticket.vote_count %>)
-  <% if params[:status].blank? || params[:status] == "open" %>
+  <% if params[:status].blank? || ["open", "all"].include?(params[:status]) %>
     [<%= ticket.status %>]
   <% end %>
   </dt>

@@ -1,15 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SupportBoard</title>
+  <title>
+    Support Board
+    &raquo;
+    <%= controller.controller_name %>
+    <%= controller.action_name %>
+  </title>
   <%= stylesheet_link_tag :all %>
   <%= csrf_meta_tag %>
+  <style type="text/css">
+    #flash_notice { color: green; }
+    #flash_error { color: red; font-size: larger; }
+  </style>
 </head>
 <body>
-<%= render :partial => 'layouts/header' %>
+  <p id=header>
+    <% if current_user %>
+      <%= link_to "Log out #{current_user.login}", logout_path %>
+    <% else %>
+      <%= render :partial => 'user_sessions/login' %>
+    <% end %>
+    <%= link_to 'Support Board', support_path %>
+    <%= link_to "Open a New Support Ticket", new_support_ticket_path %>
+    <div id=flash_notice><%= notice %></div>
+    <div id=flash_error><%= flash[:error] %></div>
+  </p>
 
 <%= yield %>
 
-<%= render :partial => 'layouts/footer' %>
 </body>
 </html>

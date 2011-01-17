@@ -91,27 +91,28 @@ class FaqTest < ActiveSupport::TestCase
     assert_nil faq.watched?(support_ticket.authentication_code)
     assert_equal 0, faq.reload.mail_to.size
   end
-  test "comment on rfc" do
+  test "can comment on a faq when it's in rfc mode" do
     faq = Faq.find(2)
+    assert_equal 0, faq.faq_details.public_comments.count
     User.current_user = nil
     assert_raise(RuntimeError) { faq.comment!("something") }
-    assert_equal 0, faq.faq_details.count
+    assert_equal 0, faq.faq_details.public_comments.count
     User.current_user = User.find_by_login("dean")
     assert faq.comment!("user")
-    assert_equal 1, faq.faq_details.count
-    assert_match "dean wrote", faq.faq_details.first.byline
-    assert_equal "user", faq.faq_details.first.content
+    assert_equal 1, faq.faq_details.public_comments.count
+    assert_match "dean wrote", faq.faq_details.public_comments.first.byline
+    assert_equal "user", faq.faq_details.public_comments.first.content
     User.current_user = User.find_by_login("sam")
     assert faq.comment!("volunteer")
-    assert_equal 2, faq.faq_details.count
-    assert_match "sam (volunteer) wrote", faq.faq_details.last.byline
-    assert_equal "volunteer", faq.faq_details.last.content
+    assert_equal 2, faq.faq_details.public_comments.count
+    assert_match "sam (volunteer) wrote", faq.faq_details.public_comments.last.byline
+    assert_equal "volunteer", faq.faq_details.public_comments.last.content
     assert faq.comment!("unofficial volunteer", false)
-    assert_equal 3, faq.faq_details.count
-    assert_match "sam wrote", faq.faq_details.last.byline
-    assert_equal "unofficial volunteer", faq.faq_details.last.content
+    assert_equal 3, faq.faq_details.public_comments.count
+    assert_match "sam wrote", faq.faq_details.public_comments.last.byline
+    assert_equal "unofficial volunteer", faq.faq_details.public_comments.last.content
   end
-  test "comment on faq" do
+  test "can't comment on faq after it's posted" do
     faq = Faq.find(1)
     User.current_user = User.find_by_login("dean")
     assert_raise(RuntimeError) { faq.comment!("something") }

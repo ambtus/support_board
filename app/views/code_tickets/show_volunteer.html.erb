@@ -1,37 +1,37 @@
 <% if current_user.support_admin? %>
   <%= link_to "Edit", edit_code_ticket_path(@ticket) %>
+  <dl>
+  <dt>url:</dt>
+    <dd><%= @ticket.url %></dd>
+  <dt>browser:</dt>
+    <dd><%= @ticket.browser %></dd>
+  </dl>
 <% end %>
 
 <%= render "show" %>
 
-<dl>
-  <dt>url:</dt>
-    <dd><%= @ticket.url %></dd>
- <dt>browser:</dt>
-    <dd><%= @ticket.browser %></dd>
 <% if @ticket.support_tickets.count > 0 %>
+  <dl>
   <dt>Related Support tickets:</dt>
   <dd>
   <% @ticket.support_tickets.each do |support_ticket| %>
     <%= link_to support_ticket.id, support_ticket %>
   <% end %>
   </dd>
+  </dl>
 <% end %>
-</dl>
 
 <%= form_for(@ticket) do %>
   <% if @add_details %>
+    <%= text_area_tag :content %>
     <% if @ticket.unowned? %>
-      <dt><%= label_tag :unofficial, "Unofficial response?" %></dt>
-        <dd><%= check_box_tag :unofficial %></dd>
+      <p><%= label_tag :unofficial, "Unofficial response?" %> <%= check_box_tag :unofficial %></p>
     <% end %>
-    <dt><%= label_tag :content, "Details" %>:</dt>
-      <dd><%= text_area_tag :content %></dd>
-    <p class="submit">
+    <p>
       <%= submit_tag "Add details" %>
     </p>
   <% end %>
-  <p class="submit">
+  <p>
     <% if !@ticket.closed? %>
       <% unless @ticket.voted? %>
         <%= submit_tag "Vote up" %>

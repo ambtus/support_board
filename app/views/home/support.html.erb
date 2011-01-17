@@ -1,6 +1,6 @@
 <% unless current_user %>
   <%= form_for(SupportTicket.new) do %>
-    <p class="submit">
+    <p>
       <%= text_field_tag :email %>
       <%= submit_tag "Send me access links to my support tickets" %>
     </p>
@@ -27,6 +27,7 @@
 <% if current_user.try(:support_volunteer?) %>
   <strong>Support Tickets</strong>
   <ul id="support_tickets">
+    <li><%= link_to "unowned", support_tickets_path(:status => "unowned") %> (<%= SupportTicket.unowned.count %>)</li>
     <li><%= link_to "waiting on admin", support_tickets_path(:status => "waiting_on_admin") %> (<%= SupportTicket.waiting_on_admin.count %>)</li>
     <li><%= link_to "taken", support_tickets_path(:status => "taken") %> (<%= SupportTicket.taken.count %>)</li>
     <li><%= link_to "waiting for code changes", support_tickets_path(:status => "waiting") %>  (<%= SupportTicket.waiting.count %>)</li>
@@ -41,6 +42,7 @@
   <strong>Code Tickets</strong>
   <ul id="code_tickets">
     <li><%= link_to "create new code ticket", new_code_ticket_path %></li>
+    <li><%= link_to "unowned", code_tickets_path(:status => "unowned") %> (<%= CodeTicket.unowned.count %>)</li>
     <li><%= link_to "taken", code_tickets_path(:status => "taken") %> (<%= CodeTicket.taken.count %>)</li>
     <li><%= link_to "committed", code_tickets_path(:status => "committed") %> (<%= CodeTicket.committed.count %>)</li>
     <li><%= link_to "staged", code_tickets_path(:status => "staged") %> (<%= CodeTicket.staged.count %>)</li>
@@ -49,7 +51,6 @@
   </ul>
   <strong>Release Notes</strong>
   <ul id="release_notes">
-    <li><strong>Release Notes</strong></li>
     <li><%= link_to "create new release note", new_release_note_path %></li>
     <li><%= link_to "drafts", release_notes_path(:drafts => true) %> (<%= ReleaseNote.drafts.count %>)</li>
   </ul>
@@ -59,7 +60,7 @@
   <span id="admin">
   <p><%= link_to "Unmatched Commits", code_commits_path(:status => "unmatched") %> (<%= CodeCommit.unmatched.count %>)</p>
   <%= form_tag '/code_tickets' do %>
-    <p class="submit">
+    <p>
       <%= submit_tag "Stage Committed Code Tickets" %>
     </p>
     <p>
@@ -67,7 +68,7 @@
       <%= select_tag :release_note,
                    options_from_collection_for_select(ReleaseNote.drafts, "id", "release") %>
     </p>
-    <p class="submit">
+    <p>
       <%= submit_tag "Deploy Verified Code Tickets" %>
     </p>
   <% end %>

@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "author"
     t.string   "url"
     t.string   "message"
-    t.string   "pushed_at"
+    t.date     "pushed_at"
     t.integer  "code_ticket_id"
     t.integer  "support_identity_id"
     t.string   "status"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   create_table "code_notifications", :force => true do |t|
     t.integer  "code_ticket_id"
     t.string   "email"
+    t.boolean  "official",       :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -81,6 +82,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   create_table "faq_notifications", :force => true do |t|
     t.integer  "faq_id"
     t.string   "email"
+    t.boolean  "official",   :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -94,7 +96,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   end
 
   create_table "faqs", :force => true do |t|
-    t.string   "title"
+    t.string   "summary"
     t.text     "content"
     t.integer  "position"
     t.string   "status"
@@ -154,6 +156,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "support_ticket_id"
     t.boolean  "public_watcher",    :default => false
     t.string   "email"
+    t.boolean  "official",          :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -169,8 +172,8 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.string   "user_agent"
     t.string   "ip_address"
     t.string   "authenticity_token"
+    t.string   "browser"
     t.string   "status"
-    t.string   "revision"
     t.integer  "support_identity_id"
     t.integer  "faq_id"
     t.integer  "code_ticket_id"

@@ -6,9 +6,8 @@
       <dt><%= label_tag :unofficial, "Unofficial response?" %></dt>
         <dd><%= check_box_tag :unofficial %></dd>
     <% end %>
-    <dt><%= label_tag :content, "Details" %>:</dt>
-      <dd><%= text_area_tag :content %></dd>
-    <p class="submit">
+    <%= text_area_tag :content %>
+    <p>
       <%= submit_tag "Add details" %>
     </p>
   <% end %>

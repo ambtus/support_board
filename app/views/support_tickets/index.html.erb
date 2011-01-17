@@ -1,7 +1,7 @@
 <%= form_tag '/support_tickets', :method => :get  do %>
   <%= label_tag :status %>
   <%= select_tag :status,
-                 options_for_select([:open] + SupportTicket.workflow_spec.state_names, params[:status]) %>
+                 options_for_select([:open, :all] + SupportTicket.workflow_spec.state_names, params[:status]) %>
   <%= label_tag :owned_by_support_identity, "Owned by" %>
   <%= select_tag :owned_by_support_identity, "<option></option>".html_safe +
                  options_from_collection_for_select(SupportIdentity.official.all, "name", "name", params[:owned_by_support_identity]) %>
@@ -19,7 +19,11 @@
 <p><%= @tickets.size %> Tickets found</p>
 <dl>
 <% @tickets.each do |ticket| %>
-  <dt><%= link_to(ticket.name, ticket) %></dt>
+  <dt><%= link_to(ticket.name, ticket) %>
+    <% if params[:status].blank? || ["open", "all"].include?(params[:status]) %>
+      [<%= ticket.status %>]
+    <% end %>
+  </dt>
   <dd><%=raw ticket.summary %></dd>
 <% end %>
 </dl>

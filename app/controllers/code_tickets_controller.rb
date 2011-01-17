@@ -16,12 +16,14 @@ class CodeTicketsController < ApplicationController
     @ticket = CodeTicket.find(params[:id])
 
     if !current_user
-      @details = @ticket.code_details.where(:private => false)
+      @details = @ticket.code_details.public
       render :show_guest
     elsif current_user.support_volunteer?
       @add_details = true # create a new empty response template
+      @details = @ticket.code_details
       render :show_volunteer
     else # logged in as non-support volunteer
+      @details = @ticket.code_details.public
       if !@ticket.support_identity_id # if support took it, it's not longer open for comment
         @add_details = true # create a new empty response template
       end
@@ -55,8 +57,8 @@ class CodeTicketsController < ApplicationController
       @ticket = CodeTicket.new(params[:code_ticket])
       if @ticket.save
         flash[:notice] = "Code ticket created"
+        @ticket.comment!(params[:details])
         redirect_to @ticket
-        @ticket.send_create_notifications
       else
         # reset so don't get field with errors which breaks definition lists
         flash[:error] = @ticket.errors.full_messages.join(", ")

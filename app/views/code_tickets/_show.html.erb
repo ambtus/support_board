@@ -1,20 +1,9 @@
-<dl>
-  <dt><%= "Status" %>:</dt>
-    <dd><%= @ticket.status_line %>
-      <% if @ticket.code_ticket_id %>
-          <%= link_to @ticket.code_ticket.name, @ticket.code_ticket %>
-      <% end %>
-    </dd>
-    <% @ticket.code_commits.each do |commit| %>
-      <dt>Commit <%= link_to commit.name, commit %> (<%= link_to "Github", commit.url %>):</dt>
-        <dd><%= commit.message %></dd>
-    <% end %>
-  <dt><%= "Votes" %>:</dt>
-    <dd><%= @ticket.vote_count %></dd>
-  <dt><%= "Summary" %>:</dt>
-    <dd><%= raw @ticket.summary %></dd>
-  <% @ticket.code_details.each do |detail| %>
-    <dt><%= detail.byline %>:</dt>
-      <dd><%= raw detail.content %></dd>
-  <% end %>
-</dl>
+<%= render :partial => "blurb", :locals => { :ticket => @ticket }  %>
+
+<% @details.each do |detail| %>
+  <%= render :partial => "code_details/blurb", :locals => { :detail => detail }  %>
+<% end %>
+
+<% @ticket.code_commits.each do |commit| %>
+  <%= render :partial => "code_commits/blurb", :locals => { :commit => commit }  %>
+<% end %>

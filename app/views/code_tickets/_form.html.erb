@@ -1,13 +1,10 @@
 <%= form_for(@ticket) do |t| %>
-  <dl>
-    <dt><%= t.label :summary %>:</dt>
-      <dd><%= t.text_field :summary %></dd>
-    <dt><%= t.label :url %>:</dt>
-      <dd><%= t.text_field :url %></dd>
-   <dt><%= t.label :browser %>:</dt>
-      <dd><%= t.text_field :browser %></dd>
- </dl>
-  <p class="submit">
-    <%= t.submit %>
-  </p>
+  <p><%= t.text_field :summary %> <%= t.label :summary %></p>
+  <% if @add_details %>
+    <p><%= label_tag :details %>:</p>
+    <p><%= text_area_tag :content %></p>
+  <% end %>
+  <p><%= t.text_field :url %> <%= t.label :url %></p>
+  <p><%= t.text_field :browser %> <%= t.label :browser %></p>
+  <p><%= t.submit %></p>
 <% end %>

@@ -6,7 +6,7 @@ class FaqMailer < ActionMailer::Base
     @details = (@faq.faq_details.count > 0) ? @faq.code_details : []
     mail(
       :to => recipient,
-      :subject => "[AO3] Updated FAQ #{faq.title}"
+      :subject => "[AO3] Updated FAQ #{faq.summary}"
     )
   end
 

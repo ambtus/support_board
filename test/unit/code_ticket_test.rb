@@ -76,10 +76,10 @@ class CodeTicketTest < ActiveSupport::TestCase
     ticket = CodeTicket.find(1)
     assert_equal 1, ticket.vote_count
     dupe = CodeTicket.find(2)
-    assert_equal 3, dupe.vote_count
+    assert_equal 4, dupe.vote_count
     User.current_user = User.find_by_login("rodney")
     assert dupe.duplicate!(ticket.id)
-    assert_equal 4, ticket.vote_count
+    assert_equal 5, ticket.vote_count
     assert_equal 0, dupe.vote_count
   end
   test "move support tickets from duplicate" do
@@ -93,13 +93,14 @@ class CodeTicketTest < ActiveSupport::TestCase
     assert_equal 0, dupe.support_tickets.count
   end
   test "scopes" do
-    assert_equal 1, CodeTicket.unowned.count
-    assert_equal 1, CodeTicket.taken.count
-    assert_equal 1, CodeTicket.committed.count
-    assert_equal 1, CodeTicket.staged.count
-    assert_equal 1, CodeTicket.verified.count
-    assert_equal 1, CodeTicket.closed.count
-    assert_equal 5, CodeTicket.not_closed.count
+    assert_equal 7, CodeTicket.all.count
+    assert_equal 6, CodeTicket.not_closed.count
+    assert_equal [1, 7], CodeTicket.unowned.ids
+    assert_equal [2], CodeTicket.taken.ids
+    assert_equal [5], CodeTicket.committed.ids
+    assert_equal [4], CodeTicket.staged.ids
+    assert_equal [3], CodeTicket.verified.ids
+    assert_equal [6], CodeTicket.closed.ids
   end
   test "vote" do
     ticket = CodeTicket.find(1)

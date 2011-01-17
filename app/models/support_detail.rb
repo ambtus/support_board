@@ -2,10 +2,15 @@ class SupportDetail < ActiveRecord::Base
   belongs_to :support_ticket
   belongs_to :support_identity
 
-  scope :not_private, where(:private => false)
   scope :resolved, where(:resolved_ticket => true)
+  scope :system_log, where(:system_log => true)
+
+  def self.public_comments
+    where(:private => false).where(:system_log => false)
+  end
 
   def by_owner?
+    return false if self.support_response # official support response
     return true if self.support_identity.blank?  # only owners can add details without being logged in
     return false if !self.support_ticket.user # the ticket was opened by a guest but is being commented on by a user
     self.support_ticket.user.support_identity == self.support_identity # was the ticket opened and commented on by the same user?
@@ -28,7 +33,8 @@ class SupportDetail < ActiveRecord::Base
     name = self.byline_name
     system = self.system_log? ? "" : " wrote"
     accepted = self.resolved_ticket? ? " (accepted)" : ""
-    "[#{date}] #{name}#{system}#{accepted}"
+    private = self.private? ? " [private]" : ""
+    "[#{date}] #{name}#{system}#{accepted}#{private}"
   end
 
   # SANITIZER stuff

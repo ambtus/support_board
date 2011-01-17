@@ -23,7 +23,6 @@ class CodeTicketMailer < ActionMailer::Base
     @ticket = ticket
     @stealer = stealer
     @url = code_ticket_url(@ticket)
-    @details = (@ticket.code_details.count > 0) ? @ticket.code_details : []
     mail(
       :to => @ticket.support_identity.user.email,
       :subject => "[AO3] Stolen #{ticket.name}"

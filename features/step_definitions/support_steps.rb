@@ -39,7 +39,7 @@ When /^"([^"]*)" creates a faq from support ticket (\d+)$/ do |login, number|
   ticket = SupportTicket.find(number.to_i)
   User.current_user = User.find_by_login(login)
   assert faq = ticket.answer!
-  faq.update_attribute(:title, "new faq")
+  faq.update_attribute(:summary, "new faq")
 end
 
 When /^"([^"]*)" creates a faq from the last support ticket$/ do |login|
@@ -47,7 +47,7 @@ When /^"([^"]*)" creates a faq from the last support ticket$/ do |login|
   ticket = SupportTicket.last
   User.current_user = User.find_by_login(login)
   assert faq = ticket.answer!
-  faq.update_attribute(:title, "new faq")
+  faq.update_attribute(:summary, "new faq")
 end
 
 When /^"([^"]*)" links support ticket (\d+) to faq (\d+)$/ do |login, arg1, arg2|
