@@ -136,9 +136,37 @@ class SupportTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     assert !ticket.stealable?
   end
-  test "ticket support_identity" do
+  test "take_and_watch and mail_to" do
+    # no take_and_watch on unowned tickets
+    assert_nil SupportTicket.find(1).support_identity_id
+    # no take_and_watch on unowned tickets even if opened by volunteer
+    assert_nil SupportTicket.find(8).support_identity_id
+    # no take_and_watch on needs_admin tickets
+    assert_nil SupportTicket.find(17).support_identity_id
+    assert !SupportTicket.find(17).mail_to.include?("blair@ao3.org")
+    # spam! calls take_and_watch
     assert_equal "sam", SupportTicket.find(2).support_identity.name
+    assert_includes SupportTicket.find(2).mail_to, "sam@ao3.org"
+    # take! calls take_and_watch
+    assert_equal "sam", SupportTicket.find(3).support_identity.name
+    assert_includes SupportTicket.find(3).mail_to, "sam@ao3.org"
+    # steal! calls take_and_watch
+    User.current_user = User.find_by_login("blair")
+    SupportTicket.find(3).steal!
+    assert_equal "blair", SupportTicket.find(3).support_identity.name
+    assert_includes SupportTicket.find(3).mail_to, "blair@ao3.org"
+    # needs_fix! calls take_and_watch
     assert_equal "rodney", SupportTicket.find(4).support_identity.name
+    assert_includes SupportTicket.find(4).mail_to, "rodney@ao3.org"
+    # answer! calls take_and_watch
+    assert_equal "rodney", SupportTicket.find(5).support_identity.name
+    assert_includes SupportTicket.find(5).mail_to, "rodney@ao3.org"
+    # post! calls take_and_watch
+    assert_equal "blair", SupportTicket.find(10).support_identity.name
+    assert_includes SupportTicket.find(10).mail_to, "blair@ao3.org"
+    # resolve! calls take_and_watch
+    assert_equal "bofh", SupportTicket.find(19).support_identity.name
+    assert_includes SupportTicket.find(19).mail_to, "bofh@ao3.org"
   end
   test "scopes" do
     assert_equal 22, SupportTicket.count
