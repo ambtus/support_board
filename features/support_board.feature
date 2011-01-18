@@ -182,4 +182,11 @@ Scenario: link to code tickets they've commented on, public
     And I should see "Code Ticket #5"
     But I should not see "Code Ticket #2"
 
+# TODO
+Scenario: support tickets can be internationalized
+Scenario: support tickets can be filtered by language
+
+# TODO
+Scenario: search as well as filter
+
 

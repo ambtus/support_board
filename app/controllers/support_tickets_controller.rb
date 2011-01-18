@@ -101,15 +101,16 @@ class SupportTicketsController < ApplicationController
     end
     Rails.logger.debug "update fixed session: #{session}"
 
+    # FIXME verify authentication code if no current user
     case params[:commit]
     when "This answer resolves my issue"
-      @ticket.accept!(params[:support_detail_id], params[:email])
+      @ticket.accept!(params[:support_detail_id])
     when "Watch this ticket"
       @ticket.watch!
     when "Don't watch this ticket"
-      @ticket.unwatch!(params[:email])
+      @ticket.unwatch!
     when "Make private"
-      @ticket.make_private!(params[:email])
+      @ticket.make_private!
     when "Hide my user name"
       @ticket.hide_username!
     when "Display my user name"
@@ -127,11 +128,11 @@ class SupportTicketsController < ApplicationController
     when "Post as comment"
       @ticket.post!
     when "Reopen"
-      @ticket.reopen!(params[:reason], params[:email])
+      @ticket.reopen!(params[:reason])
     when "Needs admin attention"
       @ticket.needs_admin!
     when "Add details"
-      @ticket.comment!(params[:content], params[:official], params[:email])
+      @ticket.comment!(params[:content], params[:official])
     when "Resolve"
       @ticket.resolve!(params[:resolution])
     when "Needs this fix"

@@ -156,16 +156,16 @@ class CodeTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("dean")
     assert ticket.comment!("user")
     assert_equal 1, ticket.code_details.count
-    assert_match "dean wrote", ticket.code_details.first.byline
+    assert_match "dean wrote", ticket.code_details.first.info
     assert_equal "user", ticket.code_details.first.content
     User.current_user = User.find_by_login("sam")
     assert ticket.comment!("volunteer")
     assert_equal 2, ticket.code_details.count
-    assert_match "sam (volunteer) wrote", ticket.code_details.last.byline
+    assert_match "sam (volunteer) wrote", ticket.code_details.last.info
     assert_equal "volunteer", ticket.code_details.last.content
     assert ticket.comment!("unofficial volunteer", false)
     assert_equal 3, ticket.code_details.count
-    assert_match "sam wrote", ticket.code_details.last.byline
+    assert_match "sam wrote", ticket.code_details.last.info
     assert_equal "unofficial volunteer", ticket.code_details.last.content
   end
   test "comment on owned ticket" do
@@ -177,8 +177,8 @@ class CodeTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     assert ticket.comment!("important stuff")
     assert_equal 2, ticket.code_details.count
-    assert_match "sam (volunteer) wrote", ticket.code_details.last.byline
     assert_equal "important stuff", ticket.code_details.last.content
+    assert_match "sam (volunteer) wrote", ticket.code_details.last.info
     assert_raise(RuntimeError) { ticket.comment!("unofficial comment", false) }
     assert_equal 2, ticket.code_details.count
   end

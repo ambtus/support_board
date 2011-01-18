@@ -347,11 +347,9 @@ class SupportTicket < ActiveRecord::Base
     self.watch!
   end
 
-  def reopen(reason, email=nil)
+  def reopen(reason)
     raise ArgumentError, "Couldn't reopen. No reason given." if reason.blank?
-    if !email.blank? || !User.current_user
-      raise SecurityError, "Couldn't reopen. not owner!" unless (self.email == email)
-    elsif !User.current_user.support_volunteer?
+    if User.current_user && !User.current_user.support_volunteer?
       raise SecurityError, "Couldn't reopen. not owner!" unless (User.current_user.id == self.user_id)
     end
     self.code_ticket_id = self.faq_id = self.support_identity_id = nil
@@ -409,12 +407,9 @@ class SupportTicket < ActiveRecord::Base
     self.support_identity = User.current_user.support_identity
   end
 
-  def accept(detail_id, email = nil)
+  def accept(detail_id)
     detail = self.support_details.find(detail_id) # will raise if no detail
-    if !email.blank?
-      raise SecurityError, "Couldn't accept answer. not owner!" unless (self.email == email)
-    else
-      raise SecurityError, "Couldn't accept answer. Not logged in." unless User.current_user
+    if User.current_user
       raise SecurityError, "Couldn't accept answer. not owner!" unless (self.user == User.current_user)
     end
     detail.update_attribute(:resolved_ticket, true)
@@ -435,16 +430,12 @@ class SupportTicket < ActiveRecord::Base
   end
 
   # leaves a non-system_log comment on the ticket. sends notifications.
-  def comment!(content, official=true, email=nil, private = false)
-    # only logged in users or the ticket owner can comment
-    if !User.current_user && email
-      raise SecurityError, "Couldn't comment. not owner!" unless (self.email == email)
-    elsif User.current_user.nil?
-      raise SecurityError, "Couldn't comment. Not logged in."
-    end
+  def comment!(content, official=true, private = false)
+    # not logged in == guest owner == not official
+    official = false unless User.current_user
     support_response = (official && User.current_user.support_volunteer?)
     raise ArgumentError, "Only official comments can be private" if private && !support_response
-    # only support volunteers or owners can comment on non-unowned or private tickets
+    # on non-unowned or private tickets, only support volunteers or owners can comment
     if (self.unowned? && !self.private?) || support_response || (User.current_user == self.user)
       self.support_details.create(:content => content,
                                :support_identity_id => User.current_user.try(:support_identity).try(:id),
@@ -459,18 +450,15 @@ class SupportTicket < ActiveRecord::Base
 
   # makes a ticket private (visible only to volunteers). can't be undone.
   # removes notifications from watchers who are not the owner or volunteers
-  def make_private!(email = nil)
-    if !email.blank?
-      raise SecurityError, "Couldn't make private. not owner!" unless (self.email == email)
-    else
-      raise SecurityError, "Couldn't make private. Not logged in." unless User.current_user
-      if !User.current_user.support_volunteer? && (User.current_user != self.user)
-        raise SecurityError, "Couldn't make private. Not owner."
-      end
+  def make_private!
+    if User.current_user && !User.current_user.support_volunteer?
+      raise SecurityError, "Couldn't make private. not owner!" unless (self.user == User.current_user)
     end
     self.update_attribute(:private, true)
     # remove all watchers who aren't support volunteers or owners
-    self.support_notifications.where(:public_watcher => true).delete_all
+    notifications = self.support_notifications.where(:public_watcher => true)
+    Rails.logger.debug "removing public watchers: #{notifications.map(&:email)}"
+    notifications.delete_all
     support_identity_id = User.current_user.try(:support_identity_id)
     official = User.current_user && User.current_user.support_volunteer?
     content = "made private"
@@ -484,11 +472,8 @@ class SupportTicket < ActiveRecord::Base
   def hide_username!
     if self.email
       raise "Couldn't hide username. Guest tickets don't have usernames"
-    else
-      raise SecurityError, "Couldn't hide username. Not logged in." unless User.current_user
-      if !User.current_user.support_volunteer? && (User.current_user != self.user)
-        raise SecurityError, "Couldn't hide username. Not owner."
-      end
+    elsif User.current_user && !User.current_user.support_volunteer?
+      raise SecurityError, "Couldn't make anonymous. not owner!" unless (self.user == User.current_user)
     end
     self.update_attribute(:anonymous, true)
     support_identity_id = User.current_user.try(:support_identity_id)
@@ -505,11 +490,8 @@ class SupportTicket < ActiveRecord::Base
   def show_username!
     if self.email
       raise "Couldn't show username. Guest tickets don't have usernames"
-    else
-      raise SecurityError, "Couldn't show username. Not logged in." unless User.current_user
-      if !User.current_user.support_volunteer? && (User.current_user != self.user)
-        raise SecurityError, "Couldn't show username. Not owner."
-      end
+    elsif User.current_user && !User.current_user.support_volunteer?
+      raise SecurityError, "Couldn't make not anonymous. not owner!" unless (self.user == User.current_user)
     end
     self.update_attribute(:anonymous, false)
     support_identity_id = User.current_user.support_identity_id
@@ -524,14 +506,16 @@ class SupportTicket < ActiveRecord::Base
 
   # add current user or ticket owner to watchers
   def watch!
+    return true if watched?
     if User.current_user
-      public_watcher = !User.current_user.support_volunteer?
-      raise SecurityError, "Couldn't watch. ticket private!" if (public_watcher && self.private? && !owner?)
+      official = User.current_user.support_volunteer?
+      public_watcher = !official && !owner?
+      raise SecurityError, "Couldn't watch. ticket private!" if (public_watcher && self.private?)
       # create a support identity if one doesn't exist
       User.current_user.support_identity unless User.current_user.support_identity_id
-      self.support_notifications.create(:email => User.current_user.email, :public_watcher => public_watcher)
+      self.support_notifications.create(:email => User.current_user.email, :public_watcher => public_watcher, :official => official)
     else
-      self.support_notifications.create(:email => self.email)
+      self.support_notifications.create!(:email => self.email)
     end
   end
 

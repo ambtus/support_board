@@ -106,9 +106,9 @@ faq1.post!
 
 User.current_user = rodney
 faq2 = Faq.create!(:summary => "why we don't have enough ZPMs", :content => "this should be self evident")
-faq2.comment!("why do i have to write this?", true, nil, true)
+faq2.comment!("why do i have to write this?", true, true)
 User.current_user = blair
-faq2.comment!("because nobody else can", true, nil, true)
+faq2.comment!("because nobody else can", true, true)
 
 User.current_user = rodney
 faq3 =Faq.create!(:summary => "what's DADT?", :content => "Ask me no questions and I'll tell you no lies")
@@ -119,7 +119,7 @@ faq3.vote!
 User.current_user = bofh
 faq4 = Faq.create!(:summary => "how to recover your password", :content => "visit the lost password page")
 User.current_user = bofh
-faq4.comment!("hack the database ;)", true, nil, true)
+faq4.comment!("hack the database ;)", true, true)
 faq4.post!
 User.current_user = nil
 faq4.vote!
@@ -151,12 +151,12 @@ st2 = SupportTicket.create!(
   :ip_address => "72.14.204.103"
 )
 User.current_user = sam
-st2.comment!("a personal problem, my ass", true, nil, true)
+st2.comment!("a personal problem, my ass", true, true)
 st2.spam!
 User.current_user = rodney
-st2.comment!("your ass is not my problem", true, nil, true)
+st2.comment!("your ass is not my problem", true, true)
 User.current_user = bofh
-st2.comment!("cut it out, guys", true, nil, true)
+st2.comment!("cut it out, guys", true, true)
 
 User.current_user = dean
 st3 = SupportTicket.create!(
@@ -234,6 +234,7 @@ st8 = SupportTicket.create!(
 User.current_user = sam
 st8.comment!("don't make me come looking for you!", false)
 
+User.current_user = dean
 st9 = SupportTicket.create!(
   :summary => "where are you, castiel?",
   :user_id => dean.id,
@@ -303,7 +304,7 @@ st14 = SupportTicket.create!(
   :ip_address => "71.111.1.40"
 )
 User.current_user = sam
-st14.comment!("small loss", true, nil, true)
+st14.comment!("small loss", true, true)
 st14.post!
 
 User.current_user = jim
@@ -330,13 +331,13 @@ st16 = SupportTicket.create!(
   :ip_address => "24.223.182.51"
 )
 User.current_user = blair
-st16.comment!("i bet this is jim", true, nil, true)
+st16.comment!("i bet this is jim", true, true)
 User.current_user = sam
-st16.comment!("nah, must be dean", true, nil, true)
+st16.comment!("nah, must be dean", true, true)
 User.current_user = rodney
-st16.comment!("better not be john", true, nil, true)
+st16.comment!("better not be john", true, true)
 User.current_user = bofh
-st16.comment!("stop gossiping about the lusers and get back to work", true, nil, true)
+st16.comment!("stop gossiping about the lusers and get back to work", true, true)
 
 User.current_user = nil
 st17 = SupportTicket.create!(
@@ -394,7 +395,7 @@ st21 = SupportTicket.create!(
   :ip_address => "71.111.1.40"
 )
 User.current_user = blair
-st21.comment!("i thought he was leaving fandom forever", true, nil, true)
+st21.comment!("i thought he was leaving fandom forever", true, true)
 st21.needs_admin!
 User.current_user = sam
-st21.comment!("forever is a long time", true, nil, true)
+st21.comment!("forever is a long time", true, true)

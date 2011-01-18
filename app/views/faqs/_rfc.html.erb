@@ -6,11 +6,12 @@
   <%= render :partial => "details/blurb", :locals => { :detail => detail }  %>
 <% end %>
 
-<% if current_user %>
+<% if current_user || session[:authentication_code] %>
   <%= form_for(@faq) do %>
     <%= text_area_tag :content, nil, :size => "72x10" %>
     <% if current_user.try(:support_volunteer?) %>
       <p><%= check_box_tag :official, true, true %> <%= label_tag :official, "Official response?" %></p>
+      <p><%= check_box_tag :private, false, false %> <%= label_tag :official, "Private response?" %></p>
     <% end %>
     <p><%= submit_tag "Add details" %></p>
     <p>

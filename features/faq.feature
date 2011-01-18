@@ -225,3 +225,8 @@ Scenario: users can remove a link to a posted FAQ if they don't think it resolve
 
 # TODO
 Scenario: volunteers can send email to an admin asking them to post a faq
+
+# TODO
+Scenario: faqs can be translated
+Scenario: faqs can be filtered by language
+

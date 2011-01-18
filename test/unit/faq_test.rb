@@ -100,16 +100,16 @@ class FaqTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("dean")
     assert faq.comment!("user")
     assert_equal 1, faq.faq_details.public_comments.count
-    assert_match "dean wrote", faq.faq_details.public_comments.first.byline
+    assert_match "dean wrote", faq.faq_details.public_comments.first.info
     assert_equal "user", faq.faq_details.public_comments.first.content
     User.current_user = User.find_by_login("sam")
     assert faq.comment!("volunteer")
     assert_equal 2, faq.faq_details.public_comments.count
-    assert_match "sam (volunteer) wrote", faq.faq_details.public_comments.last.byline
+    assert_match "sam (volunteer) wrote", faq.faq_details.public_comments.last.info
     assert_equal "volunteer", faq.faq_details.public_comments.last.content
     assert faq.comment!("unofficial volunteer", false)
     assert_equal 3, faq.faq_details.public_comments.count
-    assert_match "sam wrote", faq.faq_details.public_comments.last.byline
+    assert_match "sam wrote", faq.faq_details.public_comments.last.info
     assert_equal "unofficial volunteer", faq.faq_details.public_comments.last.content
   end
   test "can't comment on faq after it's posted" do

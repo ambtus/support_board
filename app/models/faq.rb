@@ -42,7 +42,7 @@ class Faq < ActiveRecord::Base
 
   # FAQ DETAILS stuff
   # only logged in users or guest owners can comment
-  def comment!(content, official=true, authentication_code=nil, private = false)
+  def comment!(content, official=true, private = false, authentication_code=nil)
     raise "not open for comments" unless self.rfc?
     if !User.current_user
       raise "Couldn't comment. not logged in and not guest owner!" unless guest_owner?(authentication_code)

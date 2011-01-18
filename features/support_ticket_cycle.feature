@@ -41,6 +41,9 @@ Scenario: users can comment on unowned tickets and those comments can be chosen 
     And I follow "Support Tickets"
   Then I should not see "Support Ticket #8"
 
+# TODO
+Scenario: a users's support_identity can be banned by a support admin after which they can no longer comment
+
 Scenario: guests can (un)resolve their own support tickets using a user answer
   When "jim" comments on support ticket 1
   Then 1 email should be delivered to "guest@ao3.org"
