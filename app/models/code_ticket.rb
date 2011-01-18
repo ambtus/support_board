@@ -260,6 +260,7 @@ class CodeTicket < ActiveRecord::Base
   def verify
     raise "Couldn't verify. Not logged in." unless User.current_user
     raise "Couldn't verify. Not support volunteer." unless User.current_user.support_volunteer?
+    raise "Couldn't verify, same person committed" unless User.current_user.support_identity != self.support_identity
     self.code_commits.each {|cc| cc.verify!}
     self.support_identity_id = User.current_user.support_identity_id
     self.watch! unless self.watched?

@@ -96,7 +96,7 @@ ct6.verify!
 rn = ReleaseNote.create!(:release => "1.0", :content => "new in this release, the www!")
 ct6.deploy!(rn.id)
 rn.update_attribute(:posted, true)
-rn = ReleaseNote.create!(:release => "2.0", :content => "new in this release, web 2.0!")
+rn2 = ReleaseNote.create!(:release => "2.0", :content => "new in this release, web 2.0!")
 
 # faqs
 User.current_user = sam
@@ -364,6 +364,12 @@ st18 = SupportTicket.create!(
 )
 User.current_user = sam
 ct7 = st18.needs_fix!
+CodeCommit.create!(:author => "rodney", :message => "partial fix for issue 7", :pushed_at => Time.now)
+ct7.reload.stage!
+User.current_user = blair
+ct7.verify!
+User.current_user = bofh
+ct7.deploy!(rn2)
 
 User.current_user = nil
 st19 = SupportTicket.create!(

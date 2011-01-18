@@ -51,25 +51,29 @@ class SupportTicketTest < ActiveSupport::TestCase
   end
   test "status lines" do
     assert_equal "open", SupportTicket.find(1).status_line
+    assert_equal "waiting for a code fix", SupportTicket.find(4).status_line
     assert_equal "waiting for an admin", SupportTicket.find(17).status_line
     assert_equal "spam", SupportTicket.find(2).status_line
+    assert_equal "closed by owner", SupportTicket.find(22).status_line
+    assert_equal "fixed in release", SupportTicket.find(18).status_line
+    assert_equal "answered by FAQ", SupportTicket.find(5).status_line # faq
+    assert_equal "answered by FAQ", SupportTicket.find(6).status_line # rfc
     assert_equal "taken by sam", SupportTicket.find(3).status_line
-    assert_equal "waiting for a code fix", SupportTicket.find(4).status_line
-    assert_equal "answered by FAQ", SupportTicket.find(5).status_line
-    assert_equal "answered by FAQ", SupportTicket.find(6).status_line
+    assert_equal "posted by blair", SupportTicket.find(10).status_line
+    assert_equal "closed by bofh", SupportTicket.find(19).status_line # resolved by admin
   end
   test "owned by volunteer" do
     assert_equal "sam", SupportTicket.find(2).support_identity.name
     assert_equal "rodney", SupportTicket.find(4).support_identity.name
   end
   test "scopes" do
-    assert_equal 21, SupportTicket.count
+    assert_equal 22, SupportTicket.count
     assert_equal [1, 8, 16, 20], SupportTicket.unowned.ids
     assert_equal [3, 9], SupportTicket.taken.ids
-    assert_equal [4, 7, 18], SupportTicket.waiting.ids
+    assert_equal [4, 7], SupportTicket.waiting.ids
     assert_equal [17, 21], SupportTicket.waiting_on_admin.ids
     assert_equal [2], SupportTicket.spam.ids
-    assert_equal [5, 6, 19], SupportTicket.closed.ids
+    assert_equal [5, 6, 18, 19, 22], SupportTicket.closed.ids
     assert_equal [10, 11, 12, 13, 14, 15], SupportTicket.posted.ids
   end
   test "reopen by user" do
