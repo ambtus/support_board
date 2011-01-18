@@ -101,6 +101,25 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal "sam", SupportTicket.find(2).support_identity.name
     assert_equal "rodney", SupportTicket.find(4).support_identity.name
   end
+  test "public watcher? when guest" do
+    ticket = SupportTicket.find(3)
+    assert !ticket.public_watcher?
+  end
+  test "public watcher? when user owner" do
+    ticket = SupportTicket.find(3)
+    User.current_user = User.find_by_login("dean")
+    assert !ticket.public_watcher?
+  end
+  test "public watcher? when volunteer" do
+    ticket = SupportTicket.find(3)
+    User.current_user = User.find_by_login("sam")
+    assert !ticket.public_watcher?
+  end
+  test "public watcher? when user" do
+    ticket = SupportTicket.find(3)
+    User.current_user = User.find_by_login("jim")
+    assert ticket.public_watcher?
+  end
   test "scopes" do
     assert_equal 22, SupportTicket.count
     assert_equal [1, 8, 16, 20], SupportTicket.unowned.ids
