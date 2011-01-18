@@ -9,17 +9,16 @@ class SupportTicket < ActiveRecord::Base
   has_many :support_notifications  # a bunch of email addresses for update notifications
   has_many :support_details  # like comments, except non-threaded and with extra attributes
 
-  include Workflow
-  workflow_column :status
-
   ### VALIDATIONS and CALLBACKS
 
+  # make a ticket consistently either a guest ticket or a user ticket
   before_validation(:on => :create) do
-    if !self.email.blank?
+    if User.current_user
+      self.user = User.current_user
+      self.email = nil # just to be on the safe side
+    else
       self.anonymous = false # guests are already anonymous
       self.authentication_code = SecureRandom.hex(10)
-    else
-      self.user = User.current_user
     end
     true # ensure we reach validations for better error messages
   end
@@ -99,6 +98,28 @@ class SupportTicket < ActiveRecord::Base
     (self.email ? "a guest" : (self.anonymous? ? "a user" : self.user.login)) +
     (self.private? ? " [Private]" : "") +
     ")"
+  end
+
+  # human language interpretation of status
+  # TODO needs translation
+  def status_line
+    if self.unowned?
+      "open"
+    elsif self.waiting?
+      "waiting for a code fix" # should be followed by link to code ticket
+    elsif self.waiting_on_admin?
+      "waiting for an admin"
+    elsif self.spam?
+      "spam"
+    elsif self.closed? && self.support_identity_id.nil?
+      "closed by owner"
+    elsif self.closed? && self.code_ticket_id
+      "fixed in release"  # should be followed by link to release note
+    elsif self.closed? && self.faq_id
+      "answered by FAQ"  # should be followed link to faq
+    else
+      "#{self.status} by #{self.support_identity.name}"
+    end
   end
 
   # used in controller to determine whether to show owner view
@@ -252,28 +273,9 @@ class SupportTicket < ActiveRecord::Base
   end
 
   # WORKFLOW / STATE MACHINE
+  include Workflow
+  workflow_column :status
 
-  # human language interpretation of status
-  # TODO needs translation
-  def status_line
-    if self.unowned?
-      "open"
-    elsif self.waiting?
-      "waiting for a code fix"
-    elsif self.waiting_on_admin?
-      "waiting for an admin"
-    elsif self.spam?
-      "spam"
-    elsif self.closed? && self.support_identity_id.nil?
-      "closed by owner"
-    elsif self.closed? && self.code_ticket_id
-      "fixed in #{self.code_ticket.release_note.release}"
-    elsif self.closed? && self.faq_id
-      "answered by #{self.faq.summary}"
-    else
-      "#{self.status} by #{self.support_identity.name}"
-    end
-  end
 
   workflow do
     state :unowned do
@@ -359,7 +361,7 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def steal
-    self.send_steal_notification(User.current_user)
+    self.send_steal_notification
     self.take_and_watch!
   end
 
@@ -463,12 +465,13 @@ class SupportTicket < ActiveRecord::Base
 
   # leaves a non-system_log comment on the ticket. sends notifications.
   def comment!(content, official_comment, private_comment)
-    self.support_details.create(:content => content,
+    comment = self.support_details.create(:content => content,
                                :support_identity_id => User.current_user.try(:support_identity).try(:id),
                                :support_response => official_comment,
                                :system_log => false,
                                :private => private)
     self.send_update_notifications(private_comment)
+    return comment
   end
 
   public
@@ -584,7 +587,7 @@ class SupportTicket < ActiveRecord::Base
 
   def raise_unless_user_owner
     raise_unless_logged_in
-    raise "trying to check user owner on a guest ticket!" unless self.user_id
+    raise SecurityError, "trying to check user owner on a guest ticket!" unless self.user_id
     raise SecurityError, "not user owner!" unless (self.user_id == User.current_user.id)
   end
 

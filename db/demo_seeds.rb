@@ -135,7 +135,7 @@ st1 = SupportTicket.create!(
   :summary => "some problem",
   :email => "guest@ao3.org",
   :url => "/",
-  :authenticity_token => "123456",
+  :authenticity_token => "OogoGee7oosheeciogie",
   :user_agent => "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16",
   :ip_address => "72.14.204.103"
 )
@@ -146,7 +146,7 @@ st2 = SupportTicket.create!(
   :email => "guest@ao3.org",
   :private => true,
   :url => "/faqs",
-  :authenticity_token => "123456",
+  :authenticity_token => "OogoGee7oosheeciogie",
   :user_agent => "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16",
   :ip_address => "72.14.204.103"
 )
@@ -163,7 +163,7 @@ st3 = SupportTicket.create!(
   :summary => "where's the salt?",
   :anonymous => false,
   :url => "/bookmarks",
-  :authenticity_token => "666555",
+  :authenticity_token => "EeVei3Vahseijeangief",
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "71.111.1.40"
 )
@@ -177,7 +177,7 @@ st4 = SupportTicket.create!(
   :summary => "repeal DADT",
   :private =>true,
   :url => "/faqs/3",
-  :authenticity_token => "756756",
+  :authenticity_token => "UuyohjeijeezooSh5eo5",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4",
   :ip_address => "98.223.153.124"
 )
@@ -190,7 +190,7 @@ st5 = SupportTicket.create!(
   :private =>true,
   :anonymous => false,
   :url => "/users/john",
-  :authenticity_token => "756756",
+  :authenticity_token => "UuyohjeijeezooSh5eo5",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4",
   :ip_address => "98.223.153.124"
 )
@@ -204,7 +204,7 @@ st6 = SupportTicket.create!(
   :summary => "what's wrong with me?",
   :private =>true,
   :url => "/users/jim/pseuds",
-  :authenticity_token => "8889662",
+  :authenticity_token => "Iyoh8eechohnei2looxu",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; nb-NO; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13",
   :ip_address => "24.223.182.51"
 )
@@ -215,7 +215,7 @@ User.current_user = jim
 st7 = SupportTicket.create!(
   :summary => "where can I find a guide",
   :url => "/faqs/5",
-  :authenticity_token => "8889662",
+  :authenticity_token => "Iyoh8eechohnei2looxu",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; nb-NO; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13",
   :ip_address => "24.223.182.51"
 )
@@ -227,7 +227,7 @@ st8 = SupportTicket.create!(
   :summary => "where are you, dean?",
   :anonymous => false,
   :url => "/users/dean",
-  :authenticity_token => "22333566",
+  :authenticity_token => "Phoo6Teepei7rooyu5Be",
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "71.111.1.40"
 )
@@ -239,7 +239,7 @@ st9 = SupportTicket.create!(
   :summary => "where are you, castiel?",
   :user_id => dean.id,
   :url => "/users/castiel",
-  :authenticity_token => "666555",
+  :authenticity_token => "EeVei3Vahseijeangief",
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "71.111.1.40"
 )
@@ -251,7 +251,7 @@ st10 = SupportTicket.create!(
   :summary => "You guys rock!",
   :email => "happy@ao3.org",
   :url => "/works/666",
-  :authenticity_token => "44400661",
+  :authenticity_token => "xaeDaeb6iz4iep3och5i",
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "24.98.14.241"
 )
@@ -264,7 +264,7 @@ st11 = SupportTicket.create!(
   :email => "happy@ao3.org",
   :url => "/tags",
   :private => true,
-  :authenticity_token => "44400661",
+  :authenticity_token => "xaeDaeb6iz4iep3och5i",
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "24.98.14.241"
 )
@@ -275,7 +275,7 @@ User.current_user = newbie
 st12 = SupportTicket.create!(
   :summary => "you guys suck!",
   :url => "/users/newbie/preferences",
-  :authenticity_token => "1777335002",
+  :authenticity_token => "AK4Aish5Che8ohr9Eish",
   :user_agent => "BlackBerry9330/5.0.0.857 Profile/MIDP-2.1 Configuration/CLDC-1.1 VendorID/105",
   :ip_address => "98.1.153.77"
 )
@@ -287,7 +287,7 @@ st13 = SupportTicket.create!(
   :summary => "I like the archive",
   :private => true,
   :url => "/tags/Calvin%20*a*%20Hobbes/works/",
-  :authenticity_token => "756756",
+  :authenticity_token => "UuyohjeijeezooSh5eo5",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4",
   :ip_address => "98.223.153.124"
 )
@@ -299,7 +299,7 @@ st14 = SupportTicket.create!(
   :summary => "I'm leaving fandom forever!",
   :anonymous => false,
   :url => "/collections/yuletidemadness2010/",
-  :authenticity_token => "666555",
+  :authenticity_token => "EeVei3Vahseijeangief",
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "71.111.1.40"
 )
@@ -313,7 +313,7 @@ st15 = SupportTicket.create!(
   :private => true,
   :anonymous => false,
   :url => "/support_tickets/6",
-  :authenticity_token => "8889662",
+  :authenticity_token => "Iyoh8eechohnei2looxu",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; nb-NO; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13",
   :ip_address => "24.223.182.51"
 )
@@ -326,7 +326,7 @@ st16 = SupportTicket.create!(
   :user_id => jim.id,
   :private => true,
   :url => "/faqs/5",
-  :authenticity_token => "8889662",
+  :authenticity_token => "Iyoh8eechohnei2looxu",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; nb-NO; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13",
   :ip_address => "24.223.182.51"
 )
@@ -345,7 +345,7 @@ st17 = SupportTicket.create!(
   :email => "happy@ao3.org",
   :private => true,
   :url => "/",
-  :authenticity_token => "44400661",
+  :authenticity_token => "xaeDaeb6iz4iep3och5i",
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "24.98.14.241"
 )
@@ -358,7 +358,7 @@ st18 = SupportTicket.create!(
   :summary => "tag pages look weird",
   :email => "guest@ao3.org",
   :url => "/tags",
-  :authenticity_token => "123456",
+  :authenticity_token => "OogoGee7oosheeciogie",
   :user_agent => "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16",
   :ip_address => "72.14.204.103"
 )
@@ -370,7 +370,7 @@ st19 = SupportTicket.create!(
   :summary => "fanfiction.net is down",
   :email => "guest@ao3.org",
   :url => "/works/new",
-  :authenticity_token => "123456",
+  :authenticity_token => "OogoGee7oosheeciogie",
   :user_agent => "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16",
   :ip_address => "72.14.204.103"
 )
@@ -381,7 +381,7 @@ User.current_user = john
 st20 = SupportTicket.create!(
   :summary => "anon is my name",
   :url => "/",
-  :authenticity_token => "756756",
+  :authenticity_token => "UuyohjeijeezooSh5eo5",
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4",
   :ip_address => "98.223.153.124"
 )
@@ -391,7 +391,7 @@ st21 = SupportTicket.create!(
   :summary => "please give me volunteer status",
   :anonymous => false,
   :url => "/support",
-  :authenticity_token => "666555",
+  :authenticity_token => "EeVei3Vahseijeangief",
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "71.111.1.40"
 )
@@ -400,3 +400,17 @@ st21.user_comment!("i thought he was leaving fandom forever", true, true)
 st21.needs_admin!
 User.current_user = sam
 st21.user_comment!("forever is a long time", true, true)
+
+User.current_user = nil
+st22 = SupportTicket.create!(
+  :summary => "when does yuletide 2011 open for prompts?",
+  :email => "guest@ao3.org",
+  :url => "/collections/yuletide2010",
+  :authenticity_token => "OogoGee7oosheeciogie",
+  :user_agent => "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16",
+  :ip_address => "72.14.204.103"
+)
+User.current_user = dean
+comment = st22.user_comment!("see http://community.livejournal.com/yuletide_admin/")
+User.current_user = nil
+st22.accept!(comment.id, st22.authentication_code)

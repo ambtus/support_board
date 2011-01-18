@@ -1,6 +1,13 @@
 require 'test_helper'
 
 class SupportTicketTest < ActiveSupport::TestCase
+  test "system logs" do
+    assert_equal %Q{unowned -> spam}, SupportTicket.find(2).support_details.system_log.last.content
+    assert_equal %Q{unowned -> taken}, SupportTicket.find(3).support_details.system_log.last.content
+    assert_equal %Q{unowned -> waiting (3)}, SupportTicket.find(4).support_details.system_log.last.content
+    assert_equal %Q{unowned -> closed (4)}, SupportTicket.find(5).support_details.system_log.last.content
+    assert_equal %Q{unowned -> closed (5)}, SupportTicket.find(6).support_details.system_log.last.content
+  end
   # guest comments
   test "not logged in can't comment on unowned guest ticket if email doesn't match" do
     ticket = SupportTicket.find(1)

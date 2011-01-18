@@ -1,49 +1,43 @@
 --- 
 support_identity_1: 
-  created_at: 2011-01-18 03:13:24 Z
+  created_at: 2011-01-18 22:04:48 Z
   id: 1
   name: sam
   official: true
-  updated_at: 2011-01-18 03:13:24 Z
+  updated_at: 2011-01-18 22:04:48 Z
 support_identity_2: 
-  created_at: 2011-01-18 03:13:24 Z
+  created_at: 2011-01-18 22:04:49 Z
   id: 2
   name: rodney
   official: true
-  updated_at: 2011-01-18 03:13:24 Z
+  updated_at: 2011-01-18 22:04:49 Z
 support_identity_3: 
-  created_at: 2011-01-18 03:13:24 Z
+  created_at: 2011-01-18 22:04:49 Z
   id: 3
   name: blair
   official: true
-  updated_at: 2011-01-18 03:13:24 Z
+  updated_at: 2011-01-18 22:04:49 Z
 support_identity_4: 
-  created_at: 2011-01-18 03:13:24 Z
+  created_at: 2011-01-18 22:04:49 Z
   id: 4
   name: bofh
   official: true
-  updated_at: 2011-01-18 03:13:24 Z
+  updated_at: 2011-01-18 22:04:49 Z
 support_identity_5: 
-  created_at: 2011-01-18 03:13:25 Z
+  created_at: 2011-01-18 22:04:49 Z
   id: 5
   name: john
   official: false
-  updated_at: 2011-01-18 03:13:25 Z
+  updated_at: 2011-01-18 22:04:49 Z
 support_identity_6: 
-  created_at: 2011-01-18 03:13:25 Z
+  created_at: 2011-01-18 22:04:49 Z
   id: 6
   name: jim
   official: false
-  updated_at: 2011-01-18 03:13:25 Z
+  updated_at: 2011-01-18 22:04:49 Z
 support_identity_7: 
-  created_at: 2011-01-18 03:13:28 Z
+  created_at: 2011-01-18 22:04:54 Z
   id: 7
   name: dean
   official: false
-  updated_at: 2011-01-18 03:13:28 Z
-support_identity_8: 
-  created_at: 2011-01-18 03:13:37 Z
-  id: 8
-  name: newbie
-  official: false
-  updated_at: 2011-01-18 03:13:37 Z
+  updated_at: 2011-01-18 22:04:54 Z
