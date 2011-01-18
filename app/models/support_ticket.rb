@@ -126,6 +126,11 @@ class SupportTicket < ActiveRecord::Base
     end
   end
 
+  # ticket was opened by a guest with an email address
+  def guest_ticket?
+    self.email
+  end
+
   # used in controller to determine whether to show owner view
   def owner?(code=nil)
     if User.current_user.nil? # not logged in
@@ -134,11 +139,6 @@ class SupportTicket < ActiveRecord::Base
     else # logged in
       User.current_user.id == self.user_id  # does ticket owner match current user?
     end
-  end
-
-  # ticket was opened by a guest with an email address
-  def guest_ticket?
-    self.email
   end
 
   # the current user is neither a volunteer, nor the owner of the ticket

@@ -62,6 +62,10 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal "posted by blair", SupportTicket.find(10).status_line
     assert_equal "closed by bofh", SupportTicket.find(19).status_line # resolved by admin
   end
+  test "guest ticket?" do
+    assert SupportTicket.find(1).guest_ticket?
+    assert !SupportTicket.find(3).guest_ticket?
+  end
   test "guest ticket owner? as guest" do
     ticket = SupportTicket.find(1)
     assert ticket.owner?(ticket.authentication_code)
