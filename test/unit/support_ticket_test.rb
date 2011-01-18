@@ -68,13 +68,12 @@ class SupportTicketTest < ActiveSupport::TestCase
   end
   test "owner? of guest ticket as guest" do
     ticket = SupportTicket.find(1)
-    assert ticket.owner?(ticket.authentication_code)
+    # no code
     assert !ticket.owner?
-  end
-  test "owner? of guest ticket as guest wrong code" do
-    ticket = SupportTicket.find(1)
-    assert !ticket.owner?
+    # wrong code
     assert !ticket.owner?("eeng0phaighjieTh")
+    # correct code
+    assert ticket.owner?(ticket.authentication_code)
   end
   test "owner? of guest ticket as user" do
     ticket = SupportTicket.find(1)
@@ -86,16 +85,48 @@ class SupportTicketTest < ActiveSupport::TestCase
     ticket = SupportTicket.find(3)
     assert !ticket.owner?
   end
-  test "owner? user ticket as owner" do
+  test "owner? of user ticket as owner" do
     ticket = SupportTicket.find(3)
     dean = User.find_by_login("dean")
+    assert_equal dean, ticket.user
     User.current_user = dean
     assert ticket.owner?
   end
-  test "owner? of user ticket as non-owner user" do
+  test "owner? of user ticket as user who is not owner" do
     ticket = SupportTicket.find(3)
     User.current_user = User.find_by_login("bofh")
     assert !ticket.owner?
+  end
+  test "watched? of guest ticket as guest" do
+    ticket = SupportTicket.find(1)
+    # no code
+    assert_raise(SecurityError) { ticket.watched? }
+    # wrong code
+    assert_raise(SecurityError) { ticket.watched?("eeng0phaighjieTh") }
+    # correct code
+    assert ticket.watched?(ticket.authentication_code)
+  end
+  test "watched? of guest ticket as user" do
+    ticket = SupportTicket.find(1)
+    User.current_user = User.find_by_login("bofh")
+    assert_raise(SecurityError) { ticket.watched?(ticket.authentication_code) }
+    assert !ticket.watched?
+  end
+  test "watched? of user ticket as guest" do
+    ticket = SupportTicket.find(3)
+    assert_raise(SecurityError) { ticket.watched? }
+  end
+  test "watched? of user ticket as owner" do
+    ticket = SupportTicket.find(3)
+    dean = User.find_by_login("dean")
+    assert_equal dean, ticket.user
+    User.current_user = dean
+    assert ticket.watched?
+  end
+  test "watched? of user ticket as user who is not owner" do
+    ticket = SupportTicket.find(3)
+    User.current_user = User.find_by_login("bofh")
+    assert !ticket.watched?
   end
   test "public_watcher? when guest" do
     ticket = SupportTicket.find(3)

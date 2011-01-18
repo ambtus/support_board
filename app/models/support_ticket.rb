@@ -141,6 +141,15 @@ class SupportTicket < ActiveRecord::Base
     end
   end
 
+  # used in watch! so don't get duplicate notifications
+  # also used in non-guest views to determine whether to offer to turn on or off notifications
+  # returns the support notification if it exists, nil otherwise
+  def watched?(code = nil)
+    code.blank? ? raise_unless_logged_in : raise_unless_guest_owner(code)
+    email_to_check = User.current_user ? User.current_user.email : self.email
+    self.support_notifications.where(:email => email_to_check).first
+  end
+
   # the current user is neither a volunteer, nor the owner of the ticket
   def public_watcher?
     User.current_user && !User.current_user.support_volunteer? && (self.user != User.current_user)
@@ -165,15 +174,6 @@ class SupportTicket < ActiveRecord::Base
     notifications = self.support_notifications
     notifications = notifications.official if private
     notifications.map(&:email).uniq
-  end
-
-  # used in watch! so don't get duplicate notifications
-  # also used in non-guest views to determine whether to offer to turn on or off notifications
-  # returns the support notification if it exists, nil otherwise
-  def watched?(code = nil)
-    code.blank? ? raise_unless_logged_in : raise_unless_guest_owner(code)
-    email_to_check = User.current_user ? User.current_user.email : self.email
-    self.support_notifications.where(:email => email_to_check).first
   end
 
   ### FILTER
