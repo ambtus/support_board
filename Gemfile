@@ -22,9 +22,7 @@ group :development do
 end
 
 group :test do
-  gem 'ZenTest'
   gem 'autotest-rails'
-  gem 'autotest'
   gem 'cucumber-rails'
   gem 'database_cleaner'
   gem 'capybara'

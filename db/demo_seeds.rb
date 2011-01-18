@@ -151,12 +151,12 @@ st2 = SupportTicket.create!(
   :ip_address => "72.14.204.103"
 )
 User.current_user = sam
-st2.comment!("a personal problem, my ass", true, true)
+st2.user_comment!("a personal problem, my ass", true, true)
 st2.spam!
 User.current_user = rodney
-st2.comment!("your ass is not my problem", true, true)
+st2.user_comment!("your ass is not my problem", true, true)
 User.current_user = bofh
-st2.comment!("cut it out, guys", true, true)
+st2.user_comment!("cut it out, guys", true, true)
 
 User.current_user = dean
 st3 = SupportTicket.create!(
@@ -168,7 +168,7 @@ st3 = SupportTicket.create!(
   :ip_address => "71.111.1.40"
 )
 User.current_user = dean
-st3.comment!("and the holy water")
+st3.user_comment!("and the holy water")
 User.current_user = sam
 st3.take!
 
@@ -232,7 +232,7 @@ st8 = SupportTicket.create!(
   :ip_address => "71.111.1.40"
 )
 User.current_user = sam
-st8.comment!("don't make me come looking for you!", false)
+st8.user_comment!("don't make me come looking for you!", false)
 
 User.current_user = dean
 st9 = SupportTicket.create!(
@@ -304,7 +304,7 @@ st14 = SupportTicket.create!(
   :ip_address => "71.111.1.40"
 )
 User.current_user = sam
-st14.comment!("small loss", true, true)
+st14.user_comment!("small loss", true, true)
 st14.post!
 
 User.current_user = jim
@@ -331,13 +331,13 @@ st16 = SupportTicket.create!(
   :ip_address => "24.223.182.51"
 )
 User.current_user = blair
-st16.comment!("i bet this is jim", true, true)
+st16.user_comment!("i bet this is jim", true, true)
 User.current_user = sam
-st16.comment!("nah, must be dean", true, true)
+st16.user_comment!("nah, must be dean", true, true)
 User.current_user = rodney
-st16.comment!("better not be john", true, true)
+st16.user_comment!("better not be john", true, true)
 User.current_user = bofh
-st16.comment!("stop gossiping about the lusers and get back to work", true, true)
+st16.user_comment!("stop gossiping about the lusers and get back to work", true, true)
 
 User.current_user = nil
 st17 = SupportTicket.create!(
@@ -349,6 +349,7 @@ st17 = SupportTicket.create!(
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "24.98.14.241"
 )
+st17.guest_owner_comment!("i think it was my ex", st17.authentication_code)
 User.current_user = blair
 st17.needs_admin!
 
@@ -395,7 +396,7 @@ st21 = SupportTicket.create!(
   :ip_address => "71.111.1.40"
 )
 User.current_user = blair
-st21.comment!("i thought he was leaving fandom forever", true, true)
+st21.user_comment!("i thought he was leaving fandom forever", true, true)
 st21.needs_admin!
 User.current_user = sam
-st21.comment!("forever is a long time", true, true)
+st21.user_comment!("forever is a long time", true, true)

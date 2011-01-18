@@ -116,14 +116,18 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal 1, ticket.support_details.public_comments.count
   end
   test "comment anonymity changes when ticket anonymity changes" do
+    john = User.find_by_login("john")
     ticket = SupportTicket.find(5)
+    assert !ticket.anonymous?
+    assert_equal john, ticket.user
     assert_equal 0, ticket.support_details.public_comments.count
-    User.current_user = User.find_by_login("john")
+    User.current_user = john
     assert ticket.comment!("something to say")
     assert_equal 1, ticket.support_details.public_comments.count
     assert_equal "something to say", ticket.support_details.public_comments.first.content
     assert_match "john wrote", ticket.support_details.public_comments.first.info
     assert ticket.hide_username!
+    assert ticket.anonymous?
     assert_equal 1, ticket.support_details.public_comments.count
     assert_equal "something to say", ticket.support_details.public_comments.first.content
     assert_match "ticket owner wrote", ticket.support_details.public_comments.first.info

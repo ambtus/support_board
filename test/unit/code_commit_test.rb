@@ -1,6 +1,13 @@
 require 'test_helper'
 
 class CodeCommitTest < ActiveSupport::TestCase
+  test "validate author" do
+    assert_raise(ActiveRecord::RecordInvalid) { CodeCommit.create! }
+    assert CodeCommit.create!(:author => "someone")
+  end
+  test "name" do
+    assert_equal "Code Commit #1", CodeCommit.find(1).name
+  end
   test "normal flow" do
     assert CodeCommit.find(1).unmatched?
     assert CodeCommit.find(2).verified?

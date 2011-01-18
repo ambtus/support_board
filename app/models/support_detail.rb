@@ -4,11 +4,8 @@ class SupportDetail < ActiveRecord::Base
 
   scope :resolved, where(:resolved_ticket => true)
   scope :system_log, where(:system_log => true)
+  scope :user_comments, where(:system_log => false)
   scope :visible_to_all, where(:private => false)
-
-  def self.public_comments
-    where(:private => false).where(:system_log => false)
-  end
 
   # use a generic "ticket owner" in the byline if
   # support detail created by a guest OR
