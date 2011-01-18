@@ -197,7 +197,7 @@ class SupportTicket < ActiveRecord::Base
 
     # tickets I am watching, private
     if !params[:watching].blank?
-      raise_unless_logged_in
+      raise SecurityError, "not logged in!" unless User.current_user
       tickets = tickets.joins(:support_notifications) & SupportNotification.where(:email => User.current_user.email)
     end
 
