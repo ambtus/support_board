@@ -120,6 +120,26 @@ class SupportTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("jim")
     assert ticket.public_watcher?
   end
+  test "stealable? when guest" do
+    ticket = SupportTicket.find(3)
+    assert_equal "taken by sam", ticket.status_line
+    assert_raise(SecurityError) { ticket.stealable? }
+  end
+  test "stealable? when user" do
+    ticket = SupportTicket.find(3)
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { ticket.stealable? }
+  end
+  test "stealable? when volunteer" do
+    ticket = SupportTicket.find(3)
+    User.current_user = User.find_by_login("blair")
+    assert ticket.stealable?
+  end
+  test "stealable? when already taken" do
+    ticket = SupportTicket.find(3)
+    User.current_user = User.find_by_login("sam")
+    assert !ticket.stealable?
+  end
   test "scopes" do
     assert_equal 22, SupportTicket.count
     assert_equal [1, 8, 16, 20], SupportTicket.unowned.ids
