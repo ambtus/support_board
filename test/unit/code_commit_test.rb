@@ -8,7 +8,7 @@ class CodeCommitTest < ActiveSupport::TestCase
     assert CodeCommit.find(4).matched?
     assert CodeCommit.find(5).deployed?
   end
-  test "find support id" do
+  test "support identity" do
     cc = CodeCommit.create(:author => "rodney")
     assert_equal cc.support_identity_id, SupportIdentity.find_by_name("rodney").id
   end

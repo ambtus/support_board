@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "support_identity_id"
     t.boolean  "support_response",                       :default => false
     t.boolean  "system_log",                             :default => false
-    t.string   "content"
+    t.string   "content",                                :default => ""
     t.boolean  "private",                                :default => false
     t.boolean  "resolved_ticket",                        :default => false
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
@@ -46,14 +46,14 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   end
 
   create_table "code_tickets", :force => true do |t|
-    t.string   "summary",                   :limit => 256
+    t.string   "summary",                   :limit => 256, :default => ""
     t.string   "url"
     t.string   "browser"
     t.string   "status"
     t.integer  "support_identity_id"
     t.integer  "code_ticket_id"
     t.integer  "release_note_id"
-    t.integer  "summary_sanitizer_version", :limit => 2,   :default => 0, :null => false
+    t.integer  "summary_sanitizer_version", :limit => 2,   :default => 0,  :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -71,7 +71,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "faq_id"
     t.integer  "support_identity_id"
     t.boolean  "support_response",                       :default => false
-    t.string   "content"
+    t.string   "content",                                :default => ""
     t.boolean  "private",                                :default => false
     t.boolean  "system_log",                             :default => false
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
@@ -96,13 +96,13 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   end
 
   create_table "faqs", :force => true do |t|
-    t.string   "summary",                   :limit => 256
+    t.string   "summary",                   :limit => 256, :default => ""
     t.text     "content"
     t.integer  "position"
     t.string   "status"
     t.integer  "support_identity_id"
-    t.integer  "content_sanitizer_version", :limit => 2,   :default => 0, :null => false
-    t.integer  "summary_sanitizer_version", :limit => 2,   :default => 0, :null => false
+    t.integer  "content_sanitizer_version", :limit => 2,   :default => 0,  :null => false
+    t.integer  "summary_sanitizer_version", :limit => 2,   :default => 0,  :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -137,7 +137,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "support_ticket_id"
     t.integer  "support_identity_id"
     t.boolean  "support_response",                       :default => false
-    t.string   "content"
+    t.string   "content",                                :default => ""
     t.boolean  "private",                                :default => false
     t.boolean  "resolved_ticket",                        :default => false
     t.boolean  "system_log",                             :default => false
@@ -166,7 +166,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.integer  "user_id"
     t.string   "email"
     t.string   "authentication_code"
-    t.string   "summary",                   :limit => 256
+    t.string   "summary",                   :limit => 256, :default => ""
     t.boolean  "private",                                  :default => false
     t.boolean  "anonymous",                                :default => true
     t.string   "url"

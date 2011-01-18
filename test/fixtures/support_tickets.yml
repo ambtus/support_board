@@ -1,7 +1,7 @@
 --- 
 support_ticket_1: 
   anonymous: false
-  authentication_code: 85728269cab40ab13f4e
+  authentication_code: 8a09667673a0eff996e6
   authenticity_token: "123456"
   browser: |
     --- 
@@ -14,7 +14,7 @@ support_ticket_1:
     agent_languageTag: en-US
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:04 Z
+  created_at: 2011-01-18 03:13:27 Z
   email: guest@ao3.org
   faq_id: 
   id: 1
@@ -24,13 +24,13 @@ support_ticket_1:
   summary: some problem
   summary_sanitizer_version: 0
   support_identity_id: 
-  updated_at: 2011-01-18 03:02:04 Z
+  updated_at: 2011-01-18 03:13:27 Z
   url: /
   user_agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16
   user_id: 
 support_ticket_2: 
   anonymous: false
-  authentication_code: 17f940682750d3cf12eb
+  authentication_code: 5f73c4f3dfdcc134248f
   authenticity_token: "123456"
   browser: |
     --- 
@@ -43,7 +43,7 @@ support_ticket_2:
     agent_languageTag: en-US
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:05 Z
+  created_at: 2011-01-18 03:13:28 Z
   email: guest@ao3.org
   faq_id: 
   id: 2
@@ -53,7 +53,7 @@ support_ticket_2:
   summary: a personal problem
   summary_sanitizer_version: 0
   support_identity_id: 1
-  updated_at: 2011-01-18 03:02:05 Z
+  updated_at: 2011-01-18 03:13:28 Z
   url: /faqs
   user_agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16
   user_id: 
@@ -70,7 +70,7 @@ support_ticket_3:
     os_name: Windows XP
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:06 Z
+  created_at: 2011-01-18 03:13:28 Z
   email: 
   faq_id: 
   id: 3
@@ -80,7 +80,7 @@ support_ticket_3:
   summary: where's the salt?
   summary_sanitizer_version: 0
   support_identity_id: 1
-  updated_at: 2011-01-18 03:02:06 Z
+  updated_at: 2011-01-18 03:13:29 Z
   url: /bookmarks
   user_agent: Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
   user_id: 2
@@ -101,7 +101,7 @@ support_ticket_4:
     agent_languageTag: de-de
 
   code_ticket_id: 3
-  created_at: 2011-01-18 03:02:07 Z
+  created_at: 2011-01-18 03:13:29 Z
   email: 
   faq_id: 
   id: 4
@@ -111,7 +111,7 @@ support_ticket_4:
   summary: repeal DADT
   summary_sanitizer_version: 0
   support_identity_id: 2
-  updated_at: 2011-01-18 03:02:07 Z
+  updated_at: 2011-01-18 03:13:29 Z
   url: /faqs/3
   user_agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
   user_id: 3
@@ -132,7 +132,7 @@ support_ticket_5:
     agent_languageTag: de-de
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:07 Z
+  created_at: 2011-01-18 03:13:31 Z
   email: 
   faq_id: 4
   id: 5
@@ -142,7 +142,7 @@ support_ticket_5:
   summary: what's my password?
   summary_sanitizer_version: 0
   support_identity_id: 2
-  updated_at: 2011-01-18 03:02:07 Z
+  updated_at: 2011-01-18 03:13:31 Z
   url: /users/john
   user_agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
   user_id: 3
@@ -163,7 +163,7 @@ support_ticket_6:
     agent_languageTag: nb-NO
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:08 Z
+  created_at: 2011-01-18 03:13:32 Z
   email: 
   faq_id: 5
   id: 6
@@ -173,7 +173,7 @@ support_ticket_6:
   summary: what's wrong with me?
   summary_sanitizer_version: 0
   support_identity_id: 3
-  updated_at: 2011-01-18 03:02:08 Z
+  updated_at: 2011-01-18 03:13:32 Z
   url: /users/jim/pseuds
   user_agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; nb-NO; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13
   user_id: 4
@@ -194,7 +194,7 @@ support_ticket_7:
     agent_languageTag: nb-NO
 
   code_ticket_id: 5
-  created_at: 2011-01-18 03:02:09 Z
+  created_at: 2011-01-18 03:13:33 Z
   email: 
   faq_id: 
   id: 7
@@ -204,7 +204,7 @@ support_ticket_7:
   summary: where can I find a guide
   summary_sanitizer_version: 0
   support_identity_id: 3
-  updated_at: 2011-01-18 03:02:09 Z
+  updated_at: 2011-01-18 03:13:33 Z
   url: /faqs/5
   user_agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; nb-NO; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13
   user_id: 4
@@ -221,7 +221,7 @@ support_ticket_8:
     os_name: Windows XP
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:10 Z
+  created_at: 2011-01-18 03:13:34 Z
   email: 
   faq_id: 
   id: 8
@@ -231,7 +231,7 @@ support_ticket_8:
   summary: where are you, dean?
   summary_sanitizer_version: 0
   support_identity_id: 
-  updated_at: 2011-01-18 03:02:10 Z
+  updated_at: 2011-01-18 03:13:34 Z
   url: /users/dean
   user_agent: Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
   user_id: 5
@@ -248,7 +248,7 @@ support_ticket_9:
     os_name: Windows XP
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:11 Z
+  created_at: 2011-01-18 03:13:35 Z
   email: 
   faq_id: 
   id: 9
@@ -258,13 +258,13 @@ support_ticket_9:
   summary: where are you, castiel?
   summary_sanitizer_version: 0
   support_identity_id: 4
-  updated_at: 2011-01-18 03:02:11 Z
+  updated_at: 2011-01-18 03:13:35 Z
   url: /users/castiel
   user_agent: Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
   user_id: 2
 support_ticket_10: 
   anonymous: false
-  authentication_code: 2fa673c8504e8f74a8e1
+  authentication_code: d1588c6c4864308bab15
   authenticity_token: "44400661"
   browser: |
     --- 
@@ -275,7 +275,7 @@ support_ticket_10:
     os_name: Windows XP
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:11 Z
+  created_at: 2011-01-18 03:13:35 Z
   email: happy@ao3.org
   faq_id: 
   id: 10
@@ -285,13 +285,13 @@ support_ticket_10:
   summary: You guys rock!
   summary_sanitizer_version: 0
   support_identity_id: 3
-  updated_at: 2011-01-18 03:02:11 Z
+  updated_at: 2011-01-18 03:13:36 Z
   url: /works/666
   user_agent: Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
   user_id: 
 support_ticket_11: 
   anonymous: false
-  authentication_code: c6d53bfa69ec0a80003a
+  authentication_code: 819e411c7fce258ef522
   authenticity_token: "44400661"
   browser: |
     --- 
@@ -302,7 +302,7 @@ support_ticket_11:
     os_name: Windows XP
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:13 Z
+  created_at: 2011-01-18 03:13:36 Z
   email: happy@ao3.org
   faq_id: 
   id: 11
@@ -312,7 +312,7 @@ support_ticket_11:
   summary: thanks for fixing it
   summary_sanitizer_version: 0
   support_identity_id: 3
-  updated_at: 2011-01-18 03:02:13 Z
+  updated_at: 2011-01-18 03:13:36 Z
   url: /tags
   user_agent: Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
   user_id: 
@@ -329,7 +329,7 @@ support_ticket_12:
     os_versionNumber: 5.0.0
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:14 Z
+  created_at: 2011-01-18 03:13:37 Z
   email: 
   faq_id: 
   id: 12
@@ -339,7 +339,7 @@ support_ticket_12:
   summary: you guys suck!
   summary_sanitizer_version: 0
   support_identity_id: 3
-  updated_at: 2011-01-18 03:02:14 Z
+  updated_at: 2011-01-18 03:13:37 Z
   url: /users/newbie/preferences
   user_agent: BlackBerry9330/5.0.0.857 Profile/MIDP-2.1 Configuration/CLDC-1.1 VendorID/105
   user_id: 1
@@ -360,7 +360,7 @@ support_ticket_13:
     agent_languageTag: de-de
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:14 Z
+  created_at: 2011-01-18 03:13:38 Z
   email: 
   faq_id: 
   id: 13
@@ -370,7 +370,7 @@ support_ticket_13:
   summary: I like the archive
   summary_sanitizer_version: 0
   support_identity_id: 2
-  updated_at: 2011-01-18 03:02:15 Z
+  updated_at: 2011-01-18 03:13:38 Z
   url: /tags/Calvin%20*a*%20Hobbes/works/
   user_agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
   user_id: 3
@@ -387,7 +387,7 @@ support_ticket_14:
     os_name: Windows XP
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:15 Z
+  created_at: 2011-01-18 03:13:39 Z
   email: 
   faq_id: 
   id: 14
@@ -397,7 +397,7 @@ support_ticket_14:
   summary: I'm leaving fandom forever!
   summary_sanitizer_version: 0
   support_identity_id: 1
-  updated_at: 2011-01-18 03:02:16 Z
+  updated_at: 2011-01-18 03:13:39 Z
   url: /collections/yuletidemadness2010/
   user_agent: Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
   user_id: 2
@@ -418,7 +418,7 @@ support_ticket_15:
     agent_languageTag: nb-NO
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:16 Z
+  created_at: 2011-01-18 03:13:39 Z
   email: 
   faq_id: 
   id: 15
@@ -428,7 +428,7 @@ support_ticket_15:
   summary: thank you for helping
   summary_sanitizer_version: 0
   support_identity_id: 1
-  updated_at: 2011-01-18 03:02:17 Z
+  updated_at: 2011-01-18 03:13:40 Z
   url: /support_tickets/6
   user_agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; nb-NO; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13
   user_id: 4
@@ -449,7 +449,7 @@ support_ticket_16:
     agent_languageTag: nb-NO
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:17 Z
+  created_at: 2011-01-18 03:13:40 Z
   email: 
   faq_id: 
   id: 16
@@ -459,13 +459,13 @@ support_ticket_16:
   summary: embarassing rash
   summary_sanitizer_version: 0
   support_identity_id: 
-  updated_at: 2011-01-18 03:02:17 Z
+  updated_at: 2011-01-18 03:13:40 Z
   url: /faqs/5
   user_agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; nb-NO; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13
   user_id: 4
 support_ticket_17: 
   anonymous: false
-  authentication_code: 0593a4d3ce42571280c3
+  authentication_code: 5941c15199bc90fcf6b0
   authenticity_token: "44400661"
   browser: |
     --- 
@@ -476,7 +476,7 @@ support_ticket_17:
     os_name: Windows XP
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:20 Z
+  created_at: 2011-01-18 03:13:41 Z
   email: happy@ao3.org
   faq_id: 
   id: 17
@@ -486,13 +486,13 @@ support_ticket_17:
   summary: my account was hacked
   summary_sanitizer_version: 0
   support_identity_id: 
-  updated_at: 2011-01-18 03:02:20 Z
+  updated_at: 2011-01-18 03:13:41 Z
   url: /
   user_agent: Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
   user_id: 
 support_ticket_18: 
   anonymous: false
-  authentication_code: bf45dde6f6d1adec0c14
+  authentication_code: 817e6ae87e038b424a02
   authenticity_token: "123456"
   browser: |
     --- 
@@ -505,7 +505,7 @@ support_ticket_18:
     agent_languageTag: en-US
 
   code_ticket_id: 7
-  created_at: 2011-01-18 03:02:20 Z
+  created_at: 2011-01-18 03:13:42 Z
   email: guest@ao3.org
   faq_id: 
   id: 18
@@ -515,13 +515,13 @@ support_ticket_18:
   summary: tag pages look weird
   summary_sanitizer_version: 0
   support_identity_id: 1
-  updated_at: 2011-01-18 03:02:20 Z
+  updated_at: 2011-01-18 03:13:42 Z
   url: /tags
   user_agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16
   user_id: 
 support_ticket_19: 
   anonymous: false
-  authentication_code: 4acc684bc73acff2d1d8
+  authentication_code: cd9d26e9605ae6be7a86
   authenticity_token: "123456"
   browser: |
     --- 
@@ -534,7 +534,7 @@ support_ticket_19:
     agent_languageTag: en-US
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:21 Z
+  created_at: 2011-01-18 03:13:43 Z
   email: guest@ao3.org
   faq_id: 
   id: 19
@@ -544,7 +544,7 @@ support_ticket_19:
   summary: fanfiction.net is down
   summary_sanitizer_version: 0
   support_identity_id: 4
-  updated_at: 2011-01-18 03:02:21 Z
+  updated_at: 2011-01-18 03:13:43 Z
   url: /works/new
   user_agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16
   user_id: 
@@ -565,7 +565,7 @@ support_ticket_20:
     agent_languageTag: de-de
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:22 Z
+  created_at: 2011-01-18 03:13:43 Z
   email: 
   faq_id: 
   id: 20
@@ -575,7 +575,7 @@ support_ticket_20:
   summary: anon is my name
   summary_sanitizer_version: 0
   support_identity_id: 
-  updated_at: 2011-01-18 03:02:22 Z
+  updated_at: 2011-01-18 03:13:43 Z
   url: /
   user_agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
   user_id: 3
@@ -592,7 +592,7 @@ support_ticket_21:
     os_name: Windows XP
 
   code_ticket_id: 
-  created_at: 2011-01-18 03:02:24 Z
+  created_at: 2011-01-18 03:13:44 Z
   email: 
   faq_id: 
   id: 21
@@ -602,7 +602,7 @@ support_ticket_21:
   summary: please give me volunteer status
   summary_sanitizer_version: 0
   support_identity_id: 
-  updated_at: 2011-01-18 03:02:24 Z
+  updated_at: 2011-01-18 03:13:44 Z
   url: /support
   user_agent: Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
   user_id: 2

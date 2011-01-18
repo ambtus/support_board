@@ -12,7 +12,7 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :user_id
       t.string :email
       t.string :authentication_code
-      t.string :summary, :limit => 256
+      t.string :summary, :limit => 256, :default => ""
       t.boolean :private, :default => false
       t.boolean :anonymous, :default => true
       t.string :url
@@ -33,7 +33,7 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :support_ticket_id
       t.integer :support_identity_id
       t.boolean :support_response, :default => false
-      t.string :content
+      t.string :content, :default => ""
       t.boolean :private, :default => false
       t.boolean :resolved_ticket, :default => false
       t.boolean  :system_log, :default => false
@@ -51,8 +51,8 @@ class CreateTickets < ActiveRecord::Migration
     end
 
     create_table :faqs, :force => true do |t|
-      t.string   :summary, :limit => 256
-      t.text     :content
+      t.string   :summary, :limit => 256, :default => ""
+      t.text     :content, :default => ""
       t.integer  :position
       t.string   :status
       t.integer  :support_identity_id
@@ -66,7 +66,7 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :faq_id
       t.integer :support_identity_id
       t.boolean :support_response, :default => false
-      t.string :content
+      t.string :content, :default => ""
       t.boolean :private, :default => false
       t.boolean  :system_log, :default => false
 
@@ -90,7 +90,7 @@ class CreateTickets < ActiveRecord::Migration
     end
 
     create_table :code_tickets do |t|
-      t.string :summary, :limit => 256
+      t.string :summary, :limit => 256, :default => ""
       t.string :url
       t.string  :browser
 
@@ -107,7 +107,7 @@ class CreateTickets < ActiveRecord::Migration
       t.integer  :support_identity_id
       t.boolean  :support_response, :default => false
       t.boolean  :system_log, :default => false
-      t.string   :content
+      t.string   :content, :default => ""
       t.boolean  :private, :default => false
       t.boolean  :resolved_ticket, :default => false
 
@@ -143,7 +143,7 @@ class CreateTickets < ActiveRecord::Migration
 
     create_table :release_notes, :force => true do |t|
       t.string   :release
-      t.text     :content
+      t.text     :content, :default => ""
       t.string   :deployed_rev
       t.integer  :support_identity_id
       t.boolean  :posted, :default => false
