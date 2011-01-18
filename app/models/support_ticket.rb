@@ -56,9 +56,13 @@ class SupportTicket < ActiveRecord::Base
     url = URI.parse('http://www.useragentstring.com/')
     request = Net::HTTP::Post.new(url.path)
     request.set_form_data({'uas' => self.user_agent, 'getJSON' => "all"})
-    response = Net::HTTP.new(url.host, url.port).start do |http|
-      http.read_timeout = 5
-      http.request(request)
+    response = begin
+      Net::HTTP.new(url.host, url.port).start do |http|
+        http.read_timeout = 5
+        http.request(request)
+      end
+    rescue Timeout::Error
+      "timeout error"
     end
 
     case response

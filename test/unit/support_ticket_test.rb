@@ -62,7 +62,38 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal "posted by blair", SupportTicket.find(10).status_line
     assert_equal "closed by bofh", SupportTicket.find(19).status_line # resolved by admin
   end
-  test "owned by volunteer" do
+  test "guest ticket owner? as guest" do
+    ticket = SupportTicket.find(1)
+    assert ticket.owner?(ticket.authentication_code)
+    assert !ticket.owner?
+  end
+  test "guest ticket owner? as guest wrong code" do
+    ticket = SupportTicket.find(1)
+    assert !ticket.owner?
+    assert !ticket.owner?("eeng0phaighjieTh")
+  end
+  test "guest ticket owner? as user" do
+    ticket = SupportTicket.find(1)
+    User.current_user = User.find_by_login("bofh")
+    assert !ticket.owner?
+    assert !ticket.owner?(ticket.authentication_code)
+  end
+  test "user ticket owner as guest" do
+    ticket = SupportTicket.find(3)
+    assert !ticket.owner?
+  end
+  test "user ticket owner as owner" do
+    ticket = SupportTicket.find(3)
+    dean = User.find_by_login("dean")
+    User.current_user = dean
+    assert ticket.owner?
+  end
+  test "user ticket owner as non-owner user" do
+    ticket = SupportTicket.find(3)
+    User.current_user = User.find_by_login("bofh")
+    assert !ticket.owner?
+  end
+  test "ticket support_identity" do
     assert_equal "sam", SupportTicket.find(2).support_identity.name
     assert_equal "rodney", SupportTicket.find(4).support_identity.name
   end
