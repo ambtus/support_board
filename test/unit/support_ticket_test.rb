@@ -66,56 +66,52 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert SupportTicket.find(1).guest_ticket?
     assert !SupportTicket.find(3).guest_ticket?
   end
-  test "guest ticket owner? as guest" do
+  test "owner? of guest ticket as guest" do
     ticket = SupportTicket.find(1)
     assert ticket.owner?(ticket.authentication_code)
     assert !ticket.owner?
   end
-  test "guest ticket owner? as guest wrong code" do
+  test "owner? of guest ticket as guest wrong code" do
     ticket = SupportTicket.find(1)
     assert !ticket.owner?
     assert !ticket.owner?("eeng0phaighjieTh")
   end
-  test "guest ticket owner? as user" do
+  test "owner? of guest ticket as user" do
     ticket = SupportTicket.find(1)
     User.current_user = User.find_by_login("bofh")
     assert !ticket.owner?
     assert !ticket.owner?(ticket.authentication_code)
   end
-  test "user ticket owner as guest" do
+  test "owner? of user ticket as guest" do
     ticket = SupportTicket.find(3)
     assert !ticket.owner?
   end
-  test "user ticket owner as owner" do
+  test "owner? user ticket as owner" do
     ticket = SupportTicket.find(3)
     dean = User.find_by_login("dean")
     User.current_user = dean
     assert ticket.owner?
   end
-  test "user ticket owner as non-owner user" do
+  test "owner? of user ticket as non-owner user" do
     ticket = SupportTicket.find(3)
     User.current_user = User.find_by_login("bofh")
     assert !ticket.owner?
   end
-  test "ticket support_identity" do
-    assert_equal "sam", SupportTicket.find(2).support_identity.name
-    assert_equal "rodney", SupportTicket.find(4).support_identity.name
-  end
-  test "public watcher? when guest" do
+  test "public_watcher? when guest" do
     ticket = SupportTicket.find(3)
     assert !ticket.public_watcher?
   end
-  test "public watcher? when user owner" do
+  test "public_watcher? when user owner" do
     ticket = SupportTicket.find(3)
     User.current_user = User.find_by_login("dean")
     assert !ticket.public_watcher?
   end
-  test "public watcher? when volunteer" do
+  test "public_watcher? when volunteer" do
     ticket = SupportTicket.find(3)
     User.current_user = User.find_by_login("sam")
     assert !ticket.public_watcher?
   end
-  test "public watcher? when user" do
+  test "public_watcher? when user" do
     ticket = SupportTicket.find(3)
     User.current_user = User.find_by_login("jim")
     assert ticket.public_watcher?
@@ -139,6 +135,10 @@ class SupportTicketTest < ActiveSupport::TestCase
     ticket = SupportTicket.find(3)
     User.current_user = User.find_by_login("sam")
     assert !ticket.stealable?
+  end
+  test "ticket support_identity" do
+    assert_equal "sam", SupportTicket.find(2).support_identity.name
+    assert_equal "rodney", SupportTicket.find(4).support_identity.name
   end
   test "scopes" do
     assert_equal 22, SupportTicket.count

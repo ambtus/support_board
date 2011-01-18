@@ -153,11 +153,6 @@ class SupportTicket < ActiveRecord::Base
       self.current_state.events.include?(:steal)
   end
 
-  # is the ticket's user's name visible? returns false for guest tickets
-  def show_username?
-    !self.anonymous? && !guest_ticket?
-  end
-
   # change the support id, and add current volunteer to watch list
   def take_and_watch!
     raise_unless_volunteer
