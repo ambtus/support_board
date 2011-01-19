@@ -48,6 +48,20 @@ class SupportTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("blair")
     assert_equal [2, 8, 12, 14, 16, 21], SupportTicket.filter(:comments_by_support_identity => "sam", :status => "all").ids
   end
+  test "owned_by_support_identity of an unknown user" do
+    assert_raise(ActiveRecord::RecordNotFound) { SupportTicket.filter(:owned_by_support_identity => "nobody") }
+  end
+  test "owned_by_support_identity by guest respects privacy" do
+    assert_equal [7, 10, 12], SupportTicket.filter(:owned_by_support_identity => "blair", :status => "all").ids
+  end
+  test "owned_by_support_identity by user respects privacy (even if they're yours)" do
+    User.current_user = User.find_by_login("jim")
+    assert_equal [7, 10, 12], SupportTicket.filter(:owned_by_support_identity => "blair", :status => "all").ids
+  end
+  test "owned_by_support_identity by volunteer shows private tickets" do
+    User.current_user = User.find_by_login("sam")
+    assert_equal [6, 7, 10, 11, 12], SupportTicket.filter(:owned_by_support_identity => "blair", :status => "all").ids
+  end
   test "all" do
     assert_equal 13, SupportTicket.filter({:status => "all"}).count
     User.current_user = User.find_by_login("sam")
@@ -94,6 +108,22 @@ class SupportTicketTest < ActiveSupport::TestCase
   end
   test "unknown status" do
     assert_raise(ArgumentError) {SupportTicket.filter({:status => "unknown"})}
+  end
+  # combinations
+  test "owned_by_support_identity shows your private tickets if you filter for your tickets" do
+    User.current_user = User.find_by_login("jim")
+    assert_equal [6, 7], SupportTicket.filter(:owned_by_support_identity => "blair",
+                                              :status => "all", :owned_by_user => "jim").ids
+  end
+  test "owned_by_support_identity respects privacy when filtered by user" do
+    User.current_user = User.find_by_login("bofh")
+    assert_equal [], SupportTicket.filter(:owned_by_support_identity => "blair",
+                                          :status => "all", :owned_by_user => "jim").ids
+  end
+  test "owned_by_support_identity shows your private tickets if you filter for tickets you are watching" do
+    User.current_user = User.find_by_login("jim")
+    assert_equal [6, 7], SupportTicket.filter(:owned_by_support_identity => "blair",
+                                              :status => "all", :watching => true).ids
   end
 end
 
