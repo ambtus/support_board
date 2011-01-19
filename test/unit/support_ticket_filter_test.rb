@@ -62,17 +62,15 @@ class SupportTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     assert_equal [6, 7, 10, 11, 12], SupportTicket.filter(:owned_by_support_identity => "blair", :status => "all").ids
   end
-  test "all" do
-    assert_equal 13, SupportTicket.filter({:status => "all"}).count
-    User.current_user = User.find_by_login("sam")
-    assert_equal 22, SupportTicket.filter({:status => "all"}).count
-  end
   test "unowned status" do
     assert_equal [1, 8, 20], SupportTicket.filter({:status => "unowned"}).ids
     User.current_user = User.find_by_login("blair")
     assert_equal [1, 8, 16, 20], SupportTicket.filter({:status => "unowned"}).ids
   end
-  test "admin status" do
+  test "taken status" do
+    assert_equal [3, 9], SupportTicket.filter({:status => "taken"}).ids
+  end
+  test "waiting_on_admin status" do
     assert_equal [21], SupportTicket.filter({:status => "waiting_on_admin"}).ids
     User.current_user = User.find_by_login("sam")
     assert_equal [17, 21], SupportTicket.filter({:status => "waiting_on_admin"}).ids
@@ -84,14 +82,10 @@ class SupportTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     assert_equal [10, 11, 12, 13, 14, 15], SupportTicket.filter({:status => "posted"}).ids
   end
-  test "waiting status when logged out" do
+  test "waiting status" do
     assert_equal [7], SupportTicket.filter({:status => "waiting"}).ids
-  end
-  test "waiting status when logged in as user" do
-    User.current_user = User.find_by_login("dean")
+    User.current_user = User.find_by_login("john")
     assert_equal [7], SupportTicket.filter({:status => "waiting"}).ids
-  end
-  test "waiting status when logged in as volunteer" do
     User.current_user = User.find_by_login("sam")
     assert_equal [4, 7], SupportTicket.filter({:status => "waiting"}).ids
   end
@@ -100,30 +94,55 @@ class SupportTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     assert_equal [2], SupportTicket.filter({:status => "spam"}).ids
   end
+  test "closed status" do
+    assert_equal [18, 19, 22], SupportTicket.filter({:status => "closed"}).ids
+    User.current_user = User.find_by_login("sam")
+    assert_equal [5, 6, 18, 19, 22], SupportTicket.filter({:status => "closed"}).ids
+  end
   # not spam or closed by a faq or posted as a comment
   test "not closed" do
     assert_equal 7, SupportTicket.filter.count
+    assert_equal 7, SupportTicket.filter(:status => "open").count
     User.current_user = User.find_by_login("sam")
     assert_equal 10, SupportTicket.filter.count
+    assert_equal 10, SupportTicket.filter(:status => "open").count
   end
   test "unknown status" do
     assert_raise(ArgumentError) {SupportTicket.filter({:status => "unknown"})}
   end
+  test "all" do
+    assert_equal 13, SupportTicket.filter({:status => "all"}).count
+    User.current_user = User.find_by_login("sam")
+    assert_equal 22, SupportTicket.filter({:status => "all"}).count
+  end
+  # TODO tests for sorting
   # combinations
-  test "owned_by_support_identity shows your private tickets if you filter for your tickets" do
+  test "owned_by_support_identity shows your anonymous and private tickets if you filter for your tickets" do
     User.current_user = User.find_by_login("jim")
     assert_equal [6, 7], SupportTicket.filter(:owned_by_support_identity => "blair",
                                               :status => "all", :owned_by_user => "jim").ids
   end
-  test "owned_by_support_identity respects privacy when filtered by user" do
+  test "owned_by_support_identity respects anonymity when filtered by user" do
     User.current_user = User.find_by_login("bofh")
     assert_equal [], SupportTicket.filter(:owned_by_support_identity => "blair",
                                           :status => "all", :owned_by_user => "jim").ids
   end
-  test "owned_by_support_identity shows your private tickets if you filter for tickets you are watching" do
+  test "owned_by_support_identity shows your anonymous and private tickets if you filter for tickets you are watching" do
     User.current_user = User.find_by_login("jim")
     assert_equal [6, 7], SupportTicket.filter(:owned_by_support_identity => "blair",
                                               :status => "all", :watching => true).ids
+  end
+  test "filtered by status shows our anonymous and private tickets if you filter for tickets you are watching" do
+    User.current_user = User.find_by_login("john")
+    assert_equal [4], SupportTicket.filter({:status => "waiting", :watching => true}).ids
+  end
+  test "filtered by status shows our anonymous and private tickets if you filter for tickets you opened" do
+    User.current_user = User.find_by_login("john")
+    assert_equal [4], SupportTicket.filter({:status => "waiting", :owned_by_user => "john"}).ids
+  end
+  test "filtered by status respects anonymity when filtered by user" do
+    User.current_user = User.find_by_login("bofh")
+    assert_equal [], SupportTicket.filter({:status => "waiting", :owned_by_user => "john"}).ids
   end
 end
 
