@@ -12,39 +12,92 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal [5, 6, 18, 19, 22], SupportTicket.closed.ids
     assert_equal [10, 11, 12, 13, 14, 15], SupportTicket.posted.ids
   end
-  test "reopen by user" do
-    reason = "the faq didn't work"
-    ticket = SupportTicket.find(5)
-    User.current_user = User.find_by_login("john")
-    assert ticket.reopen!(reason)
-    assert_equal "open", ticket.status_line
-    assert_equal %Q{closed -> unowned (#{reason})}, ticket.support_details.last.content
-    assert_nil ticket.support_identity_id
-  end
-  test "reopen by guest" do
+  test "spam" do
     ticket = SupportTicket.find(1)
+    assert ticket.unowned?
+    assert ticket.guest_ticket?
     User.current_user = User.find_by_login("sam")
-    ticket.needs_fix!(1)
-    assert_equal "waiting for a code fix", ticket.status_line
-    User.current_user = nil
-    reason = "that doesn't sound like my problem"
-    assert ticket.reload.reopen!(reason, ticket.authentication_code)
-    assert_equal "open", ticket.status_line
-    assert_equal %Q{waiting -> unowned (#{reason})}, ticket.support_details.last.content
-    assert_nil ticket.reload.support_identity_id
+    assert ticket.spam!
+    assert ticket.spam?
+    assert_equal "unowned -> spam", ticket.support_details.system_log.last.content
+    assert_equal "sam", ticket.support_identity.name
+  end
+  test "spam raise_unless_volunteer" do
+    ticket = SupportTicket.find(1)
+    assert_raise(SecurityError) { ticket.spam! }
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { ticket.spam! }
+  end
+  test "spam user tickets can't be spam" do
+    ticket = SupportTicket.find(8)
+    assert ticket.unowned?
+    assert !ticket.guest_ticket?
+    assert_raise(SecurityError) { ticket.spam! }
   end
   test "ham" do
     ticket = SupportTicket.find(2)
+    assert ticket.spam?
     User.current_user = User.find_by_login("sam")
     assert ticket.ham!
-    assert_equal "open", ticket.status_line
-    assert_equal %Q{spam -> unowned}, ticket.support_details.last.content
+    assert ticket.unowned?
+    assert_equal "spam -> unowned", ticket.support_details.system_log.last.content
+    assert_nil ticket.support_identity_id
+  end
+  test "ham raise_unless_volunteer" do
+    ticket = SupportTicket.find(2)
+    assert_raise(SecurityError) { ticket.ham! }
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { ticket.ham! }
+  end
+  test "take" do
+    ticket = SupportTicket.find(1)
+    assert ticket.unowned?
+    User.current_user = User.find_by_login("sam")
+    assert ticket.take!
+    assert ticket.taken?
+    assert_equal "unowned -> taken", ticket.support_details.system_log.last.content
+    assert_equal "sam", ticket.support_identity.name
+  end
+  test "take raise_unless_volunteer" do
+    ticket = SupportTicket.find(1)
+    assert_raise(SecurityError) { ticket.take! }
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { ticket.take! }
   end
   test "steal" do
     ticket = SupportTicket.find(3)
+    assert ticket.taken?
+    assert_equal "sam", ticket.support_identity.name
     User.current_user = User.find_by_login("rodney")
     assert ticket.steal!
-    assert_equal "taken by rodney", ticket.reload.status_line
+    assert ticket.taken?
+    assert_equal "taken -> taken", ticket.support_details.system_log.last.content
+    assert_equal "rodney", ticket.reload.support_identity.name
+  end
+  test "steal raise_unless_volunteer" do
+    ticket = SupportTicket.find(3)
+    assert_raise(SecurityError) { ticket.steal! }
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { ticket.steal! }
+  end
+  test "reopen by guest" do
+    ticket = SupportTicket.find(18)
+    assert ticket.closed?
+    reason = "they still look weird"
+    assert ticket.reopen!(reason, ticket.authentication_code)
+    assert_equal "open", ticket.status_line
+    assert_equal %Q{closed -> unowned (#{reason})}, ticket.support_details.last.content
+    assert_nil ticket.reload.support_identity_id
+  end
+  test "reopen by user" do
+    ticket = SupportTicket.find(5)
+    assert ticket.closed?
+    User.current_user = User.find_by_login("john")
+    reason = "that faq doesn't help"
+    assert ticket.reopen!(reason, ticket.authentication_code)
+    assert_equal "open", ticket.status_line
+    assert_equal %Q{closed -> unowned (#{reason})}, ticket.support_details.last.content
+    assert_nil ticket.reload.support_identity_id
   end
   test "guest owner accepts answer" do
     ticket = SupportTicket.find(1)

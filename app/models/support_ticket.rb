@@ -341,9 +341,11 @@ class SupportTicket < ActiveRecord::Base
   # some methods add you as watcher, some don't. some raise_unless_volunteer, some don't.
 
   def spam
-    self.take_and_watch!
+    raise_unless_volunteer
+    raise ArgumentError, "user tickets can't be spam" unless guest_ticket?
     # don't submit spam reports unless in production mode
     Rails.env.production? && Akismetor.submit_spam(akismet_attributes)
+    self.take_and_watch!
   end
 
   def ham
@@ -356,6 +358,7 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def take
+    raise_unless_volunteer
     self.take_and_watch!
   end
 
