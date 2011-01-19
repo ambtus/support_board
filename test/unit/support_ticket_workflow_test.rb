@@ -89,6 +89,25 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal %Q{closed -> unowned (#{reason})}, ticket.support_details.last.content
     assert_nil ticket.reload.support_identity_id
   end
+  test "reopen guest ticket by volunteer" do
+    ticket = SupportTicket.find(18)
+    reason = "they still look weird"
+    User.current_user = User.find_by_login("sam")
+    assert ticket.reopen!(reason)
+    assert_equal "open", ticket.status_line
+    assert_nil ticket.reload.support_identity_id
+  end
+  test "reopen unauthorized guest by guest" do
+    ticket = SupportTicket.find(18)
+    reason = "they still look weird"
+    assert_raise(SecurityError) { ticket.reopen!(reason) }
+  end
+  test "reopen unauthorized guest by user" do
+    ticket = SupportTicket.find(18)
+    User.current_user = User.find_by_login("john")
+    reason = "they still look weird"
+    assert_raise(SecurityError) { ticket.reopen!(reason) }
+  end
   test "reopen by user" do
     ticket = SupportTicket.find(5)
     assert ticket.closed?
@@ -98,6 +117,25 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal "open", ticket.status_line
     assert_equal %Q{closed -> unowned (#{reason})}, ticket.support_details.last.content
     assert_nil ticket.reload.support_identity_id
+  end
+  test "reopen user ticket by volunteer" do
+    ticket = SupportTicket.find(5)
+    User.current_user = User.find_by_login("sam")
+    reason = "that faq doesn't help"
+    assert ticket.reopen!(reason, ticket.authentication_code)
+    assert_equal "open", ticket.status_line
+    assert_nil ticket.reload.support_identity_id
+  end
+  test "reopen unauthorized user ticket by guest" do
+    ticket = SupportTicket.find(5)
+    reason = "that faq doesn't help"
+    assert_raise(SecurityError) { ticket.reopen!(reason) }
+  end
+  test "reopen unauthorized user ticket by user" do
+    ticket = SupportTicket.find(5)
+    User.current_user = User.find_by_login("dean")
+    reason = "that faq doesn't help"
+    assert_raise(SecurityError) { ticket.reopen!(reason) }
   end
   test "guest owner accepts answer" do
     ticket = SupportTicket.find(1)
