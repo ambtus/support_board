@@ -401,7 +401,7 @@ class SupportTicket < ActiveRecord::Base
     faq = Faq.find(faq_id) # will raise if no faq
     self.take_and_watch!
     self.faq_id = faq_id
-    FaqVote.create(:faq_id => faq_id, :support_ticket_id => self.id, :vote => 1)
+    FaqVote.create(:faq_id => faq_id, :support_ticket_id => self.id, :vote => 2)
   end
 
   def resolve(resolution)
