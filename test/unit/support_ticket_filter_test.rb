@@ -36,6 +36,18 @@ class SupportTicketTest < ActiveSupport::TestCase
   test "comments_by_support_identity of an unknown user" do
     assert_raise(ActiveRecord::RecordNotFound) { SupportTicket.filter(:comments_by_support_identity => "nobody") }
   end
+  test "comments_by_support_identity of a regular user" do
+    assert_equal [3, 22], SupportTicket.filter(:comments_by_support_identity => "dean", :status => "all").ids
+  end
+  test "comments_by_support_identity of a volunteer by a non-volunteer" do
+    # does not include private comments or system logs, but includes both official and non-official comments
+    assert_equal [8, 12], SupportTicket.filter(:comments_by_support_identity => "sam", :status => "all").ids
+  end
+  test "comments_by_support_identity of a volunteer by a volunteer" do
+    # includes private comments but not system logs
+    User.current_user = User.find_by_login("blair")
+    assert_equal [2, 8, 12, 14, 16, 21], SupportTicket.filter(:comments_by_support_identity => "sam", :status => "all").ids
+  end
   test "all" do
     assert_equal 13, SupportTicket.filter({:status => "all"}).count
     User.current_user = User.find_by_login("sam")
@@ -82,28 +94,6 @@ class SupportTicketTest < ActiveSupport::TestCase
   end
   test "unknown status" do
     assert_raise(ArgumentError) {SupportTicket.filter({:status => "unknown"})}
-  end
-  test "commented on" do
-    assert_equal [3], SupportTicket.filter({:comments_by_support_identity => "dean"}).ids
-    assert_equal [3], SupportTicket.filter({:comments_by_support_identity => "dean", :owned_by_support_identity => "sam"}).ids
-    assert_equal [3], SupportTicket.filter({:comments_by_support_identity => "dean", :status => "taken"}).ids
-    assert_empty SupportTicket.filter({:comments_by_support_identity => "dean", :status => "waiting"})
-    assert_empty SupportTicket.filter({:comments_by_support_identity => "dean", :owned_by_support_identity => "blair"})
-    assert_equal [8, 21], SupportTicket.filter({:comments_by_support_identity => "sam"}).ids
-    assert_empty SupportTicket.filter({:comments_by_support_identity => "sam", :status => "closed"})
-    assert_empty SupportTicket.filter({:comments_by_support_identity => "bofh"})
-  end
-  test "owned by" do
-    assert_equal [7], SupportTicket.filter(:owned_by_support_identity => "blair").ids
-    assert_equal [3], SupportTicket.filter(:owned_by_support_identity => "sam").ids
-    assert_empty SupportTicket.filter(:owned_by_support_identity => "rodney").ids
-    assert_equal [9], SupportTicket.filter(:owned_by_support_identity => "bofh").ids
-    assert_empty SupportTicket.filter(:owned_by_support_identity => "blair", :status => "closed")
-    assert_empty SupportTicket.filter(:owned_by_support_identity => "bofh", :status => "waiting")
-    User.current_user = User.find_by_login("blair")
-    assert_equal [6], SupportTicket.filter(:owned_by_support_identity => "blair", :status => "closed").ids
-    assert_equal [2, 3, 14, 15, 18], SupportTicket.filter(:owned_by_support_identity => "sam", :status => "all").ids
-    assert_equal [4], SupportTicket.filter(:owned_by_support_identity => "rodney", :status => "waiting").ids
   end
 end
 

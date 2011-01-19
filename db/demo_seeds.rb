@@ -281,6 +281,8 @@ st12 = SupportTicket.create!(
 )
 User.current_user = blair
 st12.post!
+User.current_user = sam
+st12.user_comment!("and very well, too", true, false)
 
 User.current_user = john
 st13 = SupportTicket.create!(

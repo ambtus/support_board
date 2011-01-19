@@ -468,7 +468,7 @@ class SupportTicket < ActiveRecord::Base
                                :support_identity_id => User.current_user.try(:support_identity).try(:id),
                                :support_response => official_comment,
                                :system_log => false,
-                               :private => private)
+                               :private => private_comment)
     self.send_update_notifications(private_comment)
     return comment
   end
