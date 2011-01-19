@@ -378,6 +378,7 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def post
+    raise_unless_volunteer
     self.take_and_watch!
   end
 

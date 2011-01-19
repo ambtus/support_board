@@ -137,6 +137,33 @@ class SupportTicketTest < ActiveSupport::TestCase
     reason = "that faq doesn't help"
     assert_raise(SecurityError) { ticket.reopen!(reason) }
   end
+  test "reopen ticket with code ticket removes link & code vote" do
+  end
+  test "reopen ticket with faq removes link & faq vote" do
+  end
+  test "reopen owner accepted ticket update support detail" do
+  end
+  test "post" do
+    ticket = SupportTicket.find(1)
+    assert ticket.unowned?
+    User.current_user = User.find_by_login("sam")
+    assert ticket.post!
+    assert ticket.posted?
+    assert_equal "unowned -> posted", ticket.support_details.system_log.last.content
+    assert_equal "sam", ticket.support_identity.name
+  end
+  test "post raise_unless_volunteer" do
+    ticket = SupportTicket.find(1)
+    assert_raise(SecurityError) { ticket.post! }
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { ticket.post! }
+  end
+  test "needs_fix" do
+  end
+  test "answer" do
+  end
+  test "resolve" do
+  end
   test "guest owner accepts answer" do
     ticket = SupportTicket.find(1)
     assert_equal "open", ticket.status_line
@@ -164,19 +191,5 @@ class SupportTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("dean")
     assert ticket.accept!(detail.id)
     assert_equal "closed by owner", ticket.status_line
-  end
-  test "user owner reopens one answered ticket" do
-    User.current_user = User.find_by_login("john")
-    ticket1 = SupportTicket.find(4)
-    ticket2 = SupportTicket.find(5)
-    assert ticket1.reopen!("test")
-    assert ticket2.reopen!("test")
-    assert ticket1.accept!(ticket1.support_details.first.id)
-    assert ticket2.accept!(ticket2.support_details.first.id)
-    assert "closed by owner", ticket1.status_line
-    assert "closed by owner", ticket2.status_line
-    assert ticket1.reopen!("test")
-    assert "open", ticket1.status_line
-    assert "closed by owner", ticket2.status_line
   end
 end
