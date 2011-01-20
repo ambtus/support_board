@@ -144,7 +144,6 @@ class CreateTickets < ActiveRecord::Migration
     create_table :release_notes, :force => true do |t|
       t.string   :release
       t.text     :content, :default => ""
-      t.string   :deployed_rev
       t.integer  :support_identity_id
       t.boolean  :posted, :default => false
 

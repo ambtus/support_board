@@ -97,7 +97,9 @@ User.current_user = rodney
 ct6.verify!
 rn = ReleaseNote.create!(:release => "1.0", :content => "new in this release, the www!")
 ct6.deploy!(rn.id)
-rn.update_attribute(:posted, true)
+rn.post!
+
+User.current_user = bofh
 rn2 = ReleaseNote.create!(:release => "2.0", :content => "new in this release, web 2.0!")
 
 # faqs
@@ -373,7 +375,8 @@ ct7.reload.stage!
 User.current_user = blair
 ct7.verify!
 User.current_user = bofh
-ct7.deploy!(rn2)
+ct7.deploy!(rn2.id)
+rn2.post!
 
 User.current_user = nil
 st19 = SupportTicket.create!(
@@ -424,3 +427,8 @@ User.current_user = dean
 comment = st22.user_comment!("see http://community.livejournal.com/yuletide_admin/")
 User.current_user = nil
 st22.accept!(comment.id, st22.authentication_code)
+
+User.current_user = blair
+ct8 = CodeTicket.create!(:summary => "patch the roof")
+User.current_user = sam
+ct8.duplicate!(ct1.id)

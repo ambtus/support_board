@@ -44,7 +44,7 @@ class CodeTicket < ActiveRecord::Base
   end
 
   def status_line
-    if self.unowned? || self.support_identity_id.blank?
+    if self.unowned?
       "open"
     elsif self.code_ticket_id
       "closed as duplicate by #{self.support_identity.byline}"
@@ -65,7 +65,7 @@ class CodeTicket < ActiveRecord::Base
 
   # only logged in users can vote for code tickets and only once
   def voted?
-    raise "Couldn't check vote. Not logged in." unless User.current_user
+    raise SecurityError, "Couldn't check vote. Not logged in." unless User.current_user
     self.code_votes.where(:user_id => User.current_user.id).first
   end
 
@@ -324,7 +324,7 @@ class CodeTicket < ActiveRecord::Base
     raise "Couldn't deploy. Not all tickets verified" if CodeCommit.staged.count > 0
     raise "Couldn't deploy. Release not doesn't exist." unless User.current_user.support_admin?
     CodeCommit.verified.each {|cc| cc.code_ticket.deploy!(release_note_id)}
-    note.update_attribute(:posted, true)
+    note.post!
     return note
   end
 

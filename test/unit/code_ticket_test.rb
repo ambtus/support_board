@@ -21,6 +21,15 @@ class CodeTicketTest < ActiveSupport::TestCase
     assert_equal "waiting for verification (commited by rodney)", CodeTicket.find(4).status_line
     assert_equal "committed by blair", CodeTicket.find(5).status_line
     assert_equal "deployed in 1.0 (verified by rodney)", CodeTicket.find(6).status_line
+    assert_equal "deployed in 2.0 (verified by blair)", CodeTicket.find(7).status_line
+    assert_equal "closed as duplicate by sam", CodeTicket.find(8).status_line
+  end
+  test "voted?" do
+    assert_raise(SecurityError) { CodeTicket.first.voted? }
+    User.current_user = User.find_by_login("sam")
+    assert CodeTicket.first.voted?
+    User.current_user = User.find_by_login("blair")
+    assert !CodeTicket.first.voted?
   end
   test "vote" do
     ticket = CodeTicket.find(1)
