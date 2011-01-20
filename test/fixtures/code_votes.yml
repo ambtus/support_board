@@ -1,97 +1,97 @@
 --- 
 code_vote_1: 
   code_ticket_id: 1
-  created_at: 2011-01-19 20:23:33 Z
+  created_at: 2011-01-20 04:44:49 Z
   id: 1
   support_ticket_id: 
-  updated_at: 2011-01-19 20:23:33 Z
+  updated_at: 2011-01-20 04:44:49 Z
   user_id: 5
   vote: 1
 code_vote_2: 
   code_ticket_id: 2
-  created_at: 2011-01-19 20:23:33 Z
+  created_at: 2011-01-20 04:44:50 Z
   id: 2
   support_ticket_id: 
-  updated_at: 2011-01-19 20:23:33 Z
+  updated_at: 2011-01-20 04:44:50 Z
   user_id: 2
   vote: 1
 code_vote_3: 
   code_ticket_id: 2
-  created_at: 2011-01-19 20:23:33 Z
+  created_at: 2011-01-20 04:44:50 Z
   id: 3
   support_ticket_id: 
-  updated_at: 2011-01-19 20:23:33 Z
+  updated_at: 2011-01-20 04:44:50 Z
   user_id: 6
   vote: 1
 code_vote_4: 
   code_ticket_id: 2
-  created_at: 2011-01-19 20:23:33 Z
+  created_at: 2011-01-20 04:44:50 Z
   id: 4
   support_ticket_id: 
-  updated_at: 2011-01-19 20:23:33 Z
+  updated_at: 2011-01-20 04:44:50 Z
   user_id: 4
   vote: 1
 code_vote_5: 
   code_ticket_id: 2
-  created_at: 2011-01-19 20:23:33 Z
+  created_at: 2011-01-20 04:44:50 Z
   id: 5
   support_ticket_id: 
-  updated_at: 2011-01-19 20:23:33 Z
+  updated_at: 2011-01-20 04:44:50 Z
   user_id: 8
   vote: 1
 code_vote_6: 
   code_ticket_id: 3
-  created_at: 2011-01-19 20:23:34 Z
+  created_at: 2011-01-20 04:44:50 Z
   id: 6
   support_ticket_id: 
-  updated_at: 2011-01-19 20:23:34 Z
+  updated_at: 2011-01-20 04:44:50 Z
   user_id: 6
   vote: 1
 code_vote_7: 
   code_ticket_id: 3
-  created_at: 2011-01-19 20:23:34 Z
+  created_at: 2011-01-20 04:44:50 Z
   id: 7
   support_ticket_id: 
-  updated_at: 2011-01-19 20:23:34 Z
+  updated_at: 2011-01-20 04:44:50 Z
   user_id: 3
   vote: 1
 code_vote_8: 
   code_ticket_id: 3
-  created_at: 2011-01-19 20:23:34 Z
+  created_at: 2011-01-20 04:44:50 Z
   id: 8
   support_ticket_id: 
-  updated_at: 2011-01-19 20:23:34 Z
+  updated_at: 2011-01-20 04:44:50 Z
   user_id: 4
   vote: 1
 code_vote_9: 
   code_ticket_id: 6
-  created_at: 2011-01-19 20:23:34 Z
+  created_at: 2011-01-20 04:44:50 Z
   id: 9
   support_ticket_id: 
-  updated_at: 2011-01-19 20:23:34 Z
+  updated_at: 2011-01-20 04:44:50 Z
   user_id: 8
   vote: 1
 code_vote_10: 
   code_ticket_id: 3
-  created_at: 2011-01-19 20:23:38 Z
+  created_at: 2011-01-20 04:44:54 Z
   id: 10
   support_ticket_id: 4
-  updated_at: 2011-01-19 20:23:38 Z
+  updated_at: 2011-01-20 04:44:54 Z
   user_id: 
   vote: 2
 code_vote_11: 
   code_ticket_id: 5
-  created_at: 2011-01-19 20:23:40 Z
+  created_at: 2011-01-20 04:44:57 Z
   id: 11
   support_ticket_id: 7
-  updated_at: 2011-01-19 20:23:40 Z
+  updated_at: 2011-01-20 04:44:57 Z
   user_id: 
   vote: 2
 code_vote_12: 
   code_ticket_id: 7
-  created_at: 2011-01-19 20:23:47 Z
+  created_at: 2011-01-20 04:45:05 Z
   id: 12
   support_ticket_id: 18
-  updated_at: 2011-01-19 20:23:47 Z
+  updated_at: 2011-01-20 04:45:05 Z
   user_id: 
   vote: 3

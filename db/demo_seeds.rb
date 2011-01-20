@@ -33,12 +33,12 @@ bofh = User.create!(:login => "bofh", :email => "bofh@ao3.org",
 bofh.support_admin = "1"
 
 # code tickets
-ct1 = CodeTicket.create!(:summary => "fix the roof")
 User.current_user = sam
+ct1 = CodeTicket.create!(:summary => "fix the roof")
 ct1.vote!
 
-ct2 = CodeTicket.create!(:summary => "save the world")
 User.current_user = sam
+ct2 = CodeTicket.create!(:summary => "save the world")
 ct2.take!
 CodeCommit.create!(:author => "sam", :message => "this should fix it", :pushed_at => Time.now)
 User.current_user = dean
@@ -50,8 +50,8 @@ ct2.vote!
 User.current_user = bofh
 ct2.vote!
 
-ct3 = CodeTicket.create!(:summary => "repeal DADT")
 User.current_user = rodney
+ct3 = CodeTicket.create!(:summary => "repeal DADT")
 ct3.take!
 CodeCommit.create!(:author => "rodney", :message => "finally closes issue 3", :pushed_at => Time.now)
 ct3.reload.stage!
@@ -64,6 +64,7 @@ ct3.vote!
 User.current_user = jim
 ct3.vote!
 
+User.current_user = rodney
 ct4 = CodeTicket.create!(:summary => "build a zpm")
 User.current_user = john
 ct4.comment!("haven't you started this yet?")
@@ -78,6 +79,7 @@ User.current_user = blair
 ct4.comment!("geeze guys, i don't want to know about your kinks", true, true)
 ct4.reload.stage!
 
+User.current_user = blair
 ct5 = CodeTicket.create!(:summary => "find a sentinel")
 User.current_user = jim
 ct5.comment!("what's a sentinel?")
@@ -85,8 +87,8 @@ User.current_user = blair
 ct5.take!
 CodeCommit.create!(:author => "blair", :message => "related to issue 5", :pushed_at => Time.now)
 
-ct6 = CodeTicket.create!(:summary => "create the world wide web")
 User.current_user = bofh
+ct6 = CodeTicket.create!(:summary => "create the world wide web")
 ct6.vote!
 ct6.take!
 CodeCommit.create!(:author => "bofh", :message => "issue 6", :pushed_at => Time.now)

@@ -2,7 +2,6 @@
 <% if params[:by_vote] %>
   <%= link_to "Sort by position", code_tickets_path(params.merge :by_vote => false) %>
 <% else %>
-  <%= link_to "Sort by vote count", code_tickets_path(params.merge :by_vote => true) %>
 <% end %>
 
 <%= form_tag '/code_tickets', :method => :get do %>
@@ -19,6 +18,9 @@
   <%= label_tag :closed_in_release %>
   <%= select_tag :closed_in_release, "<option></option>".html_safe +
                  options_from_collection_for_select(ReleaseNote.posted.all, "id", "release", params[:closed_in_release]) %>
+  <%= label_tag :sort_by %>
+  <%= select_tag :sort_by,
+           options_for_select(["newest", "by vote", "recently updated", "least recently updated", "oldest first"], params[:sort_by]) %>
   <%= submit_tag "Filter" %>
   <%= link_to "Clear Filters", code_tickets_path %>
 <% end %>

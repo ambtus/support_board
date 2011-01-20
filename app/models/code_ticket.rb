@@ -10,44 +10,84 @@ class CodeTicket < ActiveRecord::Base
   has_many :support_tickets  # tickets waiting for this fix
   has_many :code_commits # created from git hub pushes
 
-  # don't save new empty details
-  accepts_nested_attributes_for :code_details, :reject_if => proc { |attributes|
-                                          attributes['content'].blank? && attributes['id'].blank? }
+  ### VALIDATIONS and CALLBACKS
 
   # must have summary
   validates_presence_of :summary
   validates_length_of :summary, :maximum=> 140 # tweet length!
 
-  # CodeTicket methods
-  def self.stage!
-    raise "Couldn't stage. Not logged in." unless User.current_user
-    raise "Couldn't stage. Not logged in as support admin." unless User.current_user.support_admin?
-    raise "Couldn't stage. Not all commits matched" if CodeCommit.unmatched.count > 0
-    CodeCommit.matched.each do |cc|
-      cc.code_ticket.stage!
-    end
+  attr_accessor :turn_off_notifications
+  # add a default set of watchers to new tickets
+  # TODO at the moment, this is just the owner
+  after_create :add_default_watchers
+  def add_default_watchers
+    # on create, add owner to the notifications unless indicated otherwise
+    self.watch! unless turn_off_notifications == "1"
+
+    # TODO make default groups. e.g. coders, that people can add and remove themselves to
+    # so that when tickets are created the notifications are populated with these groups.
+    # when someone is added to that group, add them to all tickets
+    # this allows people to remove themselves from individual tickets if they usually watch all
+    # and add themselves to individual tickets if they usually don't watch all
   end
 
-  def self.deploy!(release_note_id)
-    raise "Couldn't deploy. Not logged in." unless User.current_user
-    raise "Couldn't deploy. Not logged in as support admin." unless User.current_user.support_admin?
-    note = ReleaseNote.find release_note_id  # will raise not found if doesn't exist
-    raise "Couldn't deploy. Not all tickets verified" if CodeCommit.staged.count > 0
-    CodeCommit.verified.each {|cc| cc.code_ticket.deploy!(release_note_id)}
-    note.update_attribute(:posted, true)
-    return note
-  end
+  ### HELPER METHODS
 
   # used in lists
   def name
     "Code Ticket #" + self.id.to_s
   end
 
-  def self.ids
-    select("code_tickets.id").map(&:id)
+  def status_line
+    if self.unowned? || self.support_identity_id.blank?
+      "open"
+    elsif self.code_ticket_id
+      "closed as duplicate by #{self.support_identity.byline}"
+    elsif self.release_note_id
+      "deployed in #{self.release_note.release} (verified by #{self.support_identity.byline})"
+    elsif self.staged?
+      "waiting for verification (commited by #{self.support_identity.byline})"
+    else
+      "#{self.status} by #{self.support_identity.byline}"
+    end
   end
 
-  # filter code tickets
+  # only logged in users can watch code tickets
+  def watched?
+    raise "Couldn't check watch status. Not logged in." unless User.current_user
+    self.code_notifications.where(:email => User.current_user.email).first
+  end
+
+  # only logged in users can vote for code tickets and only once
+  def voted?
+    raise "Couldn't check vote. Not logged in." unless User.current_user
+    self.code_votes.where(:user_id => User.current_user.id).first
+  end
+
+  def vote_count
+    code_votes.sum(:vote)
+  end
+
+  # test if ticket is one I can steal (used in volunteer views)
+  def stealable?
+    raise SecurityError, "Couldn't check stealable. Not logged in." unless User.current_user
+    self.support_identity_id != User.current_user.support_identity_id &&
+      self.current_state.events.include?(:steal)
+  end
+
+  # returns an array of email addresses. [] if none
+  def mail_to(private = false)
+    notifications = self.code_notifications
+    notifications = notifications.official if private
+    notifications.map(&:email).uniq
+  end
+
+  # okay until we need to paginate
+  def self.sort_by_vote
+    self.all.sort{|f1,f2|f2.vote_count <=> f1.vote_count}
+  end
+
+  ### FILTER
   def self.filter(params = {})
     tickets = CodeTicket.scoped
 
@@ -71,20 +111,6 @@ class CodeTicket < ActiveRecord::Base
       raise ActiveRecord::RecordNotFound unless support_identity
       tickets = tickets.where(:support_identity_id => support_identity.id)
     end
-
-# TODO more sorting options
-#     case params[:sort_by]
-#     when "recent"
-#       tickets = tickets.order("updated_at desc")
-#     when "oldest"
-#       tickets = tickets.order("updated_at asc")
-#     when "earliest"
-#       tickets = tickets.order("id desc")
-#     when "vote"
-#       tickets = tickets.sort_by_vote
-#     else # "newest" by default
-#       tickets = tickets.order("id asc")
-#     end
 
     if !params[:closed_in_release].blank?
       tickets = tickets.where(:release_note_id => params[:closed_in_release])
@@ -114,36 +140,26 @@ class CodeTicket < ActiveRecord::Base
       tickets = tickets.where('status != "closed"')
     end
 
-    # has to come last because returns an array
-    if !params[:by_vote].blank?
+    # has to come last because sort_by_vote returns an array
+    case params[:sort_by]
+    when "recently updated"
+      tickets = tickets.order("updated_at desc")
+    when "least recently updated"
+      tickets = tickets.order("updated_at asc")
+    when "oldest first"
+      tickets = tickets.order("id asc")
+    when "by vote"
       tickets = tickets.sort_by_vote
+    else # "newest" by default
+      tickets = tickets.order("id desc")
     end
 
     return tickets
   end
 
-  # okay until we need to paginate
-  def self.sort_by_vote
-    self.all.sort{|f1,f2|f2.vote_count <=> f1.vote_count}
-  end
-
-  # STATUS/RESOLUTION stuff
+  # WORKFLOW / STATE MACHINE
   include Workflow
   workflow_column :status
-
-  def status_line
-    if self.unowned? || self.support_identity_id.blank?
-      "open"
-    elsif self.code_ticket_id
-      "closed as duplicate by #{self.support_identity.byline}"
-    elsif self.release_note_id
-      "deployed in #{self.release_note.release} (verified by #{self.support_identity.byline})"
-    elsif self.staged?
-      "waiting for verification (commited by #{self.support_identity.byline})"
-    else
-      "#{self.status} by #{self.support_identity.byline}"
-    end
-  end
 
   workflow do
     state :unowned do
@@ -188,28 +204,38 @@ class CodeTicket < ActiveRecord::Base
     end
   end
 
+  ### SCOPES and ARRAYS
+
+  # scopes based on workflow states
   self.workflow_spec.state_names.each do |state|
     scope state, :conditions => { :status => state.to_s }
   end
+
 
   def self.not_closed
     where('status != "closed"')
   end
 
-  def self.for_commit
-    where('status != "closed"').where('status != "verified"').where('status != "committed"')
+  # tickets which can be used for code commit matching
+  # once a code ticket has been staged it's being tested, and you can't add more commits to it
+  def self.for_matching
+-    where('status != "closed"').where('status != "verified"').where('status != "staged"')
   end
+
+  # returns an array of support ticket ids
+  def self.ids
+    select("code_tickets.id").map(&:id)
+  end
+
+  ### WORKFLOW methods (call with ! to change state)
+  # volunteer status is checked by workflow on_transition
+  # logs system_log details via workflow on_transition
+  # sends notifications via workflow on_transition
+  # some methods add you as watcher, some don't. some change owner, some don't
 
   def take
     self.support_identity_id = User.current_user.support_identity_id
     self.watch! unless self.watched?
-  end
-
-  # test if ticket is one I can steal (used in volunteer views)
-  def stealable?
-    raise SecurityError, "Couldn't check stealable. Not logged in." unless User.current_user
-    self.support_identity_id != User.current_user.support_identity_id &&
-      self.current_state.events.include?(:steal)
   end
 
   def duplicate(original_id)
@@ -223,10 +249,13 @@ class CodeTicket < ActiveRecord::Base
     self.support_identity_id = User.current_user.support_identity_id
   end
 
-  def steal
-    self.send_steal_notification(User.current_user)
-    self.support_identity_id = User.current_user.support_identity_id
-    self.watch! unless self.watched?
+  def commit(code_commit_id)
+    cc = CodeCommit.find(code_commit_id) # will raise unless exists
+    raise "code commit already used" if cc.code_ticket_id
+    self.support_identity_id = cc.support_identity_id
+    cc.code_ticket_id = self.id
+    cc.status = "matched"
+    cc.save!
   end
 
   def reject(reason)
@@ -236,20 +265,17 @@ class CodeTicket < ActiveRecord::Base
     self.watch! unless self.watched?
   end
 
+  def steal
+    self.send_steal_notification(User.current_user)
+    self.support_identity_id = User.current_user.support_identity_id
+    self.watch! unless self.watched?
+  end
+
   def reopen(reason)
     raise "Couldn't reopen. No reason given." if reason.blank?
     self.code_ticket_id = nil
     self.release_note_id = nil
     self.support_identity_id = nil
-  end
-
-  def commit(code_commit_id)
-    cc = CodeCommit.find(code_commit_id) # will raise unless exists
-    raise "code commit already used" if cc.code_ticket_id
-    self.support_identity_id = cc.support_identity_id
-    cc.code_ticket_id = self.id
-    cc.status = "matched"
-    cc.save!
   end
 
   # don't update support identity, still belongs to committer
@@ -273,14 +299,36 @@ class CodeTicket < ActiveRecord::Base
     self.support_tickets.each {|st| st.deploy!}
   end
 
-  # VOTES
-  # only logged in users can vote for code tickets
+  ### META-WORKFLOW
+  # admins can change state for multiple tickets at the same time
 
-  def voted?
-    raise "Couldn't check vote. Not logged in." unless User.current_user
-    self.code_votes.where(:user_id => User.current_user.id).first
+  # deploy to stage. all commits must be matched
+  def self.stage!
+    raise "Couldn't stage. Not logged in." unless User.current_user
+    raise "Couldn't stage. Not logged in as support admin." unless User.current_user.support_admin?
+    raise "Couldn't stage. Not all commits matched" if CodeCommit.unmatched.count > 0
+    CodeCommit.matched.each { |cc| cc.code_ticket.stage! }
   end
 
+  # deploy to production. all tickets must be verified
+  # a release note must exist and will be posted
+  def self.deploy!(release_note_id)
+    raise "Couldn't deploy. Not logged in." unless User.current_user
+    raise "Couldn't deploy. Not logged in as support admin." unless User.current_user.support_admin?
+    note = ReleaseNote.find_by_id(release_note_id)
+    raise "Couldn't deploy. Not all tickets verified" if CodeCommit.staged.count > 0
+    raise "Couldn't deploy. Release not doesn't exist." unless User.current_user.support_admin?
+    CodeCommit.verified.each {|cc| cc.code_ticket.deploy!(release_note_id)}
+    note.update_attribute(:posted, true)
+    return note
+  end
+
+  ### NON-WORKFLOW but similar methods.
+  # call mailers directly to get notifications.
+  # call log! directly to add transitions to details
+  # check volunteer status directly when necessary
+
+  # user votes
   def vote!(count = 1)
     raise "can't vote for a duplicate" if self.code_ticket_id
     raise "Couldn't vote. Not logged in." unless User.current_user
@@ -288,10 +336,7 @@ class CodeTicket < ActiveRecord::Base
     self.code_votes.create(:user => User.current_user, :vote => count)
   end
 
-  def vote_count
-    code_votes.sum(:vote)
-  end
-
+  # editing a code ticket. volunteers only
   def update_from_edit!(summary, url, browser)
     raise "Couldn't update. Not logged in." unless User.current_user
     raise "Couldn't update. Not support volunteer." unless User.current_user.support_volunteer?
@@ -306,39 +351,29 @@ class CodeTicket < ActiveRecord::Base
     self.send_update_notifications
   end
 
-  # CODE DETAILS stuff
   # only logged in users can comment
   # only support volunteers can comment on non-open tickets
-  def comment!(content, official=true, private = false)
+  def comment!(content, official_comment=true, private_comment = false)
     raise "Couldn't comment. Not logged in." unless User.current_user
-    support_response = (official && User.current_user.support_volunteer?)
-    raise ArgumentError, "Only official comments can be private" if private && !support_response
+    support_response = (official_comment && User.current_user.support_volunteer?)
+    raise ArgumentError, "Only official comments can be private" if private_comment && !support_response
     if self.unowned? || support_response
       self.code_details.create(:content => content,
                                :support_identity_id => User.current_user.support_identity.id,
                                :support_response => support_response,
                                :system_log => false,
-                               :private => private)
-      self.send_update_notifications(private)
+                               :private => private_comment)
+      self.send_update_notifications(private_comment)
     else
       raise "Couldn't comment. Only official comments allowed."
     end
   end
 
-  # NOTIFICATION stuff
-  # only logged in users can watch code tickets
-
-  def watched?
-    raise "Couldn't check watch status. Not logged in." unless User.current_user
-    self.code_notifications.where(:email => User.current_user.email).first
-  end
-
+  # only logged in users can watch
   def watch!
     raise "can't watch a duplicate" if self.code_ticket_id
     raise "Couldn't watch. Not logged in." unless User.current_user
-    raise "Couldn't watch. Already watching." if watched?
-    # create a support identity for tracking purposes
-    User.current_user.support_identity unless User.current_user.support_identity_id
+    return true if watched?
     self.code_notifications.create(:email => User.current_user.email)
   end
 
@@ -347,12 +382,7 @@ class CodeTicket < ActiveRecord::Base
     self.code_notifications.where(:email => User.current_user.email).destroy_all
   end
 
-  # returns an array of email addresses. [] if none
-  def mail_to(private = false)
-    notifications = self.code_notifications
-    notifications = notifications.official if private
-    notifications.map(&:email).uniq
-  end
+  ### SEND NOTIFICATIONS
 
   def send_create_notifications
     self.mail_to.each do |recipient|

@@ -275,7 +275,6 @@ class SupportTicket < ActiveRecord::Base
   include Workflow
   workflow_column :status
 
-
   workflow do
     state :unowned do
       event :take, :transitions_to => :taken
@@ -325,6 +324,7 @@ class SupportTicket < ActiveRecord::Base
   end
 
   ### SCOPES and ARRAYS
+
   # scopes based on workflow states
   self.workflow_spec.state_names.each do |state|
     scope state, :conditions => { :status => state.to_s }
