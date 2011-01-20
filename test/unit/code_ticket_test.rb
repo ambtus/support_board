@@ -14,6 +14,14 @@ class CodeTicketTest < ActiveSupport::TestCase
   test "name" do
     assert_equal "Code Ticket #1", CodeTicket.find(1).name
   end
+  test "status_line" do
+    assert_equal "open", CodeTicket.find(1).status_line
+    assert_equal "taken by sam", CodeTicket.find(2).status_line
+    assert_equal "verified by bofh",  CodeTicket.find(3).status_line
+    assert_equal "waiting for verification (commited by rodney)", CodeTicket.find(4).status_line
+    assert_equal "committed by blair", CodeTicket.find(5).status_line
+    assert_equal "deployed in 1.0 (verified by rodney)", CodeTicket.find(6).status_line
+  end
   test "vote" do
     ticket = CodeTicket.find(1)
     assert_equal 1, ticket.vote_count
@@ -41,57 +49,5 @@ class CodeTicketTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     assert code_ticket = support_ticket.needs_fix!(code_ticket.id)
     assert_equal 3, code_ticket.vote_count
-  end
-  test "watch" do
-    ticket = CodeTicket.find(1)
-    assert_raise(RuntimeError) { ticket.watch! }
-    assert_equal 1, ticket.mail_to.size
-    User.current_user = User.find_by_login("dean")
-    assert_raise(RuntimeError) { ticket.unwatch! }
-    assert ticket.watch!
-    assert_equal 2, ticket.mail_to.size
-    assert ticket.watch! # no-op
-    assert_equal 2, ticket.mail_to.size
-    User.current_user = User.find_by_login("john")
-    assert_nil ticket.watched?
-    assert ticket.watch!
-    assert_equal 3, ticket.mail_to.size
-    assert ticket.unwatch!
-    assert_equal 2, ticket.reload.mail_to.size
-    assert_nil ticket.watched?
-  end
-  test "comment on unowned ticket" do
-    ticket = CodeTicket.find(1)
-    User.current_user = nil
-    assert_raise(RuntimeError) { ticket.comment!("something") }
-    assert_equal 0, ticket.code_details.count
-    User.current_user = User.find_by_login("dean")
-    assert ticket.comment!("user")
-    assert_equal 1, ticket.code_details.count
-    assert_match "dean wrote", ticket.code_details.first.info
-    assert_equal "user", ticket.code_details.first.content
-    User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("volunteer")
-    assert_equal 2, ticket.code_details.count
-    assert_match "sam (volunteer) wrote", ticket.code_details.last.info
-    assert_equal "volunteer", ticket.code_details.last.content
-    assert ticket.comment!("unofficial volunteer", false)
-    assert_equal 3, ticket.code_details.count
-    assert_match "sam wrote", ticket.code_details.last.info
-    assert_equal "unofficial volunteer", ticket.code_details.last.content
-  end
-  test "comment on owned ticket" do
-    ticket = CodeTicket.find(2)
-    assert_equal 1, ticket.code_details.count
-    User.current_user = User.find_by_login("dean")
-    assert_raise(RuntimeError) { ticket.comment!("something") }
-    assert_equal 1, ticket.code_details.count
-    User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("important stuff")
-    assert_equal 2, ticket.code_details.count
-    assert_equal "important stuff", ticket.code_details.last.content
-    assert_match "sam (volunteer) wrote", ticket.code_details.last.info
-    assert_raise(RuntimeError) { ticket.comment!("unofficial comment", false) }
-    assert_equal 2, ticket.code_details.count
   end
 end

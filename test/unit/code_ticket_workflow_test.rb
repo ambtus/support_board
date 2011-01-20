@@ -1,25 +1,6 @@
 require 'test_helper'
 
 class CodeTicketWorkflowTest < ActiveSupport::TestCase
-  test "normal flow" do
-    assert_equal "open", CodeTicket.find(1).status_line
-    two = CodeTicket.find(2)
-    assert_equal "taken by sam", two.status_line
-    assert_equal %Q{unowned -> taken}, two.code_details.last.content
-    three = CodeTicket.find(3)
-    assert_equal "rodney", three.code_commits.first.support_identity.name
-    assert_equal "verified by bofh", three.status_line
-    assert_equal %Q{staged -> verified}, three.code_details.last.content
-    four = CodeTicket.find(4)
-    assert_equal "waiting for verification (commited by rodney)", four.status_line
-    assert_equal %Q{committed -> staged}, four.code_details.last.content
-    five = CodeTicket.find(5)
-    assert_equal "committed by blair", five.status_line
-    assert_equal %Q{taken -> committed (4)}, five.code_details.last.content
-    six = CodeTicket.find(6)
-    assert_equal "deployed in 1.0 (verified by rodney)", six.status_line
-    assert_match %Q{verified -> closed (1)}, six.code_details.last.content
-  end
   test "reopen" do
     reason = "sorry, I don't have time to save the world this month"
     ticket = CodeTicket.find(2)

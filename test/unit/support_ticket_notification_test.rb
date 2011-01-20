@@ -1,13 +1,17 @@
 require 'test_helper'
 
-class SupportNotificationTest < ActiveSupport::TestCase
+class SupportTicketNotificationTest < ActiveSupport::TestCase
   test "a guest ticket with default owner notifications" do
+    # FIXME
   end
   test "a user ticket with default owner notifications" do
+    # FIXME
   end
   test "create a guest ticket without notifications" do
+    # FIXME
   end
   test "create a user ticket without notifications" do
+    # FIXME
   end
   test "watch guest ticket" do
     ticket = SupportTicket.find(1)
