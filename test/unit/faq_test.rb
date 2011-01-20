@@ -44,19 +44,13 @@ class FaqTest < ActiveSupport::TestCase
     assert faq.vote!
     assert_equal 4, faq.vote_count
   end
-  test "indirect votes new faq" do
-    support_ticket = SupportTicket.find(1)
-    User.current_user = User.find_by_login("sam")
-    assert faq = support_ticket.answer!
-    assert_equal 1, faq.vote_count
-  end
-  test "indirect votes old faq" do
+  test "votes when adding a ticket to a faq" do
     support_ticket = SupportTicket.find(1)
     faq = Faq.find(1)
     assert_equal 0, faq.vote_count
     User.current_user = User.find_by_login("sam")
-    assert faq = support_ticket.answer!(faq.id)
-    assert_equal 1, faq.vote_count
+    assert support_ticket.answer!(faq.id)
+    assert_equal 2, faq.vote_count
   end
   test "watch" do
     faq = Faq.find(1)
@@ -80,7 +74,7 @@ class FaqTest < ActiveSupport::TestCase
     support_ticket = SupportTicket.first
     faq = Faq.find(1)
     User.current_user = User.find_by_login("sam")
-    assert faq = support_ticket.answer!(faq.id)
+    assert support_ticket.answer!(faq.id)
     assert_raise(RuntimeError) { faq.watch!("randomstring") }
     assert_equal 0, faq.mail_to.size
     assert faq.watch!(support_ticket.authentication_code)

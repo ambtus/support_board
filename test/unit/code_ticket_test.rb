@@ -94,13 +94,13 @@ class CodeTicketTest < ActiveSupport::TestCase
   end
   test "scopes" do
     assert_equal 7, CodeTicket.all.count
-    assert_equal 6, CodeTicket.not_closed.count
-    assert_equal [1, 7], CodeTicket.unowned.ids
+    assert_equal 5, CodeTicket.not_closed.count
+    assert_equal [1], CodeTicket.unowned.ids
     assert_equal [2], CodeTicket.taken.ids
     assert_equal [5], CodeTicket.committed.ids
     assert_equal [4], CodeTicket.staged.ids
     assert_equal [3], CodeTicket.verified.ids
-    assert_equal [6], CodeTicket.closed.ids
+    assert_equal [6, 7], CodeTicket.closed.ids
   end
   test "vote" do
     ticket = CodeTicket.find(1)
