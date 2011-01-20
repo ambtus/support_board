@@ -12,6 +12,11 @@ class CodeTicket < ActiveRecord::Base
 
   ### VALIDATIONS and CALLBACKS
 
+  # only support volunteers can open code tickets
+  before_validation(:on => :create) do
+    raise SecurityError, "only volunteers can create code tickets" if !User.current_user.try(:support_volunteer?)
+  end
+
   # must have summary
   validates_presence_of :summary
   validates_length_of :summary, :maximum=> 140 # tweet length!

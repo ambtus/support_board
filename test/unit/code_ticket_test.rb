@@ -1,10 +1,15 @@
 require 'test_helper'
 
 class CodeTicketTest < ActiveSupport::TestCase
-  test "create with validations" do
+  test "create with validations and callbacks" do
+    assert_raise(SecurityError) { CodeTicket.create!(:summary => "short summary") }
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { CodeTicket.create!(:summary => "short summary") }
+    User.current_user = User.find_by_login("sam")
     assert_raise(ActiveRecord::RecordInvalid) { CodeTicket.create! }
-    assert CodeTicket.create(:summary => "short summary")
     assert_raise(ActiveRecord::RecordInvalid) { CodeTicket.create!(:summary => SecureRandom.hex(141))}
+    assert ticket = CodeTicket.create(:summary => "short summary")
+    assert_equal ["sam@ao3.org"], ticket.mail_to
   end
   test "name" do
     assert_equal "Code Ticket #1", CodeTicket.find(1).name
@@ -39,20 +44,20 @@ class CodeTicketTest < ActiveSupport::TestCase
   end
   test "watch" do
     ticket = CodeTicket.find(1)
-    User.current_user = nil
     assert_raise(RuntimeError) { ticket.watch! }
-    assert_equal 0, ticket.mail_to.size
+    assert_equal 1, ticket.mail_to.size
     User.current_user = User.find_by_login("dean")
     assert_raise(RuntimeError) { ticket.unwatch! }
     assert ticket.watch!
-    assert_raise(RuntimeError) { ticket.watch! }
-    assert_equal 1, ticket.mail_to.size
+    assert_equal 2, ticket.mail_to.size
+    assert ticket.watch! # no-op
+    assert_equal 2, ticket.mail_to.size
     User.current_user = User.find_by_login("john")
     assert_nil ticket.watched?
     assert ticket.watch!
-    assert_equal 2, ticket.mail_to.size
+    assert_equal 3, ticket.mail_to.size
     assert ticket.unwatch!
-    assert_equal 1, ticket.reload.mail_to.size
+    assert_equal 2, ticket.reload.mail_to.size
     assert_nil ticket.watched?
   end
   test "comment on unowned ticket" do
