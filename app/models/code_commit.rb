@@ -14,7 +14,6 @@ class CodeCommit < ActiveRecord::Base
     "[#{date}] #{self.support_identity.byline} (#{self.status})"
   end
 
-
   before_create :ensure_support_identity
   def ensure_support_identity
     identity = SupportIdentity.find_by_name(self.author)
@@ -99,6 +98,10 @@ class CodeCommit < ActiveRecord::Base
     scope state, :conditions => { :status => state.to_s }
   end
 
+  def self.ids
+    select("code_commits.id").map(&:id)
+  end
+
   def match(code_ticket_id)
     ticket = CodeTicket.find code_ticket_id
     # if this code ticket can commit the ticket, commit the ticket
@@ -110,6 +113,8 @@ class CodeCommit < ActiveRecord::Base
   end
 
   def unmatch
+    raise SecurityError, "not logged in!" unless User.current_user
+    raise SecurityError, "not a support volunteer!" unless User.current_user.support_volunteer?
     ticket = CodeTicket.find self.code_ticket_id
     # if the ticket was committed on the basis of this one commit, reopen it
     if ticket.code_commits == [self] && ticket.committed?
