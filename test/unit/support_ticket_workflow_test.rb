@@ -1,7 +1,7 @@
 require 'test_helper'
 
 # workflow and related methods
-class SupportTicketTest < ActiveSupport::TestCase
+class SupportTicketWorkflowTest < ActiveSupport::TestCase
   test "scopes" do
     assert_equal 22, SupportTicket.count
     assert_equal [1, 8, 16, 20], SupportTicket.unowned.ids

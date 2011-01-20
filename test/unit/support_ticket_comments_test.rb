@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SupportTicketTest < ActiveSupport::TestCase
+class SupportTicketCommentTest < ActiveSupport::TestCase
   test "system logs" do
     assert_equal %Q{unowned -> spam}, SupportTicket.find(2).support_details.system_log.last.content
     assert_equal %Q{unowned -> taken}, SupportTicket.find(3).support_details.system_log.last.content

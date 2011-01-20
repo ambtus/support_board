@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SupportTicketTest < ActiveSupport::TestCase
+class SupportTicketFilterTest < ActiveSupport::TestCase
   test "owned_by_user when bad username" do
     assert_raise(ActiveRecord::RecordNotFound) { SupportTicket.filter(:owned_by_user => "nobody") }
   end

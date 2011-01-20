@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CodeTicketTest < ActiveSupport::TestCase
+class CodeTicketFilterTest < ActiveSupport::TestCase
   test "all" do
     assert_equal 7, CodeTicket.filter({:status => "all"}).count
   end
