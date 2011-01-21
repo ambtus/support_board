@@ -138,9 +138,7 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     assert_match "john wrote", ticket.support_details.written_comments.first.info
     assert ticket.hide_username!
     assert ticket.anonymous?
-    assert_equal 1, ticket.support_details.written_comments.count
-    assert_equal "something to say", ticket.support_details.written_comments.first.content
-    assert_match "ticket owner wrote", ticket.support_details.written_comments.first.info
+    assert_match "ticket owner wrote", ticket.reload.support_details.written_comments.first.info
   end
   test "users can comment on taken ticket if it's theirs" do
     User.current_user = User.find_by_login("dean")
