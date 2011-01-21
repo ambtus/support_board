@@ -2,7 +2,7 @@ require 'test_helper'
 
 class CodeTicketFilterTest < ActiveSupport::TestCase
   test "all" do
-    assert_equal 7, CodeTicket.filter({:status => "all"}).count
+    assert_equal 8, CodeTicket.filter({:status => "all"}).count
   end
   test "unowned status" do
     assert_equal [1], CodeTicket.filter({:status => "unowned"}).ids
@@ -22,7 +22,7 @@ class CodeTicketFilterTest < ActiveSupport::TestCase
     assert_equal [3], CodeTicket.filter({:status => "verified"}).ids
   end
   test "closed status" do
-    assert_equal [6, 7], CodeTicket.filter({:status => "closed"}).ids
+    assert_equal [6, 7, 8], CodeTicket.filter({:status => "closed", :sort_by => "oldest first"}).ids
   end
   test "open status" do
     assert_equal 5, CodeTicket.filter({:status => "open"}).count
@@ -45,9 +45,9 @@ class CodeTicketFilterTest < ActiveSupport::TestCase
   end
   test "owned by" do
     assert_equal [5], CodeTicket.filter(:owned_by_support_identity => "blair").ids
-    assert_equal [2], CodeTicket.filter(:owned_by_support_identity => "sam").ids
+    assert_equal [2, 8], CodeTicket.filter(:owned_by_support_identity => "sam", :status => "all", :sort_by => "oldest first").ids
     assert_equal [4], CodeTicket.filter(:owned_by_support_identity => "rodney").ids
-    assert_equal [4, 6], CodeTicket.filter(:owned_by_support_identity => "rodney", :status => "all").ids
+    assert_equal [4, 6], CodeTicket.filter(:owned_by_support_identity => "rodney", :status => "all", :sort_by => "oldest first").ids
     assert_equal [3], CodeTicket.filter(:owned_by_support_identity => "bofh").ids
     assert_equal [7], CodeTicket.filter(:owned_by_support_identity => "blair", :status => "closed").ids
     assert_empty CodeTicket.filter(:owned_by_support_identity => "bofh", :status => "taken")
@@ -55,17 +55,17 @@ class CodeTicketFilterTest < ActiveSupport::TestCase
   test "watching" do
     assert_raise(SecurityError) {CodeTicket.filter({:watching => true})}
     User.current_user = User.find_by_login("sam")
-    assert_equal [2], CodeTicket.filter({:watching => true, :status => "all"}).ids
+    assert_equal [1, 2, 7], CodeTicket.filter({:watching => true, :status => "all", :sort_by => "oldest first"}).ids
     User.current_user = User.find_by_login("rodney")
-    assert_equal [3, 4, 6], CodeTicket.filter({:watching => true, :status => "all"}).ids
+    assert_equal [3, 4, 6, 7], CodeTicket.filter({:watching => true, :status => "all", :sort_by => "oldest first"}).ids
     User.current_user = User.find_by_login("blair")
-    assert_equal [5, 7], CodeTicket.filter({:watching => true, :status => "all"}).ids
+    assert_equal [1, 4, 5, 7], CodeTicket.filter({:watching => true, :status => "all", :sort_by => "oldest first"}).ids
     User.current_user = User.find_by_login("bofh")
-    assert_equal [3, 6], CodeTicket.filter({:watching => true, :status => "all"}).ids
+    assert_equal [3, 4, 6], CodeTicket.filter({:watching => true, :status => "all", :sort_by => "oldest first"}).ids
   end
   test "sort" do
     User.current_user = User.find_by_login("rodney")
-    assert_equal [3, 2, 5, 1, 4], CodeTicket.filter({:by_vote => true }).map(&:id)
+    assert_equal [3, 2, 5, 1, 4], CodeTicket.filter({:sort_by => "highest vote"}).map(&:id)
   end
 end
 

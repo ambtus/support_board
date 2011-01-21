@@ -14,10 +14,10 @@
     <% end %>
     <p><%= submit_tag "Add details" %></p>
   <% end %>
-  <% if !@ticket.closed? && @ticket.support_details.visible_to_all.user_comments.count > 0 %>
+  <% if !@ticket.closed? && @ticket.support_details.written_comments.visible_to_all.count > 0 %>
     <%= label_tag :support_detail_id, "Support Detail" %>
         <%= select_tag :support_detail_id,
-                       options_from_collection_for_select(@ticket.support_details.visible_to_all.user_comments, "id", "info") %>
+                       options_from_collection_for_select(@ticket.support_details.written_comments.visible_to_all, "id", "info") %>
         <%= submit_tag "This answer resolves my issue" %>
   <% end %>
   <% unless @ticket.private? %>

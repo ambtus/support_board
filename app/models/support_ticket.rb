@@ -212,7 +212,7 @@ class SupportTicket < ActiveRecord::Base
       raise ActiveRecord::RecordNotFound unless support_identity
 
       # don't include system logs
-      details = SupportDetail.user_comments.where(:support_identity_id => support_identity.id)
+      details = SupportDetail.written_comments.where(:support_identity_id => support_identity.id)
 
       # don't include private comments unless support volunteer
       details = details.visible_to_all unless User.current_user.try(:support_volunteer?)

@@ -5,10 +5,7 @@ class CodeDetail < ActiveRecord::Base
   scope :resolved, where(:resolved_ticket => true)
   scope :system_log, where(:system_log => true)
   scope :visible_to_all, where(:private => false)
-
-  def self.public_comments
-    where(:private => false).where(:system_log => false)
-  end
+  scope :written_comments, where(:system_log => false)
 
   # support_identity name, with volunteer designation if support response
   def byline

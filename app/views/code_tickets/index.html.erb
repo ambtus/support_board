@@ -20,7 +20,7 @@
                  options_from_collection_for_select(ReleaseNote.posted.all, "id", "release", params[:closed_in_release]) %>
   <%= label_tag :sort_by %>
   <%= select_tag :sort_by,
-           options_for_select(["newest", "by vote", "recently updated", "least recently updated", "oldest first"], params[:sort_by]) %>
+           options_for_select(["newest", "highest vote", "recently updated", "least recently updated", "oldest first"], params[:sort_by]) %>
   <%= submit_tag "Filter" %>
   <%= link_to "Clear Filters", code_tickets_path %>
 <% end %>

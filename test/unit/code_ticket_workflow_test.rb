@@ -1,6 +1,25 @@
 require 'test_helper'
 
 class CodeTicketWorkflowTest < ActiveSupport::TestCase
+  test "stealable? not logged in" do
+    assert_raise(SecurityError) { CodeTicket.first.stealable? }
+  end
+  test "stealable? not volunteer" do
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { CodeTicket.first.stealable? }
+  end
+  test "stealable? own ticket" do
+    User.current_user = User.find_by_login("sam")
+    assert !CodeTicket.find(2).stealable?
+  end
+  test "stealable? wrong state" do
+    User.current_user = User.find_by_login("sam")
+    assert !CodeTicket.find(4).stealable?
+  end
+  test "stealable? okay" do
+    User.current_user = User.find_by_login("blair")
+    assert CodeTicket.find(2).stealable?
+  end
   test "reopen" do
     reason = "sorry, I don't have time to save the world this month"
     ticket = CodeTicket.find(2)
@@ -39,16 +58,16 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
   end
   test "move watchers from duplicate" do
     ticket = CodeTicket.find(1)
-    assert_equal 0, ticket.mail_to.size
+    assert_equal ["sam@ao3.org", "blair@ao3.org"], ticket.mail_to
     dupe = CodeTicket.find(2)
-    assert_equal 1, dupe.mail_to.size # sam
     User.current_user = User.find_by_login("john")
     dupe.watch!
-    assert_equal 2, dupe.mail_to.size # sam and john
+    assert_equal ["sam@ao3.org", "john@ao3.org"], dupe.mail_to
     User.current_user = User.find_by_login("rodney")
     assert dupe.duplicate!(ticket.id)
-    assert_equal 2, ticket.reload.mail_to.size
     assert_equal 0, dupe.reload.mail_to.size
+    assert_equal ["sam@ao3.org", "blair@ao3.org", "john@ao3.org"], ticket.reload.mail_to
+    assert_equal 3, ticket.code_notifications.size
   end
   test "move votes from duplicate" do
     ticket = CodeTicket.find(1)
@@ -71,13 +90,13 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
     assert_equal 0, dupe.support_tickets.count
   end
   test "scopes" do
-    assert_equal 7, CodeTicket.all.count
+    assert_equal 8, CodeTicket.all.count
     assert_equal 5, CodeTicket.not_closed.count
     assert_equal [1], CodeTicket.unowned.ids
     assert_equal [2], CodeTicket.taken.ids
     assert_equal [5], CodeTicket.committed.ids
     assert_equal [4], CodeTicket.staged.ids
     assert_equal [3], CodeTicket.verified.ids
-    assert_equal [6, 7], CodeTicket.closed.ids
+    assert_equal [6, 7, 8], CodeTicket.closed.ids
   end
 end

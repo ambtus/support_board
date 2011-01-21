@@ -87,24 +87,25 @@ class FaqTest < ActiveSupport::TestCase
   end
   test "can comment on a faq when it's in rfc mode" do
     faq = Faq.find(2)
-    assert_equal 0, faq.faq_details.public_comments.count
+    assert faq.rfc?
+    assert_equal 2, faq.faq_details.count
     User.current_user = nil
     assert_raise(RuntimeError) { faq.comment!("something") }
-    assert_equal 0, faq.faq_details.public_comments.count
+    assert_equal 2, faq.faq_details.count
     User.current_user = User.find_by_login("dean")
-    assert faq.comment!("user")
-    assert_equal 1, faq.faq_details.public_comments.count
-    assert_match "dean wrote", faq.faq_details.public_comments.first.info
-    assert_equal "user", faq.faq_details.public_comments.first.content
+    assert detail = faq.comment!("user")
+    assert_equal 3, faq.faq_details.count
+    assert_equal "user", detail.content
+    assert_match "dean wrote", detail.info
     User.current_user = User.find_by_login("sam")
-    assert faq.comment!("volunteer")
-    assert_equal 2, faq.faq_details.public_comments.count
-    assert_match "sam (volunteer) wrote", faq.faq_details.public_comments.last.info
-    assert_equal "volunteer", faq.faq_details.public_comments.last.content
-    assert faq.comment!("unofficial volunteer", false)
-    assert_equal 3, faq.faq_details.public_comments.count
-    assert_match "sam wrote", faq.faq_details.public_comments.last.info
-    assert_equal "unofficial volunteer", faq.faq_details.public_comments.last.content
+    assert detail = faq.comment!("volunteer")
+    assert_equal 4, faq.faq_details.count
+    assert_equal "volunteer", detail.content
+    assert_match "sam (volunteer) wrote", detail.info
+    assert detail = faq.comment!("unofficial volunteer", false)
+    assert_equal 5, faq.faq_details.count
+    assert_equal "unofficial volunteer", detail.content
+    assert_match "sam wrote", detail.info
   end
   test "can't comment on faq after it's posted" do
     faq = Faq.find(1)

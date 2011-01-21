@@ -167,7 +167,7 @@ class SupportTicketWorkflowTest < ActiveSupport::TestCase
   end
   test "reopen owner accepted ticket update support detail" do
     ticket = SupportTicket.find(22)
-    detail = ticket.support_details.user_comments.last
+    detail = ticket.support_details.written_comments.last
     assert ticket.closed?
     assert_nil ticket.support_identity_id
     assert detail.resolved_ticket?
@@ -194,14 +194,14 @@ class SupportTicketWorkflowTest < ActiveSupport::TestCase
   end
   test "needs_fix" do
     ticket = SupportTicket.find(1)
-    assert_equal 7, CodeTicket.count
+    assert_equal 8, CodeTicket.count
     assert ticket.unowned?
     User.current_user = User.find_by_login("sam")
     assert code_ticket = ticket.needs_fix!
     assert ticket.waiting?
     assert_equal "unowned -> waiting", ticket.support_details.system_log.last.content
     assert_equal "sam", ticket.support_identity.name
-    assert_equal 8, CodeTicket.count
+    assert_equal 9, CodeTicket.count
     assert_equal 3, code_ticket.vote_count
   end
   test "answer" do

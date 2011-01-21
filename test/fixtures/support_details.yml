@@ -2,7 +2,7 @@
 support_detail_1: 
   content: a personal problem, my ass
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:06 Z
+  created_at: 2011-01-21 00:43:11 Z
   id: 1
   private: true
   resolved_ticket: false
@@ -10,11 +10,11 @@ support_detail_1:
   support_response: true
   support_ticket_id: 2
   system_log: false
-  updated_at: 2011-01-20 21:18:06 Z
+  updated_at: 2011-01-21 00:43:11 Z
 support_detail_2: 
   content: unowned -> spam
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:06 Z
+  created_at: 2011-01-21 00:43:11 Z
   id: 2
   private: false
   resolved_ticket: false
@@ -22,11 +22,11 @@ support_detail_2:
   support_response: true
   support_ticket_id: 2
   system_log: true
-  updated_at: 2011-01-20 21:18:06 Z
+  updated_at: 2011-01-21 00:43:11 Z
 support_detail_3: 
   content: your ass is not my problem
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:06 Z
+  created_at: 2011-01-21 00:43:11 Z
   id: 3
   private: true
   resolved_ticket: false
@@ -34,11 +34,11 @@ support_detail_3:
   support_response: true
   support_ticket_id: 2
   system_log: false
-  updated_at: 2011-01-20 21:18:06 Z
+  updated_at: 2011-01-21 00:43:11 Z
 support_detail_4: 
   content: cut it out, guys
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:06 Z
+  created_at: 2011-01-21 00:43:11 Z
   id: 4
   private: true
   resolved_ticket: false
@@ -46,11 +46,11 @@ support_detail_4:
   support_response: true
   support_ticket_id: 2
   system_log: false
-  updated_at: 2011-01-20 21:18:06 Z
+  updated_at: 2011-01-21 00:43:11 Z
 support_detail_5: 
   content: and the holy water
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:06 Z
+  created_at: 2011-01-21 00:43:12 Z
   id: 5
   private: false
   resolved_ticket: false
@@ -58,11 +58,11 @@ support_detail_5:
   support_response: false
   support_ticket_id: 3
   system_log: false
-  updated_at: 2011-01-20 21:18:06 Z
+  updated_at: 2011-01-21 00:43:12 Z
 support_detail_6: 
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:06 Z
+  created_at: 2011-01-21 00:43:12 Z
   id: 6
   private: false
   resolved_ticket: false
@@ -70,11 +70,11 @@ support_detail_6:
   support_response: true
   support_ticket_id: 3
   system_log: true
-  updated_at: 2011-01-20 21:18:06 Z
+  updated_at: 2011-01-21 00:43:12 Z
 support_detail_7: 
   content: unowned -> waiting (3)
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:07 Z
+  created_at: 2011-01-21 00:43:13 Z
   id: 7
   private: false
   resolved_ticket: false
@@ -82,11 +82,11 @@ support_detail_7:
   support_response: true
   support_ticket_id: 4
   system_log: true
-  updated_at: 2011-01-20 21:18:07 Z
+  updated_at: 2011-01-21 00:43:13 Z
 support_detail_8: 
   content: unowned -> closed (4)
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:10 Z
+  created_at: 2011-01-21 00:43:13 Z
   id: 8
   private: false
   resolved_ticket: false
@@ -94,11 +94,11 @@ support_detail_8:
   support_response: true
   support_ticket_id: 5
   system_log: true
-  updated_at: 2011-01-20 21:18:10 Z
+  updated_at: 2011-01-21 00:43:13 Z
 support_detail_9: 
   content: unowned -> closed (5)
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:11 Z
+  created_at: 2011-01-21 00:43:14 Z
   id: 9
   private: false
   resolved_ticket: false
@@ -106,11 +106,11 @@ support_detail_9:
   support_response: true
   support_ticket_id: 6
   system_log: true
-  updated_at: 2011-01-20 21:18:11 Z
+  updated_at: 2011-01-21 00:43:14 Z
 support_detail_10: 
   content: unowned -> waiting (5)
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:12 Z
+  created_at: 2011-01-21 00:43:15 Z
   id: 10
   private: false
   resolved_ticket: false
@@ -118,11 +118,11 @@ support_detail_10:
   support_response: true
   support_ticket_id: 7
   system_log: true
-  updated_at: 2011-01-20 21:18:12 Z
+  updated_at: 2011-01-21 00:43:15 Z
 support_detail_11: 
   content: don't make me come looking for you!
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:13 Z
+  created_at: 2011-01-21 00:43:16 Z
   id: 11
   private: false
   resolved_ticket: false
@@ -130,11 +130,11 @@ support_detail_11:
   support_response: false
   support_ticket_id: 8
   system_log: false
-  updated_at: 2011-01-20 21:18:13 Z
+  updated_at: 2011-01-21 00:43:16 Z
 support_detail_12: 
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:14 Z
+  created_at: 2011-01-21 00:43:16 Z
   id: 12
   private: false
   resolved_ticket: false
@@ -142,11 +142,11 @@ support_detail_12:
   support_response: true
   support_ticket_id: 9
   system_log: true
-  updated_at: 2011-01-20 21:18:14 Z
+  updated_at: 2011-01-21 00:43:16 Z
 support_detail_13: 
   content: unowned -> posted
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:14 Z
+  created_at: 2011-01-21 00:43:18 Z
   id: 13
   private: false
   resolved_ticket: false
@@ -154,11 +154,11 @@ support_detail_13:
   support_response: true
   support_ticket_id: 10
   system_log: true
-  updated_at: 2011-01-20 21:18:14 Z
+  updated_at: 2011-01-21 00:43:18 Z
 support_detail_14: 
   content: unowned -> posted
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:15 Z
+  created_at: 2011-01-21 00:43:18 Z
   id: 14
   private: false
   resolved_ticket: false
@@ -166,11 +166,11 @@ support_detail_14:
   support_response: true
   support_ticket_id: 11
   system_log: true
-  updated_at: 2011-01-20 21:18:15 Z
+  updated_at: 2011-01-21 00:43:18 Z
 support_detail_15: 
   content: unowned -> posted
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:16 Z
+  created_at: 2011-01-21 00:43:20 Z
   id: 15
   private: false
   resolved_ticket: false
@@ -178,11 +178,11 @@ support_detail_15:
   support_response: true
   support_ticket_id: 12
   system_log: true
-  updated_at: 2011-01-20 21:18:16 Z
+  updated_at: 2011-01-21 00:43:20 Z
 support_detail_16: 
   content: and very well, too
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:16 Z
+  created_at: 2011-01-21 00:43:20 Z
   id: 16
   private: false
   resolved_ticket: false
@@ -190,11 +190,11 @@ support_detail_16:
   support_response: true
   support_ticket_id: 12
   system_log: false
-  updated_at: 2011-01-20 21:18:16 Z
+  updated_at: 2011-01-21 00:43:20 Z
 support_detail_17: 
   content: unowned -> posted
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:17 Z
+  created_at: 2011-01-21 00:43:21 Z
   id: 17
   private: false
   resolved_ticket: false
@@ -202,11 +202,11 @@ support_detail_17:
   support_response: true
   support_ticket_id: 13
   system_log: true
-  updated_at: 2011-01-20 21:18:17 Z
+  updated_at: 2011-01-21 00:43:21 Z
 support_detail_18: 
   content: small loss
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:17 Z
+  created_at: 2011-01-21 00:43:21 Z
   id: 18
   private: true
   resolved_ticket: false
@@ -214,11 +214,11 @@ support_detail_18:
   support_response: true
   support_ticket_id: 14
   system_log: false
-  updated_at: 2011-01-20 21:18:17 Z
+  updated_at: 2011-01-21 00:43:21 Z
 support_detail_19: 
   content: unowned -> posted
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:17 Z
+  created_at: 2011-01-21 00:43:21 Z
   id: 19
   private: false
   resolved_ticket: false
@@ -226,11 +226,11 @@ support_detail_19:
   support_response: true
   support_ticket_id: 14
   system_log: true
-  updated_at: 2011-01-20 21:18:17 Z
+  updated_at: 2011-01-21 00:43:21 Z
 support_detail_20: 
   content: unowned -> posted
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:19 Z
+  created_at: 2011-01-21 00:43:22 Z
   id: 20
   private: false
   resolved_ticket: false
@@ -238,11 +238,11 @@ support_detail_20:
   support_response: true
   support_ticket_id: 15
   system_log: true
-  updated_at: 2011-01-20 21:18:19 Z
+  updated_at: 2011-01-21 00:43:22 Z
 support_detail_21: 
   content: i bet this is jim
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:19 Z
+  created_at: 2011-01-21 00:43:23 Z
   id: 21
   private: true
   resolved_ticket: false
@@ -250,11 +250,11 @@ support_detail_21:
   support_response: true
   support_ticket_id: 16
   system_log: false
-  updated_at: 2011-01-20 21:18:19 Z
+  updated_at: 2011-01-21 00:43:23 Z
 support_detail_22: 
   content: nah, must be dean
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:19 Z
+  created_at: 2011-01-21 00:43:23 Z
   id: 22
   private: true
   resolved_ticket: false
@@ -262,11 +262,11 @@ support_detail_22:
   support_response: true
   support_ticket_id: 16
   system_log: false
-  updated_at: 2011-01-20 21:18:19 Z
+  updated_at: 2011-01-21 00:43:23 Z
 support_detail_23: 
   content: better not be john
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:19 Z
+  created_at: 2011-01-21 00:43:23 Z
   id: 23
   private: true
   resolved_ticket: false
@@ -274,11 +274,11 @@ support_detail_23:
   support_response: true
   support_ticket_id: 16
   system_log: false
-  updated_at: 2011-01-20 21:18:19 Z
+  updated_at: 2011-01-21 00:43:23 Z
 support_detail_24: 
   content: stop gossiping about the lusers and get back to work
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:19 Z
+  created_at: 2011-01-21 00:43:23 Z
   id: 24
   private: true
   resolved_ticket: false
@@ -286,11 +286,11 @@ support_detail_24:
   support_response: true
   support_ticket_id: 16
   system_log: false
-  updated_at: 2011-01-20 21:18:19 Z
+  updated_at: 2011-01-21 00:43:23 Z
 support_detail_25: 
   content: i think it was my ex
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:20 Z
+  created_at: 2011-01-21 00:43:23 Z
   id: 25
   private: false
   resolved_ticket: false
@@ -298,11 +298,11 @@ support_detail_25:
   support_response: false
   support_ticket_id: 17
   system_log: false
-  updated_at: 2011-01-20 21:18:20 Z
+  updated_at: 2011-01-21 00:43:23 Z
 support_detail_26: 
   content: unowned -> waiting_on_admin
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:20 Z
+  created_at: 2011-01-21 00:43:23 Z
   id: 26
   private: false
   resolved_ticket: false
@@ -310,11 +310,11 @@ support_detail_26:
   support_response: true
   support_ticket_id: 17
   system_log: true
-  updated_at: 2011-01-20 21:18:20 Z
+  updated_at: 2011-01-21 00:43:23 Z
 support_detail_27: 
   content: unowned -> waiting
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:21 Z
+  created_at: 2011-01-21 00:43:24 Z
   id: 27
   private: false
   resolved_ticket: false
@@ -322,11 +322,11 @@ support_detail_27:
   support_response: true
   support_ticket_id: 18
   system_log: true
-  updated_at: 2011-01-20 21:18:21 Z
+  updated_at: 2011-01-21 00:43:24 Z
 support_detail_28: 
   content: waiting -> closed
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:21 Z
+  created_at: 2011-01-21 00:43:25 Z
   id: 28
   private: false
   resolved_ticket: false
@@ -334,11 +334,11 @@ support_detail_28:
   support_response: true
   support_ticket_id: 18
   system_log: true
-  updated_at: 2011-01-20 21:18:21 Z
+  updated_at: 2011-01-21 00:43:25 Z
 support_detail_29: 
   content: unowned -> closed (not our problem)
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:22 Z
+  created_at: 2011-01-21 00:43:26 Z
   id: 29
   private: false
   resolved_ticket: false
@@ -346,11 +346,11 @@ support_detail_29:
   support_response: true
   support_ticket_id: 19
   system_log: true
-  updated_at: 2011-01-20 21:18:22 Z
+  updated_at: 2011-01-21 00:43:26 Z
 support_detail_30: 
   content: i thought he was leaving fandom forever
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:23 Z
+  created_at: 2011-01-21 00:43:27 Z
   id: 30
   private: true
   resolved_ticket: false
@@ -358,11 +358,11 @@ support_detail_30:
   support_response: true
   support_ticket_id: 21
   system_log: false
-  updated_at: 2011-01-20 21:18:23 Z
+  updated_at: 2011-01-21 00:43:27 Z
 support_detail_31: 
   content: unowned -> waiting_on_admin
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:23 Z
+  created_at: 2011-01-21 00:43:27 Z
   id: 31
   private: false
   resolved_ticket: false
@@ -370,11 +370,11 @@ support_detail_31:
   support_response: true
   support_ticket_id: 21
   system_log: true
-  updated_at: 2011-01-20 21:18:23 Z
+  updated_at: 2011-01-21 00:43:27 Z
 support_detail_32: 
   content: forever is a long time
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:23 Z
+  created_at: 2011-01-21 00:43:28 Z
   id: 32
   private: true
   resolved_ticket: false
@@ -382,11 +382,11 @@ support_detail_32:
   support_response: true
   support_ticket_id: 21
   system_log: false
-  updated_at: 2011-01-20 21:18:23 Z
+  updated_at: 2011-01-21 00:43:28 Z
 support_detail_33: 
   content: see http://community.livejournal.com/yuletide_admin/
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:24 Z
+  created_at: 2011-01-21 00:43:28 Z
   id: 33
   private: false
   resolved_ticket: true
@@ -394,11 +394,11 @@ support_detail_33:
   support_response: false
   support_ticket_id: 22
   system_log: false
-  updated_at: 2011-01-20 21:18:24 Z
+  updated_at: 2011-01-21 00:43:28 Z
 support_detail_34: 
   content: unowned -> closed (33)
   content_sanitizer_version: 0
-  created_at: 2011-01-20 21:18:24 Z
+  created_at: 2011-01-21 00:43:28 Z
   id: 34
   private: false
   resolved_ticket: false
@@ -406,4 +406,4 @@ support_detail_34:
   support_response: 
   support_ticket_id: 22
   system_log: true
-  updated_at: 2011-01-20 21:18:24 Z
+  updated_at: 2011-01-21 00:43:28 Z

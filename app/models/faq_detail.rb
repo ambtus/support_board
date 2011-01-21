@@ -4,11 +4,8 @@ class FaqDetail < ActiveRecord::Base
 
   scope :resolved, where(:resolved_ticket => true)
   scope :system_log, where(:system_log => true)
+  scope :written_comments, where(:system_log => false)
   scope :visible_to_all, where(:private => false)
-
-  def self.public_comments
-    where(:private => false).where(:system_log => false)
-  end
 
   # we use a generic "ticket owner" in the byline if detail was written by a guest (linked in from support ticket)
   def show_generic?

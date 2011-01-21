@@ -24,26 +24,29 @@ class CodeTicketTest < ActiveSupport::TestCase
     assert_equal "deployed in 2.0 (verified by blair)", CodeTicket.find(7).status_line
     assert_equal "closed as duplicate by sam", CodeTicket.find(8).status_line
   end
-  test "voted?" do
+  test "voted? not logged in" do
     assert_raise(SecurityError) { CodeTicket.first.voted? }
+  end
+  test "voted? when true" do
     User.current_user = User.find_by_login("sam")
     assert CodeTicket.first.voted?
+  end
+  test "voted? when false" do
     User.current_user = User.find_by_login("blair")
     assert !CodeTicket.first.voted?
   end
-  test "vote" do
-    ticket = CodeTicket.find(1)
-    assert_equal 1, ticket.vote_count
-    User.current_user = nil
-    assert_raise(RuntimeError) { ticket.vote! }
-    User.current_user = User.find_by_login("dean")
-    assert ticket.vote!
-    assert_raise(RuntimeError) { ticket.vote! }
-    assert_equal 2, ticket.vote_count
-    User.current_user = User.find_by_login("john")
-    assert_nil ticket.voted?
-    assert ticket.vote!
-    assert_equal 3, ticket.vote_count
+  test "vote_count" do
+    assert_equal 1, CodeTicket.find(1).vote_count
+    assert_equal 4, CodeTicket.find(2).vote_count
+    assert_equal 5, CodeTicket.find(3).vote_count
+    assert_equal 0, CodeTicket.find(4).vote_count
+    assert_equal 2, CodeTicket.find(5).vote_count
+    assert_equal 1, CodeTicket.find(6).vote_count
+    assert_equal 3, CodeTicket.find(7).vote_count
+    assert_equal 0, CodeTicket.find(8).vote_count
+  end
+  test "sort (by vote)" do
+    assert_equal [3, 2, 5, 1, 4], CodeTicket.not_closed.sort.map(&:id)
   end
   test "indirect votes new ticket" do
     support_ticket = SupportTicket.find(1)

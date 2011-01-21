@@ -57,10 +57,31 @@ class CodeTicket < ActiveRecord::Base
     end
   end
 
+  # test if ticket is one I can steal (used in volunteer views)
+  def stealable?
+    raise SecurityError, "Couldn't check stealable. Not volunteer." unless User.current_user.try(:support_volunteer?)
+    self.support_identity_id != User.current_user.support_identity_id &&
+      self.current_state.events.include?(:steal)
+  end
+
   # only logged in users can watch code tickets
   def watched?
     raise "Couldn't check watch status. Not logged in." unless User.current_user
     self.code_notifications.where(:email => User.current_user.email).first
+  end
+
+  # returns an array of email addresses. [] if none
+  def mail_to(private = false)
+    notifications = self.code_notifications
+    notifications = notifications.official if private
+    notifications.map(&:email).uniq
+  end
+
+  # change the support id, and add current volunteer to watch list
+  def take_and_watch!
+    raise SecurityError, "not support volunteer" unless User.current_user.try(:support_volunteer?)
+    self.support_identity_id = User.current_user.support_identity_id
+    self.watch!
   end
 
   # only logged in users can vote for code tickets and only once
@@ -73,23 +94,10 @@ class CodeTicket < ActiveRecord::Base
     code_votes.sum(:vote)
   end
 
-  # test if ticket is one I can steal (used in volunteer views)
-  def stealable?
-    raise SecurityError, "Couldn't check stealable. Not logged in." unless User.current_user
-    self.support_identity_id != User.current_user.support_identity_id &&
-      self.current_state.events.include?(:steal)
-  end
-
-  # returns an array of email addresses. [] if none
-  def mail_to(private = false)
-    notifications = self.code_notifications
-    notifications = notifications.official if private
-    notifications.map(&:email).uniq
-  end
-
   # okay until we need to paginate
-  def self.sort_by_vote
-    self.all.sort{|f1,f2|f2.vote_count <=> f1.vote_count}
+  # sort by votes
+  def <=>(other)
+    other.vote_count <=> self.vote_count
   end
 
   ### FILTER
@@ -107,7 +115,13 @@ class CodeTicket < ActiveRecord::Base
     if !params[:comments_by_support_identity].blank?
       support_identity = SupportIdentity.find_by_name(params[:comments_by_support_identity])
       raise ActiveRecord::RecordNotFound unless support_identity
-      tickets = tickets.joins(:code_details) & CodeDetail.public_comments.where(:support_identity_id => support_identity.id)
+      # don't include system logs
+      details = CodeDetail.written_comments.where(:support_identity_id => support_identity.id)
+
+      # don't include private comments unless support volunteer
+      details = details.visible_to_all unless User.current_user.try(:support_volunteer?)
+
+      tickets = tickets.joins(:code_details) & details
     end
 
     # tickets owned by volunteer
@@ -153,8 +167,8 @@ class CodeTicket < ActiveRecord::Base
       tickets = tickets.order("updated_at asc")
     when "oldest first"
       tickets = tickets.order("id asc")
-    when "by vote"
-      tickets = tickets.sort_by_vote
+    when "highest vote"
+      tickets = tickets.sort
     else # "newest" by default
       tickets = tickets.order("id desc")
     end
@@ -204,7 +218,8 @@ class CodeTicket < ActiveRecord::Base
       self.code_details.create(:content => content,
                                :support_identity_id => User.current_user.support_identity_id,
                                :system_log => true)
-      # TODO FIXME: sends notifications with ticket in previous state
+    end
+    after_transition do |from, to, triggering_event, *event_args|
       self.send_update_notifications unless [:steal].include?(triggering_event)
     end
   end
@@ -239,18 +254,18 @@ class CodeTicket < ActiveRecord::Base
   # some methods add you as watcher, some don't. some change owner, some don't
 
   def take
-    self.support_identity_id = User.current_user.support_identity_id
-    self.watch! unless self.watched?
+    self.take_and_watch!
   end
 
   def duplicate(original_id)
-    CodeTicket.find original_id # will raise error if no such ticket
+    original = CodeTicket.find original_id # will raise error if no such ticket
     self.code_ticket_id = original_id
+    # move all related support tickets
     self.support_tickets.update_all(:code_ticket_id => original_id)
-    # it's okay if there are duplicates. mail_to uses uniq. and unwatch uses destroy all
-    self.code_notifications.update_all(:code_ticket_id => original_id)
-    # probably should remove duplicates, but a couple extra votes doesn't hurt
-    self.code_votes.update_all(:code_ticket_id => original_id)
+    # move all code notifications unless they are dupes
+    self.code_notifications.each {|watcher| watcher.move_to_ticket(original)}
+     # move all code votes unless they are dupes
+    self.code_votes.each {|vote| vote.move_to_ticket(original) }
     self.support_identity_id = User.current_user.support_identity_id
   end
 
@@ -261,19 +276,18 @@ class CodeTicket < ActiveRecord::Base
     cc.code_ticket_id = self.id
     cc.status = "matched"
     cc.save!
+    self.take_and_watch!
   end
 
   def reject(reason)
     raise "Couldn't reject. No reason given." if reason.blank?
     raise "Couldn't reject. Not support admin." unless User.current_user.support_admin?
-    self.support_identity_id = User.current_user.support_identity_id
-    self.watch! unless self.watched?
+    self.take_and_watch!
   end
 
   def steal
     self.send_steal_notification(User.current_user)
-    self.support_identity_id = User.current_user.support_identity_id
-    self.watch! unless self.watched?
+    self.take_and_watch!
   end
 
   def reopen(reason)
@@ -293,10 +307,10 @@ class CodeTicket < ActiveRecord::Base
     raise "Couldn't verify. Not support volunteer." unless User.current_user.support_volunteer?
     raise "Couldn't verify, same person committed" unless User.current_user.support_identity != self.support_identity
     self.code_commits.each {|cc| cc.verify!}
-    self.support_identity_id = User.current_user.support_identity_id
-    self.watch! unless self.watched?
+    self.take_and_watch!
   end
 
+  # don't update support identity, still belongs to verifier
   def deploy(release_note_id)
     note = ReleaseNote.find(release_note_id) # will raise error if no release note
     self.release_note_id = release_note_id
@@ -369,6 +383,8 @@ class CodeTicket < ActiveRecord::Base
                                :system_log => false,
                                :private => private_comment)
       self.send_update_notifications(private_comment)
+      # DECISION should notifications be sent before or after you're added to the ticket?
+      self.watch! unless self.code_ticket_id
     else
       raise "Couldn't comment. Only official comments allowed."
     end

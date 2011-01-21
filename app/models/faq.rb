@@ -51,12 +51,13 @@ class Faq < ActiveRecord::Base
     end
     support_response = (official && User.current_user.support_volunteer?)
     raise ArgumentError, "Only official comments can be private" if private && !support_response
-    self.faq_details.create(:content => content,
+    detail = self.faq_details.create!(:content => content,
                             :support_identity_id => User.current_user.try(:support_identity).try(:id),
                             :support_response => support_response,
                             :system_log => false,
                             :private => private)
-      self.send_update_notifications(private)
+    self.send_update_notifications(private)
+    return detail
   end
 
   # are any of the associated support tickets owned by the current user?
