@@ -363,6 +363,7 @@ class SupportTicket < ActiveRecord::Base
   end
 
   def steal
+    raise "couldn't steal, not stealable" unless stealable?
     self.send_steal_notification
     self.take_and_watch!
   end

@@ -1,5 +1,3 @@
 <p>A new support ticket has been created: <%= link_to @ticket.name, support_ticket_url(@ticket) %></p>
-
 <%= render :partial => "support_tickets/blurb", :locals => { :ticket => @ticket }  %>
-
 <%= render :partial => "support_details/blurb", :locals => { :detail => @ticket.support_detail.last }  %>

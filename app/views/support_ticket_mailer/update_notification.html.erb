@@ -1,5 +1,3 @@
 <p><%= link_to @ticket.name, support_ticket_url(@ticket) %> has been updated.</p>
-
 <%= render :partial => "support_tickets/blurb", :locals => { :ticket => @ticket }  %>
-
 <%= render :partial => "details/blurb", :locals => { :detail => @ticket.support_details.last }  %>

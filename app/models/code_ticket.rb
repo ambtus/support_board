@@ -232,7 +232,6 @@ class CodeTicket < ActiveRecord::Base
     scope state, :conditions => { :status => state.to_s }
   end
 
-
   def self.not_closed
     where('status != "closed"')
   end
@@ -240,7 +239,7 @@ class CodeTicket < ActiveRecord::Base
   # tickets which can be used for code commit matching
   # once a code ticket has been staged it's being tested, and you can't add more commits to it
   def self.for_matching
--    where('status != "closed"').where('status != "verified"').where('status != "staged"')
+    not_closed.where('status != "verified"').where('status != "staged"')
   end
 
   # returns an array of support ticket ids
@@ -282,11 +281,12 @@ class CodeTicket < ActiveRecord::Base
 
   def reject(reason)
     raise "Couldn't reject. No reason given." if reason.blank?
-    raise "Couldn't reject. Not support admin." unless User.current_user.support_admin?
+    raise SecurityError, "Couldn't reject. Not support admin." unless User.current_user.support_admin?
     self.take_and_watch!
   end
 
   def steal
+    raise "couldn't steal, not stealable" unless stealable?
     self.send_steal_notification(User.current_user)
     self.take_and_watch!
   end
@@ -300,19 +300,19 @@ class CodeTicket < ActiveRecord::Base
 
   # don't update support identity, still belongs to committer
   def stage
+    raise SecurityError, "Couldn't stage. Not logged in as support admin." unless User.current_user.support_admin?
     self.code_commits.each {|cc| cc.stage!}
   end
 
   def verify
-    raise "Couldn't verify. Not logged in." unless User.current_user
-    raise "Couldn't verify. Not support volunteer." unless User.current_user.support_volunteer?
-    raise "Couldn't verify, same person committed" unless User.current_user.support_identity != self.support_identity
+    raise "Couldn't verify, same person committed" if User.current_user.support_identity == self.support_identity
     self.code_commits.each {|cc| cc.verify!}
     self.take_and_watch!
   end
 
   # don't update support identity, still belongs to verifier
   def deploy(release_note_id)
+    raise SecurityError, "Couldn't stage. Not logged in as support admin." unless User.current_user.support_admin?
     note = ReleaseNote.find(release_note_id) # will raise error if no release note
     self.release_note_id = release_note_id
     self.code_commits.each {|cc| cc.deploy!}
@@ -324,8 +324,7 @@ class CodeTicket < ActiveRecord::Base
 
   # deploy to stage. all commits must be matched
   def self.stage!
-    raise "Couldn't stage. Not logged in." unless User.current_user
-    raise "Couldn't stage. Not logged in as support admin." unless User.current_user.support_admin?
+    raise SecurityError, "Couldn't stage. Not logged in as support admin." unless User.current_user.support_admin?
     raise "Couldn't stage. Not all commits matched" if CodeCommit.unmatched.count > 0
     CodeCommit.matched.each { |cc| cc.code_ticket.stage! }
   end
@@ -333,12 +332,11 @@ class CodeTicket < ActiveRecord::Base
   # deploy to production. all tickets must be verified
   # a release note must exist and will be posted
   def self.deploy!(release_note_id)
-    raise "Couldn't deploy. Not logged in." unless User.current_user
-    raise "Couldn't deploy. Not logged in as support admin." unless User.current_user.support_admin?
-    note = ReleaseNote.find_by_id(release_note_id)
+    raise SecurityError, "Couldn't stage. Not logged in as support admin." unless User.current_user.support_admin?
     raise "Couldn't deploy. Not all tickets verified" if CodeCommit.staged.count > 0
-    raise "Couldn't deploy. Release not doesn't exist." unless User.current_user.support_admin?
-    CodeCommit.verified.each {|cc| cc.code_ticket.deploy!(release_note_id)}
+    note = ReleaseNote.find_by_id(release_note_id)
+    raise "Couldn't deploy. Release not doesn't exist." unless note
+    CodeCommit.verified.each {|cc| cc.code_ticket.deploy!(note.id)}
     note.post!
     return note
   end

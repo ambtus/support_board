@@ -1,12 +1,8 @@
 <p>Dear <%= @user.login %>,</p>
-
 <p>Please consider <%= @ticket.unowned? ? "taking" : "stealing" %> <%= link_to(@ticket.name, @url) %>
-
 <%= render :partial => "support_tickets/blurb", :locals => { :ticket => @ticket }  %>
-
 <% @ticket.support_details.each do |detail| %>
   <%= render :partial => "support_details/blurb", :locals => { :detail => detail }  %>
 <% end %>
-
 <p>Thank you,<br />
 <%= @requestor.support_identity.name %></p>
