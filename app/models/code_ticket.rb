@@ -66,7 +66,7 @@ class CodeTicket < ActiveRecord::Base
 
   # only logged in users can watch code tickets
   def watched?
-    raise "Couldn't check watch status. Not logged in." unless User.current_user
+    raise SecurityError, "Couldn't check watch status. Not logged in." unless User.current_user
     self.code_notifications.where(:email => User.current_user.email).first
   end
 
@@ -399,7 +399,6 @@ class CodeTicket < ActiveRecord::Base
   # only logged in users can watch
   def watch!
     raise "can't watch a duplicate" if self.code_ticket_id
-    raise "Couldn't watch. Not logged in." unless User.current_user
     return true if watched?
     self.code_notifications.create(:email => User.current_user.email, :official => User.current_user.support_volunteer?)
   end

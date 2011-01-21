@@ -8,38 +8,74 @@ class CodeTicketCommentsTest < ActiveSupport::TestCase
     assert_equal %Q{taken -> committed (4)}, CodeTicket.find(5).code_details.last.content
     assert_match %Q{verified -> closed (1)}, CodeTicket.find(6).code_details.last.content
   end
-  test "comment on unowned ticket" do
+  test "guest comment on unowned ticket" do
     ticket = CodeTicket.find(1)
     User.current_user = nil
     assert_raise(RuntimeError) { ticket.comment!("something") }
+  end
+  test "user comment on unowned ticket" do
+    ticket = CodeTicket.find(1)
     assert_equal 0, ticket.code_details.count
     User.current_user = User.find_by_login("dean")
-    assert ticket.comment!("user")
+    assert ticket.comment!("something")
     assert_equal 1, ticket.code_details.count
-    assert_match "dean wrote", ticket.code_details.first.info
-    assert_equal "user", ticket.code_details.first.content
-    User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("volunteer")
-    assert_equal 2, ticket.code_details.count
-    assert_match "sam (volunteer) wrote", ticket.code_details.last.info
-    assert_equal "volunteer", ticket.code_details.last.content
-    assert ticket.comment!("unofficial volunteer", false)
-    assert_equal 3, ticket.code_details.count
-    assert_match "sam wrote", ticket.code_details.last.info
-    assert_equal "unofficial volunteer", ticket.code_details.last.content
+    assert_match "dean wrote", ticket.code_details.last.info
+    assert_equal "something", ticket.code_details.last.content
   end
-  test "comment on owned ticket" do
-    ticket = CodeTicket.find(2)
-    assert_equal 1, ticket.code_details.count
+  test "user private comment ticket" do
+    ticket = CodeTicket.find(1)
+    User.current_user = User.find_by_login("dean")
+    assert_raise(ArgumentError) { ticket.comment!("something", true, true) }
+  end
+  test "volunteer comment unofficially on unowned ticket" do
+    ticket = CodeTicket.find(1)
+    User.current_user = User.find_by_login("sam")
+    assert ticket.comment!("something", false)
+    assert_match "sam wrote", ticket.code_details.last.info
+  end
+  test "volunteer comment officially on unowned ticket" do
+    ticket = CodeTicket.find(1)
+    User.current_user = User.find_by_login("sam")
+    assert ticket.comment!("something")
+    assert_match "sam (volunteer) wrote", ticket.code_details.last.info
+  end
+  test "volunteer private official comment on unowned ticket" do
+    ticket = CodeTicket.find(1)
+    User.current_user = User.find_by_login("sam")
+    assert ticket.comment!("something", true, true)
+    assert_match "sam (volunteer) wrote [private]", ticket.code_details.last.info
+  end
+  test "volunteer private unofficial comment on unowned ticket" do
+    ticket = CodeTicket.find(1)
+    User.current_user = User.find_by_login("sam")
+    assert_raise(ArgumentError) { ticket.comment!("something", false, true) }
+  end
+  test "guest comment on owned ticket" do
+    ticket = CodeTicket.find(3)
+    User.current_user = nil
+    assert_raise(RuntimeError) { ticket.comment!("something") }
+  end
+  test "user comment on owned ticket" do
+    ticket = CodeTicket.find(3)
     User.current_user = User.find_by_login("dean")
     assert_raise(RuntimeError) { ticket.comment!("something") }
-    assert_equal 1, ticket.code_details.count
+  end
+  test "volunteer comment unofficially on owned ticket" do
+    ticket = CodeTicket.find(3)
     User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("important stuff")
-    assert_equal 2, ticket.code_details.count
-    assert_equal "important stuff", ticket.code_details.last.content
+    assert_raise(RuntimeError) { ticket.comment!("something", false) }
+  end
+  test "volunteer comment officially on owned ticket" do
+    ticket = CodeTicket.find(3)
+    User.current_user = User.find_by_login("sam")
+    assert ticket.comment!("something")
     assert_match "sam (volunteer) wrote", ticket.code_details.last.info
-    assert_raise(RuntimeError) { ticket.comment!("unofficial comment", false) }
-    assert_equal 2, ticket.code_details.count
+    assert_match "something", ticket.code_details.last.content
+  end
+  test "volunteer private official comment on owned ticket" do
+    ticket = CodeTicket.find(3)
+    User.current_user = User.find_by_login("sam")
+    assert ticket.comment!("something", true, true)
+    assert_match "sam (volunteer) wrote [private]", ticket.code_details.last.info
   end
 end
