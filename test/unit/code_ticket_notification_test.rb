@@ -26,6 +26,9 @@ class CodeTicketNotificationTest < ActiveSupport::TestCase
     assert_equal [], CodeTicket.find(8).mail_to
   end
   test "mail_to private" do
-    # FIXME
+    assert_equal ["rodney@ao3.org", "bofh@ao3.org", "blair@ao3.org"], CodeTicket.find(4).mail_to(true)
+    assert_equal ["blair@ao3.org"], CodeTicket.find(5).mail_to(true)
+    assert_equal ["sam@ao3.org", "rodney@ao3.org", "blair@ao3.org"], CodeTicket.find(7).mail_to(true)
+    assert_equal [], CodeTicket.find(8).mail_to(true)
   end
 end

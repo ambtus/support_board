@@ -89,6 +89,7 @@ CodeCommit.create!(:author => "blair", :message => "related to issue 5", :pushed
 
 User.current_user = bofh
 ct6 = CodeTicket.create!(:summary => "create the world wide web")
+ct6.comment!("should be an easy days work")
 ct6.vote!
 ct6.take!
 CodeCommit.create!(:author => "bofh", :message => "issue 6", :pushed_at => Time.now)

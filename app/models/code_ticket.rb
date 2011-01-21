@@ -132,8 +132,9 @@ class CodeTicket < ActiveRecord::Base
     end
 
     if !params[:closed_in_release].blank?
-      tickets = tickets.where(:release_note_id => params[:closed_in_release])
-      # elsif filter by status because the status must be closed even if they forgot to select it
+      # ignore status because the status must be closed
+      release = ReleaseNote.find(params[:closed_in_release]) # raise if non-existent
+      tickets = tickets.where(:release_note_id => release.id)
     elsif !params[:status].blank?
       case params[:status]
       when "unowned"
@@ -395,7 +396,7 @@ class CodeTicket < ActiveRecord::Base
     raise "can't watch a duplicate" if self.code_ticket_id
     raise "Couldn't watch. Not logged in." unless User.current_user
     return true if watched?
-    self.code_notifications.create(:email => User.current_user.email)
+    self.code_notifications.create(:email => User.current_user.email, :official => User.current_user.support_volunteer?)
   end
 
   def unwatch!
