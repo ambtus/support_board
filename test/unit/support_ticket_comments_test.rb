@@ -138,7 +138,7 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     assert_match "john wrote", ticket.support_details.written_comments.first.info
     assert ticket.hide_username!
     assert ticket.anonymous?
-    assert_match "ticket owner wrote", ticket.reload.support_details.written_comments.first.info
+    assert_match "ticket owner wrote", ticket.support_details.written_comments.first.reload.info
   end
   test "users can comment on taken ticket if it's theirs" do
     User.current_user = User.find_by_login("dean")
@@ -190,13 +190,24 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
   test "volunteers who comment on their own user tickets unofficially respects anonymity" do
     User.current_user = User.find_by_login("sam")
     ticket = SupportTicket.find(8)
-    assert_equal 1, ticket.support_details.written_comments.count
-    assert ticket.user_comment!("i'm warning you", false)
-    assert_match "i'm warning you", ticket.support_details.last.content
-    assert_match "ticket owner wrote", ticket.support_details.last.info
-    assert_equal 2, ticket.support_details.written_comments.count
+    assert !ticket.anonymous?
+    assert_equal 1, ticket.support_details.count
+    assert_match "sam wrote", ticket.support_details.first.info
+    assert ticket.user_comment!("i'm warning you", true)
+    assert_match "sam (volunteer) wrote", ticket.support_details[1].reload.info
+    assert_equal 2, ticket.support_details.count
+    assert ticket.hide_username!
+    assert_equal 3, ticket.support_details.count
+    assert_equal "don't make me come looking for you!", ticket.support_details[0].content
+    assert_match "ticket owner wrote", ticket.support_details[0].reload.info
+    assert_match "i'm warning you", ticket.support_details[1].content
+    assert_match "sam (volunteer) wrote", ticket.support_details[1].reload.info
+    assert_match "hide username", ticket.support_details[2].content
+    assert_match "ticket owner", ticket.support_details[2].reload.info
     assert ticket.show_username!
-    assert_match "sam wrote", ticket.support_details.written_comments.last.info
+    assert_match "sam", ticket.support_details[0].reload.info
+    assert_match "sam (volunteer)", ticket.support_details[1].reload.info
+    assert_match "sam", ticket.support_details[2].reload.info
   end
   test "system log details should respect anonymity for volunteers" do
     User.current_user = User.find_by_login("sam")

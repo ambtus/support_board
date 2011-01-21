@@ -11,6 +11,7 @@ class SupportDetail < ActiveRecord::Base
   # support detail created by a guest OR
   # support detail is by the same user as opened the ticket AND the ticket is anonymous
   def show_generic?
+    return false if self.support_response?
     return true unless self.support_identity_id # guest comment on own ticket
     return false unless self.support_ticket.user # user comment on guest ticket
     return true if (self.support_identity_id == self.support_ticket.user.support_identity_id) && self.support_ticket.anonymous?

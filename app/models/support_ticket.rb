@@ -454,7 +454,8 @@ class SupportTicket < ActiveRecord::Base
     raise_unless_logged_in
     official_comment = false unless User.current_user.support_volunteer?
     raise ArgumentError, "can't be private unless official" if private_comment && !official_comment
-    raise_if_public_watcher unless self.unowned?
+    raise_if_public_watcher(official_comment) unless self.unowned?
+    raise_if_public_watcher(official_comment) if self.private?
     comment!(content, official_comment, private_comment)
   end
 
@@ -613,8 +614,9 @@ class SupportTicket < ActiveRecord::Base
     raise SecurityError, "not a support admin!" unless User.current_user.support_admin?
   end
 
-  # logged in, but neither volunteer nor owner
-  def raise_if_public_watcher
+  # logged in, but neither owner nor official volunteer
+  def raise_if_public_watcher(official_comment=true)
+    raise SecurityError, "unofficial comments not allowed" if User.current_user.support_volunteer? && !official_comment
     raise SecurityError, "not authorized!" if public_watcher?
   end
 
