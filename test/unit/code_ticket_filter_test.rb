@@ -75,10 +75,10 @@ class CodeTicketFilterTest < ActiveSupport::TestCase
     assert_raise(TypeError) {CodeTicket.filter({:status => "unknown"})}
   end
   test "sort_by recently updated" do
-    assert_equal [4, 5, 3, 1, 2], CodeTicket.filter({:sort_by => "recently updated"}).ids
-    User.current_user = User.find_by_login("rodney")
-    CodeTicket.first.take!
-    assert_equal [1, 4, 5, 3, 2], CodeTicket.filter({:sort_by => "recently updated"}).ids
+    assert_equal [8, 2], CodeTicket.filter({:sort_by => "recently updated", :owned_by_support_identity => "sam", :status => "all"}).ids
+    User.current_user = User.find_by_login("sam")
+    CodeTicket.find(2).commit!(CodeCommit.find(1))
+    assert_equal [2, 8], CodeTicket.filter({:sort_by => "recently updated", :owned_by_support_identity => "sam", :status => "all"}).ids
   end
   test "sort_by least recently updated" do
     User.current_user = User.find_by_login("rodney")

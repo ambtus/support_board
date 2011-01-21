@@ -77,6 +77,7 @@ User.current_user = rodney
 ct4.comment!("happy now, master?", true, true)
 User.current_user = blair
 ct4.comment!("geeze guys, i don't want to know about your kinks", true, true)
+User.current_user = rodney
 ct4.reload.stage!
 
 User.current_user = blair
@@ -372,6 +373,7 @@ st18 = SupportTicket.create!(
 User.current_user = sam
 ct7 = st18.needs_fix!
 CodeCommit.create!(:author => "rodney", :message => "partial fix for issue 7", :pushed_at => Time.now)
+User.current_user = bofh
 ct7.reload.stage!
 User.current_user = blair
 ct7.verify!

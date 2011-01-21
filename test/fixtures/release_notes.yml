@@ -2,18 +2,18 @@
 release_note_1: 
   content: new in this release, the www!
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:20 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 1
   posted: true
   release: "1.0"
   support_identity_id: 
-  updated_at: 2011-01-21 03:45:20 Z
+  updated_at: 2011-01-21 17:34:46 Z
 release_note_2: 
   content: new in this release, web 2.0!
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:20 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 2
   posted: true
   release: "2.0"
   support_identity_id: 
-  updated_at: 2011-01-21 03:45:35 Z
+  updated_at: 2011-01-21 17:35:02 Z

@@ -90,16 +90,6 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
     assert_equal 1, ticket.support_tickets.count
     assert_equal 0, dupe.support_tickets.count
   end
-  test "commit" do
-    commit = CodeCommit.first
-    assert commit.unmatched?
-    ticket = CodeTicket.first
-    assert ticket.unowned?
-    User.current_user = User.find_by_login("sam")
-    assert ticket.commit!(commit.id)
-    assert ticket.committed?
-    assert commit.reload.matched?
-  end
   test "commit with bad code_commit" do
     ticket = CodeTicket.first
     User.current_user = User.find_by_login("sam")
@@ -109,6 +99,26 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
     ticket = CodeTicket.first
     User.current_user = User.find_by_login("sam")
     assert_raise(RuntimeError) { ticket.commit!(2) }
+  end
+  test "commit" do
+    commit = CodeCommit.first
+    assert commit.unmatched?
+    ticket = CodeTicket.first
+    assert ticket.unowned?
+    User.current_user = User.find_by_login("sam")
+    assert ticket.commit!(commit.id)
+    assert ticket.committed?
+    assert commit.reload.matched?
+    assert_equal "sam", ticket.support_identity.name
+  end
+  test "commit someone else's commit" do
+    commit = CodeCommit.first
+    ticket = CodeTicket.first
+    User.current_user = User.find_by_login("rodney")
+    assert ticket.commit!(commit.id)
+    assert ticket.committed?
+    assert commit.reload.matched?
+    assert_equal "sam", ticket.support_identity.name
   end
   test "reject" do
     reason = "not reproducible"

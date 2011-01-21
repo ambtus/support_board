@@ -3,311 +3,311 @@ code_detail_1:
   code_ticket_id: 2
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:17 Z
+  created_at: 2011-01-21 17:34:44 Z
   id: 1
   private: false
   resolved_ticket: false
   support_identity_id: 1
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:17 Z
+  updated_at: 2011-01-21 17:34:44 Z
 code_detail_2: 
   code_ticket_id: 3
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 2
   private: false
   resolved_ticket: false
   support_identity_id: 2
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_3: 
   code_ticket_id: 3
   content: taken -> committed (2)
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 3
   private: false
   resolved_ticket: false
   support_identity_id: 2
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_4: 
   code_ticket_id: 3
   content: committed -> staged
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 4
   private: false
   resolved_ticket: false
   support_identity_id: 2
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_5: 
   code_ticket_id: 3
   content: staged -> verified
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 5
   private: false
   resolved_ticket: false
   support_identity_id: 4
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_6: 
   code_ticket_id: 4
   content: haven't you started this yet?
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 6
   private: false
   resolved_ticket: false
   support_identity_id: 5
   support_response: false
   system_log: false
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_7: 
   code_ticket_id: 4
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 7
   private: false
   resolved_ticket: false
   support_identity_id: 2
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_8: 
   code_ticket_id: 4
   content: rodney, get the lead out!
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 8
   private: true
   resolved_ticket: false
   support_identity_id: 4
   support_response: true
   system_log: false
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_9: 
   code_ticket_id: 4
   content: taken -> committed (3)
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 9
   private: false
   resolved_ticket: false
   support_identity_id: 2
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_10: 
   code_ticket_id: 4
   content: happy now, master?
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 10
   private: true
   resolved_ticket: false
   support_identity_id: 2
   support_response: true
   system_log: false
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_11: 
   code_ticket_id: 4
   content: geeze guys, i don't want to know about your kinks
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 11
   private: true
   resolved_ticket: false
   support_identity_id: 3
   support_response: true
   system_log: false
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_12: 
   code_ticket_id: 4
   content: committed -> staged
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 12
   private: false
   resolved_ticket: false
-  support_identity_id: 3
+  support_identity_id: 2
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_13: 
   code_ticket_id: 5
   content: what's a sentinel?
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 13
   private: false
   resolved_ticket: false
   support_identity_id: 6
   support_response: false
   system_log: false
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:45 Z
 code_detail_14: 
   code_ticket_id: 5
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 14
   private: false
   resolved_ticket: false
   support_identity_id: 3
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:46 Z
 code_detail_15: 
   code_ticket_id: 5
   content: taken -> committed (4)
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 15
   private: false
   resolved_ticket: false
   support_identity_id: 3
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:46 Z
 code_detail_16: 
   code_ticket_id: 6
   content: should be an easy days work
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 16
   private: false
   resolved_ticket: false
   support_identity_id: 4
   support_response: true
   system_log: false
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:46 Z
 code_detail_17: 
   code_ticket_id: 6
   content: unowned -> taken
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 17
   private: false
   resolved_ticket: false
   support_identity_id: 4
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:46 Z
 code_detail_18: 
   code_ticket_id: 6
   content: taken -> committed (5)
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 18
   private: false
   resolved_ticket: false
   support_identity_id: 4
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:46 Z
 code_detail_19: 
   code_ticket_id: 6
   content: committed -> staged
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 19
   private: false
   resolved_ticket: false
   support_identity_id: 4
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:46 Z
 code_detail_20: 
   code_ticket_id: 6
   content: staged -> verified
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:20 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 20
   private: false
   resolved_ticket: false
   support_identity_id: 2
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:20 Z
+  updated_at: 2011-01-21 17:34:46 Z
 code_detail_21: 
   code_ticket_id: 6
   content: verified -> closed (1)
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:20 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 21
   private: false
   resolved_ticket: false
   support_identity_id: 2
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:20 Z
+  updated_at: 2011-01-21 17:34:46 Z
 code_detail_22: 
   code_ticket_id: 7
   content: unowned -> committed (6)
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:34 Z
+  created_at: 2011-01-21 17:35:02 Z
   id: 22
   private: false
   resolved_ticket: false
   support_identity_id: 2
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:34 Z
+  updated_at: 2011-01-21 17:35:02 Z
 code_detail_23: 
   code_ticket_id: 7
   content: committed -> staged
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:34 Z
+  created_at: 2011-01-21 17:35:02 Z
   id: 23
   private: false
   resolved_ticket: false
-  support_identity_id: 2
+  support_identity_id: 4
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:34 Z
+  updated_at: 2011-01-21 17:35:02 Z
 code_detail_24: 
   code_ticket_id: 7
   content: staged -> verified
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:34 Z
+  created_at: 2011-01-21 17:35:02 Z
   id: 24
   private: false
   resolved_ticket: false
   support_identity_id: 3
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:34 Z
+  updated_at: 2011-01-21 17:35:02 Z
 code_detail_25: 
   code_ticket_id: 7
   content: verified -> closed (2)
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:34 Z
+  created_at: 2011-01-21 17:35:02 Z
   id: 25
   private: false
   resolved_ticket: false
   support_identity_id: 4
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:34 Z
+  updated_at: 2011-01-21 17:35:02 Z
 code_detail_26: 
   code_ticket_id: 8
   content: unowned -> closed (1)
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:37 Z
+  created_at: 2011-01-21 17:35:05 Z
   id: 26
   private: false
   resolved_ticket: false
   support_identity_id: 1
   support_response: false
   system_log: true
-  updated_at: 2011-01-21 03:45:37 Z
+  updated_at: 2011-01-21 17:35:05 Z

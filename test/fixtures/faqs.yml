@@ -2,55 +2,55 @@
 faq_1: 
   content: in the sea. or the great salt lake. possibly your salt shaker
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:20 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 1
   position: 1
   status: faq
   summary: where to find salt
   summary_sanitizer_version: 0
   support_identity_id: 4
-  updated_at: 2011-01-21 03:45:20 Z
+  updated_at: 2011-01-21 17:34:46 Z
 faq_2: 
   content: this should be self evident
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:20 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 2
   position: 2
   status: rfc
   summary: why we don't have enough ZPMs
   summary_sanitizer_version: 0
   support_identity_id: 2
-  updated_at: 2011-01-21 03:45:20 Z
+  updated_at: 2011-01-21 17:34:46 Z
 faq_3: 
   content: Ask me no questions and I'll tell you no lies
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:20 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 3
   position: 3
   status: faq
   summary: what's DADT?
   summary_sanitizer_version: 0
   support_identity_id: 2
-  updated_at: 2011-01-21 03:45:20 Z
+  updated_at: 2011-01-21 17:34:46 Z
 faq_4: 
   content: visit the lost password page
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:20 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 4
   position: 4
   status: faq
   summary: how to recover your password
   summary_sanitizer_version: 0
   support_identity_id: 4
-  updated_at: 2011-01-21 03:45:20 Z
+  updated_at: 2011-01-21 17:34:46 Z
 faq_5: 
   content: "lookout: a person employed to keep watch for some anticipated event"
   content_sanitizer_version: 0
-  created_at: 2011-01-21 03:45:20 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 5
   position: 5
   status: rfc
   summary: what's a sentinel?
   summary_sanitizer_version: 0
   support_identity_id: 3
-  updated_at: 2011-01-21 03:45:20 Z
+  updated_at: 2011-01-21 17:34:46 Z

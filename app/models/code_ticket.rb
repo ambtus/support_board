@@ -276,7 +276,15 @@ class CodeTicket < ActiveRecord::Base
     cc.code_ticket_id = self.id
     cc.status = "matched"
     cc.save!
-    self.take_and_watch!
+    code_committer = cc.support_identity.user
+    if code_committer && (code_committer != User.current_user) # matching someone else's code commit
+      current = User.current_user
+      User.current_user = cc.support_identity.user
+      take_and_watch!
+      User.current_user = current
+    else
+      take_and_watch!
+    end
   end
 
   def reject(reason)
@@ -348,16 +356,15 @@ class CodeTicket < ActiveRecord::Base
 
   # user votes
   def vote!(count = 1)
+    raise SecurityError, "Couldn't vote. Not logged in." unless User.current_user
     raise "can't vote for a duplicate" if self.code_ticket_id
-    raise "Couldn't vote. Not logged in." unless User.current_user
     raise "already voted" if voted?
     self.code_votes.create(:user => User.current_user, :vote => count)
   end
 
   # editing a code ticket. volunteers only
   def update_from_edit!(summary, url, browser)
-    raise "Couldn't update. Not logged in." unless User.current_user
-    raise "Couldn't update. Not support volunteer." unless User.current_user.support_volunteer?
+    raise SecurityError, "Couldn't vote. Not support volunteer." unless User.current_user.try(:support_volunteer?)
     self.summary = summary
     self.url = url
     self.browser = browser

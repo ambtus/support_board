@@ -48,6 +48,62 @@ class CodeTicketTest < ActiveSupport::TestCase
   test "sort (by vote)" do
     assert_equal [3, 2, 5, 1, 4], CodeTicket.not_closed.sort.map(&:id)
   end
+  test "vote not logged in" do
+    assert_raise(SecurityError) { CodeTicket.first.vote! }
+  end
+  test "vote for duplicate" do
+    User.current_user = User.find_by_login("jim")
+    assert_raise(RuntimeError) { CodeTicket.find(8).vote! }
+  end
+  test "vote already voted" do
+    ticket = CodeTicket.find(2)
+    User.current_user = User.find_by_login("rodney")
+    assert ticket.voted?
+    assert_raise(RuntimeError) { ticket.vote! }
+  end
+  test "vote" do
+    ticket = CodeTicket.find(1)
+    assert_equal 1, ticket.code_votes.count
+    assert_equal 1, ticket.vote_count
+    User.current_user = User.find_by_login("rodney")
+    assert !ticket.voted?
+    assert ticket.vote!
+    assert_equal 2, ticket.code_votes.count
+    assert_equal 2, ticket.vote_count
+  end
+  test "vote different amount" do
+    ticket = CodeTicket.find(1)
+    assert_equal 1, ticket.vote_count
+    User.current_user = User.find_by_login("rodney")
+    assert ticket.vote!(7)
+    assert_equal 8, ticket.vote_count
+  end
+  test "update not logged in" do
+    assert_raise(SecurityError) { CodeTicket.first.update_from_edit!("new summary", "", "") }
+  end
+  test "update not volunteer" do
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { CodeTicket.first.update_from_edit!("new summary", "", "") }
+  end
+  test "update summary validation" do
+    User.current_user = User.find_by_login("sam")
+    assert_raise(ActiveRecord::RecordInvalid) { CodeTicket.first.update_from_edit!("", "", "") }
+    assert_raise(ActiveRecord::RecordInvalid) { CodeTicket.first.update_from_edit!(SecureRandom.hex(141), "", "") }
+  end
+  test "update from edit" do
+    ticket = CodeTicket.first
+    assert_equal "fix the roof", ticket.summary
+    assert_nil ticket.url
+    assert_nil ticket.browser
+    User.current_user = User.find_by_login("sam")
+    ticket.update_from_edit!("repair the roof", "/roof/1", "safari on iPhone")
+    ticket.reload
+    assert_equal "repair the roof", ticket.summary
+    assert_equal "/roof/1", ticket.url
+    assert_equal "safari on iPhone", ticket.browser
+    assert_equal "ticket edited", ticket.code_details.last.content
+    assert_equal "sam (volunteer)", ticket.code_details.last.byline
+  end
   test "indirect votes new ticket" do
     support_ticket = SupportTicket.find(1)
     User.current_user = User.find_by_login("sam")

@@ -2,66 +2,66 @@
 code_commit_1: 
   author: sam
   code_ticket_id: 
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 1
   message: this should fix it
-  pushed_at: 2011-01-21 03:45:18 Z
+  pushed_at: 2011-01-21 17:34:45 Z
   status: unmatched
   support_identity_id: 1
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
   url: 
 code_commit_2: 
   author: rodney
   code_ticket_id: 3
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 2
   message: finally closes issue 3
-  pushed_at: 2011-01-21 03:45:18 Z
+  pushed_at: 2011-01-21 17:34:45 Z
   status: verified
   support_identity_id: 2
-  updated_at: 2011-01-21 03:45:18 Z
+  updated_at: 2011-01-21 17:34:45 Z
   url: 
 code_commit_3: 
   author: rodney
   code_ticket_id: 4
-  created_at: 2011-01-21 03:45:18 Z
+  created_at: 2011-01-21 17:34:45 Z
   id: 3
   message: issue 4. run db:migrate afterwards.
-  pushed_at: 2011-01-21 03:45:18 Z
+  pushed_at: 2011-01-21 17:34:45 Z
   status: staged
   support_identity_id: 2
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:45 Z
   url: 
 code_commit_4: 
   author: blair
   code_ticket_id: 5
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 4
   message: related to issue 5
-  pushed_at: 2011-01-21 03:45:19 Z
+  pushed_at: 2011-01-21 17:34:46 Z
   status: matched
   support_identity_id: 3
-  updated_at: 2011-01-21 03:45:19 Z
+  updated_at: 2011-01-21 17:34:46 Z
   url: 
 code_commit_5: 
   author: bofh
   code_ticket_id: 6
-  created_at: 2011-01-21 03:45:19 Z
+  created_at: 2011-01-21 17:34:46 Z
   id: 5
   message: issue 6
-  pushed_at: 2011-01-21 03:45:19 Z
+  pushed_at: 2011-01-21 17:34:46 Z
   status: deployed
   support_identity_id: 4
-  updated_at: 2011-01-21 03:45:20 Z
+  updated_at: 2011-01-21 17:34:46 Z
   url: 
 code_commit_6: 
   author: rodney
   code_ticket_id: 7
-  created_at: 2011-01-21 03:45:34 Z
+  created_at: 2011-01-21 17:35:02 Z
   id: 6
   message: partial fix for issue 7
-  pushed_at: 2011-01-21 03:45:34 Z
+  pushed_at: 2011-01-21 17:35:02 Z
   status: deployed
   support_identity_id: 2
-  updated_at: 2011-01-21 03:45:34 Z
+  updated_at: 2011-01-21 17:35:02 Z
   url: 

@@ -52,6 +52,7 @@ class SupportTicket < ActiveRecord::Base
   # FIXME make this a background job so it's asyncronous and can be retried
   before_create :get_browser_hash_string_from_agent
   def get_browser_hash_string_from_agent
+    return if user_agent.blank?
     Rails.logger.debug "querying useragent"
     url = URI.parse('http://www.useragentstring.com/')
     request = Net::HTTP::Post.new(url.path)
@@ -63,6 +64,8 @@ class SupportTicket < ActiveRecord::Base
       end
     rescue Timeout::Error
       "timeout error"
+    rescue SocketError
+      "network down?"
     end
 
     case response
