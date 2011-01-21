@@ -7,28 +7,45 @@ class FaqsController < ApplicationController
   def show
     Rails.logger.debug "show faq session: #{session}"
     @faq = Faq.find(params[:id])
-    @details = []
-    # special views if still requesting comments
+    # special view if still requesting comments
     if @faq.rfc?
       @details = @faq.faq_details
-      if current_user.try(:support_admin?)
-        render :show_admin
-      else
-        @details = @details.where(:private => false) if !current_user.try(:support_volunteer?)
-        render :show_rfc
-      end
-    else
-      render :show
+      @details = @details.where(:private => false) if !current_user.try(:support_volunteer?)
+      render :show_rfc and return
     end
+  end
+
+  def new
+    if !current_user.try(:support_volunteer?)
+      flash[:error] = "Sorry, only support volunteers can create faqs"
+      redirect_to support_path and return
+    end
+    @faq = Faq.new
+    render :edit
   end
 
   def edit
     @faq = Faq.find(params[:id])
-    if current_user.support_volunteer?
-      @faq.faq_details.build(:support_response => true) # create a new empty response template
-    else
-      flash[:notice] = "Sorry, only support volunteers can edit faqs"
+    if !current_user.try(:support_volunteer?)
+      flash[:error] = "Sorry, only support volunteers can edit faqs"
       redirect_to @faq and return
+    end
+  end
+
+  def create
+    if !current_user.try(:support_volunteer?)
+      flash[:error] = "Sorry, only support volunteers can create faqs."
+      redirect_to support_path and return
+    end
+    @faq = Faq.new(params[:faq])
+    if @faq.save
+      flash[:notice] = "Faq created"
+      redirect_to @faq
+    else
+      # reset so don't get field with errors which breaks definition lists
+      flash[:error] = @ticket.errors.full_messages.join(", ")
+      @faq = Faq.new(params[:faq])
+      render :edit
     end
   end
 

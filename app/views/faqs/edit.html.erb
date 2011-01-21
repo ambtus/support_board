@@ -1,4 +1,7 @@
 <%= form_for(@faq) do |f| %>
+  <% if @faq.new_record? %>
+    <p><%= f.check_box :turn_off_notifications %> <%= f.label :turn_off_notifications, "Don't send me email notifications about this faq" %></p>
+  <% end %>
   <p><%= f.text_field :position, :size => 4 %> <%= f.label :position %></p>
   <p><%= f.text_field :summary, :size => 100 %> <%= f.label :summary %></p>
   <p><%= f.text_area :content, :size => "72x10" %> <%= f.label :content %></p>

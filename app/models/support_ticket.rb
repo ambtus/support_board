@@ -40,7 +40,7 @@ class SupportTicket < ActiveRecord::Base
   after_create :add_default_watchers
   def add_default_watchers
     # on create, add owner to the notifications unless indicated otherwise
-    self.watch!(self.authentication_code) unless turn_off_notifications == "1"
+    self.watch!(self.authentication_code) if turn_off_notifications.blank?
 
     # TODO make default groups. e.g. testers, that people can add and remove themselves to
     # so that when tickets are created the notifications are populated with these groups.

@@ -27,7 +27,7 @@ class CodeTicket < ActiveRecord::Base
   after_create :add_default_watchers
   def add_default_watchers
     # on create, add owner to the notifications unless indicated otherwise
-    self.watch! unless turn_off_notifications == "1"
+    self.watch! if turn_off_notifications.blank?
 
     # TODO make default groups. e.g. coders, that people can add and remove themselves to
     # so that when tickets are created the notifications are populated with these groups.

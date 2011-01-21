@@ -1,1 +1,25 @@
-<%= render "rfc" %>
+<% if current_user.try(:support_volunteer?) %>
+  <p><%= link_to "Edit", edit_faq_path(@faq) %></p>
+<% end %>
+
+<h1><%= @faq.sanitized_summary %> (draft)</h1>
+
+<blockquote><%= @faq.sanitized_content %></blockquote>
+
+<% @details.each do |detail| %>
+  <%= render :partial => "details/blurb", :locals => { :detail => detail }  %>
+<% end %>
+
+<% if current_user || session[:authentication_code] %>
+  <%= form_for(@faq) do %>
+    <% if current_user.try(:support_admin?) %>
+      <p><%= submit_tag "Post" %></p>
+    <% end %>
+    <% if current_user.try(:support_volunteer?) %>
+      <p><%= check_box_tag :official, true, true %> <%= label_tag :official, "Official response?" %>
+      <%= check_box_tag :private, false, false %> <%= label_tag :official, "Private response?" %></p>
+    <% end %>
+    <%= text_area_tag :content, nil, :size => "72x10" %>
+    <p><%= submit_tag "Add details" %></p>
+  <% end %>
+<% end %>

@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class CodeTicketNotificationTest < ActiveSupport::TestCase
+  test "create without notification" do
+    User.current_user = User.find_by_login("sam")
+    assert ticket = CodeTicket.create(:summary => "short summary", :turn_off_notifications => true)
+    assert_equal [], ticket.mail_to
+  end
   test "watched? not logged in" do
     ticket = CodeTicket.find(1)
     assert_raise(SecurityError) { ticket.watched? }

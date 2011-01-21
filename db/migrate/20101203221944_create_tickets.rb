@@ -55,7 +55,6 @@ class CreateTickets < ActiveRecord::Migration
       t.text     :content, :default => ""
       t.integer  :position
       t.string   :status
-      t.integer  :support_identity_id
 
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.integer :summary_sanitizer_version, :limit => 2, :default => 0, :null => false
@@ -144,7 +143,6 @@ class CreateTickets < ActiveRecord::Migration
     create_table :release_notes, :force => true do |t|
       t.string   :release
       t.text     :content, :default => ""
-      t.integer  :support_identity_id
       t.boolean  :posted, :default => false
 
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false

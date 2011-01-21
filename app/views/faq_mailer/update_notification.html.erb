@@ -1,2 +1,2 @@
 <p><%= link_to @faq.sanitized_summary, faq_url(@faq) %> has been updated.</p>
-<%= render :partial => "details/blurb", :locals => { :detail => @ticket.code_details.last }  %>
+<%= render :partial => "details/blurb", :locals => { :detail => @faq.faq_details.last }  %>

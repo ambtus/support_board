@@ -100,7 +100,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.text     "content"
     t.integer  "position"
     t.string   "status"
-    t.integer  "support_identity_id"
     t.integer  "content_sanitizer_version", :limit => 2,   :default => 0,  :null => false
     t.integer  "summary_sanitizer_version", :limit => 2,   :default => 0,  :null => false
     t.datetime "created_at"
@@ -110,7 +109,6 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
   create_table "release_notes", :force => true do |t|
     t.string   "release"
     t.text     "content"
-    t.integer  "support_identity_id"
     t.boolean  "posted",                                 :default => false
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"

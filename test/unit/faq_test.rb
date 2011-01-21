@@ -1,6 +1,30 @@
 require 'test_helper'
 
 class FaqTest < ActiveSupport::TestCase
+  test "default scope by position" do
+    assert_equal [1, 2, 3, 4, 5], Faq.select("faqs.id").map(&:id)
+    Faq.find(3).update_attribute(:position, 6)
+    assert_equal [1, 2, 4, 5, 3], Faq.select("faqs.id").map(&:id)
+    Faq.find(1).update_attribute(:position, 3)
+    assert_equal [2, 1, 4, 5, 3], Faq.select("faqs.id").map(&:id)
+  end
+  test "create with validations and callbacks" do
+    assert_raise(SecurityError) { Faq.create!(:summary => "short summary", :content  => "something") }
+    User.current_user = User.find_by_login("jim")
+    assert_raise(SecurityError) { Faq.create!(:summary => "short summary", :content  => "something") }
+    User.current_user = User.find_by_login("sam")
+    assert_raise(ActiveRecord::RecordInvalid) { Faq.create! }
+    assert_raise(ActiveRecord::RecordInvalid) { Faq.create!(:summary => "short summary", :content => "")}
+    assert_raise(ActiveRecord::RecordInvalid) { Faq.create!(:summary => SecureRandom.hex(141), :content => "something")}
+    assert faq = Faq.create(:summary => "short summary", :content => "something")
+    assert_equal 6, faq.position
+    assert_equal ["sam@ao3.org"], faq.mail_to
+  end
+  test "create without notification" do
+    User.current_user = User.find_by_login("sam")
+    assert faq = Faq.create(:summary => "short summary", :content => "something", :turn_off_notifications => true)
+    assert_equal [], faq.mail_to
+  end
   test "normal flow" do
     assert_equal "rfc", Faq.find(2).status
     assert_equal "faq", Faq.find(1).status
@@ -13,7 +37,6 @@ class FaqTest < ActiveSupport::TestCase
     assert faq.open_for_comments!(reason)
     assert_equal "rfc", faq.status
     assert_equal %Q{faq -> rfc (#{reason})}, faq.faq_details.last.content
-    assert_equal sam.support_identity_id, faq.support_identity_id
   end
   test "post" do
     faq = Faq.find(2)
@@ -25,7 +48,6 @@ class FaqTest < ActiveSupport::TestCase
     assert faq.post!
     assert_equal "faq", faq.status
     assert_equal %Q{rfc -> faq}, faq.faq_details.last.content
-    assert_equal bofh.support_identity_id, faq.support_identity_id
   end
   test "scopes" do
     assert_equal 3, Faq.faq.count
@@ -56,18 +78,18 @@ class FaqTest < ActiveSupport::TestCase
     faq = Faq.find(1)
     User.current_user = nil
     assert_raise(RuntimeError) { faq.watch! }
-    assert_equal 0, faq.mail_to.size
+    assert_equal 1, faq.mail_to.size
     User.current_user = User.find_by_login("dean")
     assert_raise(RuntimeError) { faq.unwatch! }
     assert faq.watch!
     assert_raise(RuntimeError) { faq.watch! }
-    assert_equal 1, faq.mail_to.size
+    assert_equal 2, faq.mail_to.size
     User.current_user = User.find_by_login("john")
     assert_nil faq.watched?
     assert faq.watch!
-    assert_equal 2, faq.mail_to.size
+    assert_equal 3, faq.mail_to.size
     assert faq.unwatch!
-    assert_equal 1, faq.reload.mail_to.size
+    assert_equal 2, faq.reload.mail_to.size
     assert_nil faq.watched?
   end
   test "watch by guest" do
@@ -76,14 +98,14 @@ class FaqTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     assert support_ticket.answer!(faq.id)
     assert_raise(RuntimeError) { faq.watch!("randomstring") }
-    assert_equal 0, faq.mail_to.size
-    assert faq.watch!(support_ticket.authentication_code)
     assert_equal 1, faq.mail_to.size
+    assert faq.watch!(support_ticket.authentication_code)
+    assert_equal 2, faq.mail_to.size
     assert faq.watched?(support_ticket.authentication_code)
     assert_raise(RuntimeError) { faq.unwatch!("randomstring") }
     assert faq.unwatch!(support_ticket.authentication_code)
     assert_nil faq.watched?(support_ticket.authentication_code)
-    assert_equal 0, faq.reload.mail_to.size
+    assert_equal 1, faq.reload.mail_to.size
   end
   test "can comment on a faq when it's in rfc mode" do
     faq = Faq.find(2)
