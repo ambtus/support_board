@@ -14,16 +14,14 @@ class CodeTicketsController < ApplicationController
 
   def show
     @ticket = CodeTicket.find(params[:id])
+    @details = @ticket.visible_code_details
 
     if !current_user
-      @details = @ticket.code_details.visible_to_all
       render :show_guest
     elsif current_user.support_volunteer?
       @add_details = true # create a new empty response template
-      @details = @ticket.code_details
       render :show_volunteer
     else # logged in as non-support volunteer
-      @details = @ticket.code_details.visible_to_all
       if !@ticket.support_identity_id # if support took it, it's not longer open for comment
         @add_details = true # create a new empty response template
       end

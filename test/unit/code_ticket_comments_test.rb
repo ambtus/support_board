@@ -1,6 +1,14 @@
 require 'test_helper'
 
 class CodeTicketCommentsTest < ActiveSupport::TestCase
+  test "visible_code_details" do
+    ticket = CodeTicket.find(4)
+    assert_equal 4, ticket.visible_code_details.size
+    User.current_user = User.find_by_login("jim")
+    assert_equal 4, ticket.visible_code_details.size
+    User.current_user = User.find_by_login("sam")
+    assert_equal 7, ticket.visible_code_details.size
+  end
   test "system_log comments" do
     assert_equal %Q{unowned -> taken}, CodeTicket.find(2).code_details.last.content
     assert_equal %Q{staged -> verified}, CodeTicket.find(3).code_details.last.content

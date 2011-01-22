@@ -97,6 +97,9 @@ class CodeTicketFilterTest < ActiveSupport::TestCase
   test "sort_by newest" do
     assert_equal [5, 4, 3, 2, 1], CodeTicket.filter({:sort_by => "newest"}).ids
   end
+  test "sort_by unknown" do
+    assert_raise(TypeError) { CodeTicket.filter({:sort_by => "oldest"}) }
+  end
   test "sort_by default is newest" do
     assert_equal [5, 4, 3, 2, 1], CodeTicket.filter.ids
   end

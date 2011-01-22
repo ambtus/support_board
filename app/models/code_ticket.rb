@@ -94,6 +94,11 @@ class CodeTicket < ActiveRecord::Base
     code_votes.sum(:vote)
   end
 
+  # used in controller to decide which details to show
+  def visible_code_details
+    User.current_user.try(:support_volunteer?) ? self.code_details : self.code_details.visible_to_all
+  end
+
   # okay until we need to paginate
   # sort by votes
   def <=>(other)
@@ -161,15 +166,21 @@ class CodeTicket < ActiveRecord::Base
     end
 
     # has to come last because sort_by_vote returns an array
-    case params[:sort_by]
-    when "recently updated"
-      tickets = tickets.order("updated_at desc")
-    when "least recently updated"
-      tickets = tickets.order("updated_at asc")
-    when "oldest first"
-      tickets = tickets.order("id asc")
-    when "highest vote"
-      tickets = tickets.sort
+    if params[:sort_by]
+      case params[:sort_by]
+      when "recently updated"
+        tickets = tickets.order("updated_at desc")
+      when "least recently updated"
+        tickets = tickets.order("updated_at asc")
+      when "oldest first"
+        tickets = tickets.order("id asc")
+      when "highest vote"
+        tickets = tickets.sort
+      when "newest"
+        tickets = tickets.order("id desc")
+      else
+        raise TypeError
+      end
     else # "newest" by default
       tickets = tickets.order("id desc")
     end
