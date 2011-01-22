@@ -9,7 +9,7 @@ class Faq < ActiveRecord::Base
 
   # only support volunteers can create faqs. positions monitonically increase, but can be overwritten
   before_validation(:on => :create) do
-    raise SecurityError, "only volunteers can create code tickets" if !User.current_user.try(:support_volunteer?)
+    raise_unless_volunteer
     self.position = (Faq.count + 1) unless self.position
   end
 
@@ -37,13 +37,6 @@ class Faq < ActiveRecord::Base
 
   ### HELPER METHODS
 
-  # are any of the associated support tickets owned by the current user?
-  def guest_owner?(authentication_code)
-    return false unless authentication_code
-    raise "shouldn't have authentication code if logged in" if User.current_user
-    self.support_tickets.where(:authentication_code => authentication_code).first
-  end
-
   def vote_count
     faq_votes.sum(:vote)
   end
@@ -54,14 +47,15 @@ class Faq < ActiveRecord::Base
     notifications.map(&:email).uniq
   end
 
+  # returns the linked support ticket with the given code
+  def associated_ticket(code)
+    self.support_tickets.where(:authentication_code => code).first
+  end
+
   # used in view to determine whether to offer to turn on or off notifications
-  def watched?(authentication_code = nil)
-    if !authentication_code.blank?
-      email_address = SupportTicket.find_by_authentication_code(authentication_code).try(:email)
-    else
-      email_address = User.current_user.try(:email)
-    end
-    raise "Couldn't check watch. No email address to check." unless email_address
+  def watched?(code = nil)
+    raise_unless_logged_in_or_guest(code)
+    email_address = User.current_user ? User.current_user.email : self.associated_ticket(code).email
     # if there's no watcher with that email, this will be nil which acts as false
     self.faq_notifications.where(:email => email_address).first
   end
@@ -115,13 +109,11 @@ class Faq < ActiveRecord::Base
   # some methods add you as watcher, some don't. some change owner, some don't
 
   def post
-    raise "Couldn't post. Not logged in." unless User.current_user
-    raise "Couldn't post. Not logged in as support admin." unless User.current_user.support_admin?
+    raise_unless_admin
   end
 
   def open_for_comments(reason)
-    raise "Couldn't reopen. Not logged in." unless User.current_user
-    raise "Couldn't reopen. Not logged in as support volunteer." unless User.current_user.support_volunteer?
+    raise_unless_volunteer
   end
 
   ### NON-WORKFLOW but similar methods.
@@ -130,8 +122,7 @@ class Faq < ActiveRecord::Base
   # check volunteer status directly when necessary
 
   def update_from_edit!(position, summary, content)
-    raise "Couldn't update. Not logged in." unless User.current_user
-    raise "Couldn't update. Not support volunteer." unless User.current_user.support_volunteer?
+    raise_unless_volunteer
     self.position = position
     self.summary = summary
     self.content = content
@@ -144,13 +135,9 @@ class Faq < ActiveRecord::Base
   end
 
   # only logged in users or guest owners can comment
-  def comment!(content, official=true, private = false, authentication_code=nil)
+  def comment!(content, official=true, private = false, code=nil)
     raise "not open for comments" unless self.rfc?
-    if !User.current_user
-      raise "Couldn't comment. not logged in and not guest owner!" unless guest_owner?(authentication_code)
-    elsif User.current_user.nil?
-      raise "Couldn't comment. Not logged in."
-    end
+    raise_unless_logged_in_or_guest(code)
     support_response = (official && User.current_user.support_volunteer?)
     raise ArgumentError, "Only official comments can be private" if private && !support_response
     detail = self.faq_details.create!(:content => content,
@@ -167,27 +154,17 @@ class Faq < ActiveRecord::Base
     FaqVote.create(:faq_id => self.id)
   end
 
-  def watch!(authentication_code = nil)
-    if authentication_code
-      email_address = SupportTicket.find_by_authentication_code(authentication_code).try(:email)
-    else
-      raise "Couldn't watch. Not logged in." unless User.current_user
-      email_address = User.current_user.email
-    end
-    raise "Couldn't watch. No email address to watch with." unless email_address
-    raise "Couldn't watch. Already watching." if watched?(authentication_code)
+  def watch!(code = nil)
+    return true if watched?(code)
+    raise_unless_logged_in_or_guest(code)
+    email_address = User.current_user ? User.current_user.email : self.associated_ticket(code).email
     self.faq_notifications.create(:email => email_address)
   end
 
-  def unwatch!(authentication_code = nil)
-    if authentication_code
-      email_address = SupportTicket.find_by_authentication_code(authentication_code).try(:email)
-    else
-      raise "Couldn't watch. Not logged in." unless User.current_user
-      email_address = User.current_user.email
-    end
-    raise "Couldn't watch. No email address to watch with." unless email_address
-    raise "Couldn't remove watch. Not watching." unless watched?(authentication_code)
+  def unwatch!(code = nil)
+    raise "Couldn't remove watch. Not watching." unless watched?(code)
+    raise_unless_logged_in_or_guest(code)
+    email_address = User.current_user ? User.current_user.email : self.associated_ticket(code).email
     self.faq_notifications.where(:email => email_address).delete_all
   end
 
@@ -212,6 +189,32 @@ class Faq < ActiveRecord::Base
     # FIXME add sanitizer library and change sanitized_summary to summary in views
     #sanitize_field self, :content
     content.html_safe
+  end
+
+  ### a bunch of methods which raise SecurityError
+
+  def raise_unless_logged_in
+    raise SecurityError, "not logged in!" unless User.current_user
+  end
+
+  # returns the ticket which gives authentication
+  def raise_unless_guest(code)
+    raise SecurityError, "can't check guest if logged in!" if User.current_user
+    associated_ticket(code) || raise(SecurityError, "no associated security tickets")
+  end
+
+  def raise_unless_logged_in_or_guest(code=nil)
+    code.blank? ? raise_unless_logged_in : raise_unless_guest(code)
+  end
+
+  def raise_unless_volunteer
+    raise_unless_logged_in
+    raise SecurityError, "not a support volunteer!" unless User.current_user.support_volunteer?
+  end
+
+  def raise_unless_admin
+    raise_unless_logged_in
+    raise SecurityError, "not a support admin!" unless User.current_user.support_admin?
   end
 
 end

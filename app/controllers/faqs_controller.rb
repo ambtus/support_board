@@ -61,9 +61,9 @@ class FaqsController < ApplicationController
     when "Add details"
       @faq.comment!(params[:content], params[:official], params[:private], session[:authentication_code])
     when "Watch this FAQ"
-      @faq.watch!(params[:email])
+      @faq.watch!(session[:authentication_code])
     when "Don't watch this FAQ"
-      @faq.unwatch!(params[:email])
+      @faq.unwatch!(session[:authentication_code])
     when "Update Faq"
       @faq.update_from_edit!(params[:faq][:position],
                              params[:faq][:summary],

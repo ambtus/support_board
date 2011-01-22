@@ -42,7 +42,7 @@ class FaqTest < ActiveSupport::TestCase
     faq = Faq.find(2)
     User.current_user = User.find_by_login("sam")
     assert_equal false, User.current_user.support_admin?
-    assert_raise(RuntimeError) { faq.post! }
+    assert_raise(SecurityError) { faq.post! }
     bofh = User.find_by_login("bofh")
     User.current_user = bofh
     assert faq.post!
@@ -77,12 +77,13 @@ class FaqTest < ActiveSupport::TestCase
   test "watch" do
     faq = Faq.find(1)
     User.current_user = nil
-    assert_raise(RuntimeError) { faq.watch! }
+    assert_raise(SecurityError) { faq.watch! }
     assert_equal 1, faq.mail_to.size
     User.current_user = User.find_by_login("dean")
     assert_raise(RuntimeError) { faq.unwatch! }
     assert faq.watch!
-    assert_raise(RuntimeError) { faq.watch! }
+    assert_equal 2, faq.mail_to.size
+    assert faq.watch!
     assert_equal 2, faq.mail_to.size
     User.current_user = User.find_by_login("john")
     assert_nil faq.watched?
@@ -93,26 +94,27 @@ class FaqTest < ActiveSupport::TestCase
     assert_nil faq.watched?
   end
   test "watch by guest" do
-    support_ticket = SupportTicket.first
+    support_ticket = SupportTicket.find(1)
     faq = Faq.find(1)
+    assert_equal ["sam@ao3.org"], faq.mail_to
     User.current_user = User.find_by_login("sam")
     assert support_ticket.answer!(faq.id)
-    assert_raise(RuntimeError) { faq.watch!("randomstring") }
-    assert_equal 1, faq.mail_to.size
+    User.current_user = nil
+    assert_raise(SecurityError) { faq.watch!("randomstring") }
     assert faq.watch!(support_ticket.authentication_code)
-    assert_equal 2, faq.mail_to.size
+    assert_equal ["sam@ao3.org", "guest@ao3.org"], faq.mail_to
     assert faq.watched?(support_ticket.authentication_code)
-    assert_raise(RuntimeError) { faq.unwatch!("randomstring") }
+    assert_raise(SecurityError) { faq.unwatch!("randomstring") }
     assert faq.unwatch!(support_ticket.authentication_code)
     assert_nil faq.watched?(support_ticket.authentication_code)
-    assert_equal 1, faq.reload.mail_to.size
+    assert_equal ["sam@ao3.org"], faq.reload.mail_to
   end
   test "can comment on a faq when it's in rfc mode" do
     faq = Faq.find(2)
     assert faq.rfc?
     assert_equal 2, faq.faq_details.count
     User.current_user = nil
-    assert_raise(RuntimeError) { faq.comment!("something") }
+    assert_raise(SecurityError) { faq.comment!("something") }
     assert_equal 2, faq.faq_details.count
     User.current_user = User.find_by_login("dean")
     assert detail = faq.comment!("user")

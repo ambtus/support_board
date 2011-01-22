@@ -15,6 +15,11 @@
     <% if current_user.try(:support_admin?) %>
       <p><%= submit_tag "Post" %></p>
     <% end %>
+    <% if @faq.watched?(session[:authentication_code]) %>
+      <%= submit_tag "Don't watch this FAQ" %>
+    <% else %>
+      <%= submit_tag "Watch this FAQ"%>
+    <% end %>
     <% if current_user.try(:support_volunteer?) %>
       <p><%= check_box_tag :official, true, true %> <%= label_tag :official, "Official response?" %>
       <%= check_box_tag :private, false, false %> <%= label_tag :official, "Private response?" %></p>
