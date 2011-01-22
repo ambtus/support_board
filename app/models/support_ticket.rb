@@ -259,15 +259,21 @@ class SupportTicket < ActiveRecord::Base
     end
 
     # TODO add sorting to view
-    case params[:order_by]
-    when "recent"
-      tickets = tickets.order("updated_at desc")
-    when "oldest"
-      tickets = tickets.order("updated_at asc")
-    when "earliest"
-      tickets = tickets.order("id desc")
+    if params[:sort_by]
+      case params[:sort_by]
+      when "recently updated"
+        tickets = tickets.order("updated_at desc")
+      when "least recently updated"
+        tickets = tickets.order("updated_at asc")
+      when "oldest first"
+        tickets = tickets.order("id asc")
+      when "newest"
+        tickets = tickets.order("id desc")
+      else
+        raise TypeError
+      end
     else # "newest" by default
-      tickets = tickets.order("id asc")
+      tickets = tickets.order("id desc")
     end
 
     return tickets
@@ -321,7 +327,8 @@ class SupportTicket < ActiveRecord::Base
       content = "#{from} -> #{to}"
       content += " (#{event_args.first})" unless event_args.blank?
       log!(content)
-      # TODO FIXME: sends notifications with ticket still in previous state
+    end
+    after_transition do |from, to, triggering_event, *event_args|
       self.send_update_notifications unless [:spam, :ham, :steal].include?(triggering_event)
     end
   end
