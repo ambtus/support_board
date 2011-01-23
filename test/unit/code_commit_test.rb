@@ -127,4 +127,180 @@ class CodeCommitTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("jim")
     assert_raise(SecurityError) { commit.unmatch! }
   end
+  test "single create_commits_from_json" do
+    json = <<EOF
+{
+  "after": "b4e2b8f073cdd563e27d990bbf68063250dca7e7",
+  "before": "09ba484417c4656b2fbc33bd4889174e99dc9b53",
+  "commits": [
+    {
+      "added": [],
+      "author": {
+        "email": "alice@alum.mit.edu",
+        "name": "Sidra",
+        "username": "ambtus"
+      },
+      "id": "b4e2b8f073cdd563e27d990bbf68063250dca7e7",
+      "message": "feature TODOs",
+      "modified": [
+        "features\/support_board_volunteer_code.feature",
+        "features\/support_board_volunteer_resolution.feature"
+      ],
+      "removed": [],
+      "timestamp": "2010-12-17T09:38:02-08:00",
+      "url": "https:\/\/github.com\/ambtus\/support_board\/commit\/b4e2b8f073cdd563e27d990bbf68063250dca7e7"
+    }
+  ],
+  "compare": "https:\/\/github.com\/ambtus\/support_board\/compare\/09ba484...b4e2b8f",
+  "forced": false,
+  "pusher": {
+    "email": "github@ambt.us",
+    "name": "ambtus"
+  },
+  "ref": "refs\/heads\/app",
+  "repository": {
+    "created_at": "2010\/12\/02 10:34:09 -0800",
+    "description": "integrated support board",
+    "fork": true,
+    "forks": 0,
+    "has_downloads": true,
+    "has_issues": true,
+    "has_wiki": true,
+    "homepage": "",
+    "name": "support_board",
+    "open_issues": 0,
+    "owner": {
+      "email": "github@ambt.us",
+      "name": "ambtus"
+    },
+    "private": false,
+    "pushed_at": "2010\/12\/17 09:38:33 -0800",
+    "url": "https:\/\/github.com\/ambtus\/support_board",
+    "watchers": 1
+  }
+}
+EOF
+    assert_equal 6, CodeCommit.count
+    payload = JSON.parse(json)
+    CodeCommit.create_commits_from_json(payload)
+    assert_equal 7, CodeCommit.count
+    new_cc = CodeCommit.last
+    assert_equal "Sidra", new_cc.author
+    assert_equal "https://github.com/ambtus/support_board/commit/b4e2b8f073cdd563e27d990bbf68063250dca7e7", new_cc.url
+    assert_equal "2010/12/17 09:38:33 -0800".to_time, new_cc.pushed_at
+    assert_equal "feature TODOs", new_cc.message
+  end
+  test "multiple create_commits_from_json" do
+    json = <<EOF
+{
+  "after": "a3750699a35db5e6c74f7808fceb952f8e75d2cb",
+  "before": "088d233dd0d52214b7f167dad6e8fd06c34a6c75",
+  "commits": [
+    {
+      "added": [],
+      "author": {
+        "email": "alice@alum.mit.edu",
+        "name": "Sidra",
+        "username": "ambtus"
+      },
+      "id": "e89ce12f4ce7d051994b91e739de6f07220b92be",
+      "message": "more work to make code independent of otwarchive code.",
+      "modified": [
+        "app\/models\/code_ticket.rb",
+        "features\/support_board_volunteer_code.feature"
+      ],
+      "removed": [
+        "app\/controllers\/known_issues_controller.rb"
+      ],
+      "timestamp": "2010-12-21T16:15:46-08:00",
+      "url": "https:\/\/github.com\/ambtus\/support_board\/commit\/e89ce12f4ce7d051994b91e739de6f07220b92be"
+    },
+    {
+      "added": [],
+      "author": {
+        "email": "alice@alum.mit.edu",
+        "name": "Sidra",
+        "username": "ambtus"
+      },
+      "id": "eb9bfb44521b53d7b5f4b39af71d6462ae172ae5",
+      "message": "removed unused admin model (all admin functions will be taken by support admins)",
+      "modified": [
+        "app\/controllers\/application_controller.rb",
+        "features\/support_board_volunteer_code.feature"
+      ],
+      "removed": [
+        "app\/controllers\/admin_posts_controller.rb",
+        "features\/step_definitions\/admin_steps.rb"
+      ],
+      "timestamp": "2010-12-21T16:53:42-08:00",
+      "url": "https:\/\/github.com\/ambtus\/support_board\/commit\/eb9bfb44521b53d7b5f4b39af71d6462ae172ae5"
+    },
+    {
+      "added": [
+        "app\/models\/support_identity.rb",
+        "features\/support_identity.feature"
+      ],
+      "author": {
+        "email": "alice@alum.mit.edu",
+        "name": "Sidra",
+        "username": "ambtus"
+      },
+      "id": "a3750699a35db5e6c74f7808fceb952f8e75d2cb",
+      "message": "removed dependency on otwarchive pseud model. added a new support identity model",
+      "modified": [
+        "app\/controllers\/code_tickets_controller.rb",
+        "features\/support_board_volunteer_resolution.feature"
+      ],
+      "removed": [
+        "app\/controllers\/pseuds_controller.rb",
+        "features\/pseud.feature"
+      ],
+      "timestamp": "2010-12-23T11:10:04-08:00",
+      "url": "https:\/\/github.com\/ambtus\/support_board\/commit\/a3750699a35db5e6c74f7808fceb952f8e75d2cb"
+    }
+  ],
+  "compare": "https:\/\/github.com\/ambtus\/support_board\/compare\/088d233...a375069",
+  "forced": false,
+  "pusher": {
+    "email": "github@ambt.us",
+    "name": "ambtus"
+  },
+  "ref": "refs\/heads\/app",
+  "repository": {
+    "created_at": "2010\/12\/02 10:34:09 -0800",
+    "description": "integrated support board",
+    "fork": true,
+    "forks": 0,
+    "has_downloads": true,
+    "has_issues": false,
+    "has_wiki": false,
+    "homepage": "",
+    "name": "support_board",
+    "open_issues": 0,
+    "owner": {
+      "email": "github@ambt.us",
+      "name": "ambtus"
+    },
+    "private": false,
+    "pushed_at": "2010\/12\/23 11:10:40 -0800",
+    "url": "https:\/\/github.com\/ambtus\/support_board",
+    "watchers": 1
+  }
+}
+EOF
+    assert_equal 6, CodeCommit.count
+    payload = JSON.parse(json)
+    CodeCommit.create_commits_from_json(payload)
+    assert_equal 9, CodeCommit.count
+    new_cc = CodeCommit.all[6]
+    assert_equal "Sidra", new_cc.author
+    assert_equal "https://github.com/ambtus/support_board/commit/e89ce12f4ce7d051994b91e739de6f07220b92be", new_cc.url
+    assert_equal "2010/12/23 11:10:40 -0800".to_time, new_cc.pushed_at
+    assert_equal "more work to make code independent of otwarchive code.", new_cc.message
+    new_cc = CodeCommit.last
+    assert_equal "Sidra", new_cc.author
+    assert_equal "https://github.com/ambtus/support_board/commit/a3750699a35db5e6c74f7808fceb952f8e75d2cb", new_cc.url
+    assert_equal "2010/12/23 11:10:40 -0800".to_time, new_cc.pushed_at
+    assert_equal "removed dependency on otwarchive pseud model. added a new support identity model", new_cc.message
+  end
 end

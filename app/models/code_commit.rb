@@ -8,6 +8,17 @@ class CodeCommit < ActiveRecord::Base
     "Code Commit ##{self.id}"
   end
 
+  def self.create_commits_from_json(payload)
+    pushed_at = payload["repository"]["pushed_at"].to_time
+    commits = payload["commits"]
+    commits.each do |commit|
+      CodeCommit.create!(:author => commit["author"]["name"],
+                         :message => commit["message"],
+                         :url => commit["url"],
+                         :pushed_at => pushed_at)
+    end
+  end
+
   # concise representation of all info except message, url and associated code ticket
   def info
     date = self.pushed_at.to_s(:short)
