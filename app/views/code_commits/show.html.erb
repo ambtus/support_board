@@ -8,7 +8,7 @@
       <%= submit_tag "Unmatch" %>
     <% elsif @commit.current_state.events[:match] %>
       <%= select_tag :code_ticket_id, '<option></option>'.html_safe +
-                   options_from_collection_for_select(CodeTicket.for_commit, "id", "sanitized_summary") %>
+                   options_from_collection_for_select(CodeTicket.for_matching, "id", "sanitized_summary") %>
       <%= submit_tag "Match" %>
     <% end %>
   <% end %>

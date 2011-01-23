@@ -90,12 +90,12 @@ class CodeCommit < ActiveRecord::Base
       case params[:sort_by]
       when "oldest first"
         commits = commits.order("id asc")
-      when "newest"
+      when "newest first"
         commits = commits.order("id desc")
       else
         raise TypeError
       end
-    else # "newest" by default
+    else # "newest first" by default
       commits = commits.order("id desc")
     end
 
