@@ -67,18 +67,19 @@ class SupportTicketsController < ApplicationController
       redirect_to support_path and return
     end
 
-    # new support ticket
-    @ticket = SupportTicket.new(params[:support_ticket])
-    @ticket.authenticity_token = params[:authenticity_token]
-    @ticket.ip_address = request.remote_ip
-    @ticket.user_agent = request.user_agent
+    @ticket = SupportTicket.new(params[:support_ticket].merge({
+         :authenticity_token => params[:authenticity_token],
+         :ip_address => request.remote_ip,
+         :user_agent => request.user_agent}))
     if @ticket.save
       flash[:notice] = "Support ticket created"
-      if @ticket.authentication_code
+      if current_user
+        @ticket.user_comment!(params[:content], !params[:unofficial])
+      else
+        @ticket.guest_owner_comment!(params[:content], @ticket.authentication_code)
         session[:authentication_code] = @ticket.authentication_code
         Rails.logger.debug "create session: #{session}"
       end
-      @ticket.comment!(params[:content], !params[:unofficial])
       redirect_to @ticket
     else
       # reset so don't get field with errors which breaks definition lists
@@ -130,7 +131,11 @@ class SupportTicketsController < ApplicationController
     when "Needs admin attention"
       @ticket.needs_admin!
     when "Add details"
-      @ticket.comment!(params[:content], params[:official])
+      if current_user
+        @ticket.user_comment!(params[:content], params[:official], params[:private])
+      else
+        @ticket.guest_owner_comment!(params[:content], session[:authentication_code])
+      end
     when "Resolve"
       @ticket.resolve!(params[:resolution])
     when "Needs this fix"
