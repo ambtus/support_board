@@ -6,6 +6,7 @@ class UserSessionsController < ApplicationController
     if @user_session.save
       @current_user = @user_session.record
       flash[:notice] = "Hi, #{current_user.login}!"
+      session.delete(:authentication_code)
       redirect_back_or_default
     else
       # reset user session so errors don't indicate where the problem is
