@@ -6,8 +6,9 @@
   <% end %>
 <% end %>
 
-<% @faqs.each do |faq, i| %>
-  <h1><%= link_to faq.sanitized_summary, faq %>
+<% #FIXME index is a hack for cucumber tests %>
+<% @faqs.each_with_index do |faq, i| %>
+  <h1 id=<%=i%>><%= link_to faq.sanitized_summary, faq %>
     (<% if faq.rfc? %>draft<% else %><%= faq.vote_count %> votes<% end %>)
   </h1>
 <% end %>

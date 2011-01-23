@@ -1,7 +1,7 @@
 class FaqsController < ApplicationController
   def index
     @faqs = params[:rfc] ? Faq.rfc : Faq.faq
-    @faqs = Faq.scoped if params[:all]
+    @faqs = @faqs.sort if params[:by_vote]
   end
 
   def show
@@ -10,7 +10,9 @@ class FaqsController < ApplicationController
     # special view if still requesting comments
     if @faq.rfc?
       @details = @faq.faq_details
-      @details = @details.where(:private => false) if !current_user.try(:support_volunteer?)
+      Rails.logger.debug @details
+      @details = @details.where(:private => false).all if !current_user.try(:support_volunteer?)
+      Rails.logger.debug @details
       render :show_rfc and return
     end
   end

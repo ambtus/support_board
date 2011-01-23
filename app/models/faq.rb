@@ -47,12 +47,14 @@ class Faq < ActiveRecord::Base
     notifications.map(&:email).uniq
   end
 
-  # returns the linked support ticket with the given code
+  # returns the support ticket with the given code
+  # a guest of any ticket can leave comments on and watch any faq
   def associated_ticket(code)
-    self.support_tickets.where(:authentication_code => code).first
+    SupportTicket.where(:authentication_code => code).first
   end
 
   # used in view to determine whether to offer to turn on or off notifications
+  # need to return false if
   def watched?(code = nil)
     raise_unless_logged_in_or_guest(code)
     email_address = User.current_user ? User.current_user.email : self.associated_ticket(code).email
@@ -135,17 +137,17 @@ class Faq < ActiveRecord::Base
   end
 
   # only logged in users or guest owners can comment
-  def comment!(content, official=true, private = false, code=nil)
+  def comment!(content, official=true, make_private = false, code=nil)
     raise "not open for comments" unless self.rfc?
     raise_unless_logged_in_or_guest(code)
     support_response = (official && User.current_user.support_volunteer?)
-    raise ArgumentError, "Only official comments can be private" if private && !support_response
+    raise ArgumentError, "Only official comments can be private" if make_private && !support_response
     detail = self.faq_details.create!(:content => content,
                             :support_identity_id => User.current_user.try(:support_identity).try(:id),
                             :support_response => support_response,
                             :system_log => false,
-                            :private => private)
-    self.send_update_notifications(private)
+                            :private => !!make_private)
+    self.send_update_notifications(make_private)
     return detail
   end
 

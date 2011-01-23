@@ -127,7 +127,7 @@ class SupportTicketsController < ApplicationController
     when "Post as comment"
       @ticket.post!
     when "Reopen"
-      @ticket.reopen!(params[:reason])
+      @ticket.reopen!(params[:reason], session[:authentication_code])
     when "Needs admin attention"
       @ticket.needs_admin!
     when "Add details"
@@ -147,8 +147,9 @@ class SupportTicketsController < ApplicationController
       new = @ticket.needs_fix!
       redirect_to edit_code_ticket_path(new) and return
     when "Create new FAQ"
-      new = @ticket.answer!
-      redirect_to edit_faq_path(new) and return
+      faq = Faq.create!(:summary => @ticket.summary, :content => "EDIT ME")
+      @ticket.answer!(faq.id)
+      redirect_to edit_faq_path(faq) and return
     end
     redirect_to @ticket
   end

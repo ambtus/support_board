@@ -1,6 +1,6 @@
 <% if detail.system_log %>
   <p><%= detail.info %>: <%= detail.sanitized_content %><p>
 <% else %>
-  <p><%= detail.info %><p>
+  <p><%= detail.info %>:<p>
   <blockquote><%= detail.sanitized_content %></blockquote>
 <% end %>

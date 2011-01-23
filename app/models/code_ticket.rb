@@ -398,7 +398,7 @@ class CodeTicket < ActiveRecord::Base
                                :support_identity_id => User.current_user.support_identity.id,
                                :support_response => support_response,
                                :system_log => false,
-                               :private => private_comment)
+                               :private => !!private_comment)
       self.send_update_notifications(private_comment)
       # DECISION should notifications be sent before or after you're added to the ticket?
       self.watch! unless self.code_ticket_id

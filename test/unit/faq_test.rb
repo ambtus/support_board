@@ -71,11 +71,11 @@ class FaqTest < ActiveSupport::TestCase
     faq = Faq.find(2)
     assert faq.rfc?
     User.current_user = nil
-    assert_raise { faq.vote! }
+    assert_raise(RuntimeError) { faq.vote! }
     User.current_user = User.find_by_login("dean")
-    assert_raise { faq.vote! }
+    assert_raise(RuntimeError) { faq.vote! }
     User.current_user = User.find_by_login("sam")
-    assert_raise { faq.vote! }
+    assert_raise(RuntimeError) { faq.vote! }
   end
   test "votes when adding a ticket to a faq" do
     support_ticket = SupportTicket.find(1)
@@ -119,6 +119,20 @@ class FaqTest < ActiveSupport::TestCase
     assert faq.unwatch!(support_ticket.authentication_code)
     assert_nil faq.watched?(support_ticket.authentication_code)
     assert_equal ["sam@ao3.org"], faq.reload.mail_to
+  end
+  test "watch by guest of an unrelated faq" do
+    support_ticket = SupportTicket.find(1)
+    faq = Faq.find(3)
+    assert_equal ["rodney@ao3.org"], faq.mail_to
+    User.current_user = User.find_by_login("sam")
+    assert support_ticket.answer!(faq.id)
+    User.current_user = nil
+    assert faq.watch!(support_ticket.authentication_code)
+    assert_equal ["rodney@ao3.org", "guest@ao3.org"], faq.mail_to
+    assert faq.watched?(support_ticket.authentication_code)
+    assert faq.unwatch!(support_ticket.authentication_code)
+    assert_nil faq.watched?(support_ticket.authentication_code)
+    assert_equal ["rodney@ao3.org"], faq.reload.mail_to
   end
   test "can comment on a faq when it's in rfc mode" do
     faq = Faq.find(2)
