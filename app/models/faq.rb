@@ -149,8 +149,9 @@ class Faq < ActiveRecord::Base
     return detail
   end
 
-  # anyone can vote, and can vote multiple times
+  # anyone can vote, and can vote multiple times, but not on a draft
   def vote!
+    raise "can't vote until posted" if self.rfc?
     FaqVote.create(:faq_id => self.id)
   end
 

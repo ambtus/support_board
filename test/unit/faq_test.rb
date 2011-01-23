@@ -55,6 +55,7 @@ class FaqTest < ActiveSupport::TestCase
   end
   test "vote" do
     faq = Faq.find(1)
+    assert faq.faq?
     User.current_user = nil
     assert faq.vote!
     assert_equal 1, faq.vote_count
@@ -65,6 +66,16 @@ class FaqTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("john")
     assert faq.vote!
     assert_equal 4, faq.vote_count
+  end
+  test "vote on draft" do
+    faq = Faq.find(2)
+    assert faq.rfc?
+    User.current_user = nil
+    assert_raise { faq.vote! }
+    User.current_user = User.find_by_login("dean")
+    assert_raise { faq.vote! }
+    User.current_user = User.find_by_login("sam")
+    assert_raise { faq.vote! }
   end
   test "votes when adding a ticket to a faq" do
     support_ticket = SupportTicket.find(1)
