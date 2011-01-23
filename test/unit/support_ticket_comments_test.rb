@@ -1,6 +1,14 @@
 require 'test_helper'
 
 class SupportTicketCommentTest < ActiveSupport::TestCase
+  test "visible_support_details" do
+    ticket = SupportTicket.find(2)
+    assert_equal 1, ticket.visible_support_details.size
+    User.current_user = User.find_by_login("jim")
+    assert_equal 1, ticket.visible_support_details.size
+    User.current_user = User.find_by_login("sam")
+    assert_equal 4, ticket.visible_support_details.size
+  end
   test "system logs" do
     assert_equal %Q{unowned -> spam}, SupportTicket.find(2).support_details.system_log.last.content
     assert_equal %Q{unowned -> taken}, SupportTicket.find(3).support_details.system_log.last.content
@@ -8,6 +16,7 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     assert_equal %Q{unowned -> closed (4)}, SupportTicket.find(5).support_details.system_log.last.content
     assert_equal %Q{unowned -> closed (5)}, SupportTicket.find(6).support_details.system_log.last.content
   end
+
   # guest comments
   test "not logged in can't comment on unowned guest ticket if authentication code doesn't match" do
     ticket = SupportTicket.find(1)

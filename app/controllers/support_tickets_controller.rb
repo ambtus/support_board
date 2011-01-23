@@ -31,19 +31,17 @@ class SupportTicketsController < ApplicationController
       redirect_to support_path and return
     end
 
+    @details = @ticket.visible_support_details
+
     if is_owner && !params[:support]
-      @details = @ticket.support_details.visible_to_all
       @add_details = true # create a new empty response template
       render :show_owner
     elsif !current_user
-      @details = @ticket.support_details.visible_to_all
       render :show_guest
     elsif current_user.support_volunteer?
-      @details = @ticket.support_details
       @add_details = true # create a new empty response template
       render :show_volunteer
     else # logged in as non-support volunteer
-      @details = @ticket.support_details.visible_to_all
       if !@ticket.support_identity_id # if support took it, it's not longer open for public comment
         @add_details = true # create a new empty response template
       end

@@ -179,6 +179,10 @@ class SupportTicket < ActiveRecord::Base
     notifications.map(&:email).uniq
   end
 
+  def visible_support_details
+    User.current_user.try(:support_volunteer?) ? self.support_details : self.support_details.visible_to_all
+  end
+
   ### FILTER
   def self.filter(params = {})
     tickets = SupportTicket.scoped
