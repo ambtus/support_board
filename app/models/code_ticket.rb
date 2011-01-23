@@ -250,7 +250,7 @@ class CodeTicket < ActiveRecord::Base
   # tickets which can be used for code commit matching
   # once a code ticket has been staged it's being tested, and you can't add more commits to it
   def self.for_matching
-    not_closed.where('status != "verified"').where('status != "staged"')
+    not_closed.where('status != "verified"').where('status != "staged"').order("id desc")
   end
 
   # returns an array of support ticket ids

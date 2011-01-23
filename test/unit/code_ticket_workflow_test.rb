@@ -29,7 +29,7 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
     assert_equal [4], CodeTicket.staged.ids
     assert_equal [3], CodeTicket.verified.ids
     assert_equal [6, 7, 8], CodeTicket.closed.ids
-    assert_equal [1, 2, 5], CodeTicket.for_matching.ids
+    assert_equal [5, 2, 1], CodeTicket.for_matching.ids
   end
   test "take" do
     ticket = CodeTicket.find(1)
