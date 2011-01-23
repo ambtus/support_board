@@ -59,7 +59,7 @@ class CodeCommitTest < ActiveSupport::TestCase
   test "filter by owned_by_support_identity" do
     assert_equal [1], CodeCommit.filter(:owned_by_support_identity => "sam", :status => "all").ids
     assert_equal [4], CodeCommit.filter(:owned_by_support_identity => "blair", :status => "all").ids
-    assert_equal [2, 3, 6], CodeCommit.filter(:owned_by_support_identity => "rodney", :status => "all").ids
+    assert_equal [6, 3, 2], CodeCommit.filter(:owned_by_support_identity => "rodney", :status => "all").ids
     assert_equal [5], CodeCommit.filter(:owned_by_support_identity => "bofh", :status => "all").ids
   end
   test "filter by nonexistent status" do
@@ -74,7 +74,7 @@ class CodeCommitTest < ActiveSupport::TestCase
     assert_equal [2], CodeCommit.filter(:status => "verified").ids
     assert_equal [3], CodeCommit.filter(:status => "staged").ids
     assert_equal [4], CodeCommit.filter(:status => "matched").ids
-    assert_equal [5, 6], CodeCommit.filter(:status => "deployed").ids
+    assert_equal [5, 6], CodeCommit.filter(:status => "deployed", :sort_by => "oldest first").ids
     assert_equal [1], CodeCommit.filter.ids
   end
   test "filter by both" do

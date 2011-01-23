@@ -86,6 +86,19 @@ class CodeCommit < ActiveRecord::Base
       commits = commits.unmatched
     end
 
+    if params[:sort_by]
+      case params[:sort_by]
+      when "oldest first"
+        commits = commits.order("id asc")
+      when "newest"
+        commits = commits.order("id desc")
+      else
+        raise TypeError
+      end
+    else # "newest" by default
+      commits = commits.order("id desc")
+    end
+
     return commits
   end
 

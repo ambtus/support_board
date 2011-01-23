@@ -3,6 +3,9 @@
           options_for_select(CodeCommit.workflow_spec.state_names + [:all], params[:status]) %>
   <%= select_tag :owned_by_support_identity, "<option></option>".html_safe +
                  options_from_collection_for_select(SupportIdentity.official.all, "name", "name", params[:owned_by_support_identity]) %>
+  <%= label_tag :sort_by %>
+  <%= select_tag :sort_by,
+           options_for_select(["newest first", "oldest first"], params[:sort_by]) %>
   <%= submit_tag "Filter" %>
   <%= link_to "Clear Filters", code_commits_path %>
 <% end %>
