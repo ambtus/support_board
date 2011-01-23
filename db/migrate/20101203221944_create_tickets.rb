@@ -6,7 +6,11 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :support_identities, :name
+    add_index :support_identities, :official
+
     add_column :users, :support_identity_id, :integer
+    add_index :users, :support_identity_id
 
     create_table :support_tickets do |t|
       t.integer :user_id
@@ -29,6 +33,17 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :summary_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
     end
+    add_index :support_tickets, :user_id
+    add_index :support_tickets, :email
+    add_index :support_tickets, :authentication_code
+    add_index :support_tickets, :private
+    add_index :support_tickets, :anonymous
+    add_index :support_tickets, :status
+    add_index :support_tickets, :support_identity_id
+    add_index :support_tickets, :faq_id
+    add_index :support_tickets, :code_ticket_id
+
+
     create_table :support_details do |t|
       t.integer :support_ticket_id
       t.integer :support_identity_id
@@ -41,6 +56,12 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
     end
+    add_index :support_details, :support_ticket_id
+    add_index :support_details, :support_identity_id
+    add_index :support_details, :support_response
+    add_index :support_details, :private
+    add_index :support_details, :system_log
+
     create_table :support_notifications do |t|
       t.integer :support_ticket_id
       t.boolean :public_watcher, :default => false
@@ -49,6 +70,10 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :support_notifications, :support_ticket_id
+    add_index :support_notifications, :public_watcher
+    add_index :support_notifications, :email
+    add_index :support_notifications, :official
 
     create_table :faqs, :force => true do |t|
       t.string   :summary, :limit => 256, :default => ""
@@ -60,6 +85,8 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :summary_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
     end
+    add_index :faqs, :position
+    add_index :faqs, :status
 
     create_table :faq_details do |t|
       t.integer :faq_id
@@ -72,6 +99,11 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
     end
+    add_index :faq_details, :faq_id
+    add_index :faq_details, :support_identity_id
+    add_index :faq_details, :support_response
+    add_index :faq_details, :private
+    add_index :faq_details, :system_log
 
     create_table :faq_votes do |t|
       t.integer :faq_id
@@ -80,6 +112,9 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :faq_votes, :faq_id
+    add_index :faq_votes, :support_ticket_id
+
     create_table :faq_notifications do |t|
       t.integer :faq_id
       t.string :email
@@ -87,6 +122,9 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :faq_notifications, :faq_id
+    add_index :faq_notifications, :email
+    add_index :faq_notifications, :official
 
     create_table :code_tickets do |t|
       t.string :summary, :limit => 256, :default => ""
@@ -101,6 +139,11 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :summary_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
     end
+    add_index :code_tickets, :status
+    add_index :code_tickets, :support_identity_id
+    add_index :code_tickets, :code_ticket_id
+    add_index :code_tickets, :release_note_id
+
     create_table :code_details do |t|
       t.integer  :code_ticket_id
       t.integer  :support_identity_id
@@ -108,11 +151,16 @@ class CreateTickets < ActiveRecord::Migration
       t.boolean  :system_log, :default => false
       t.string   :content, :default => ""
       t.boolean  :private, :default => false
-      t.boolean  :resolved_ticket, :default => false
 
       t.integer  :content_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
     end
+    add_index :code_details, :code_ticket_id
+    add_index :code_details, :support_identity_id
+    add_index :code_details, :support_response
+    add_index :code_details, :system_log
+    add_index :code_details, :private
+
     create_table :code_votes do |t|
       t.integer :code_ticket_id
       t.integer :user_id
@@ -121,6 +169,10 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :code_votes, :code_ticket_id
+    add_index :code_votes, :user_id
+    add_index :code_votes, :support_ticket_id
+
     create_table :code_notifications do |t|
       t.integer :code_ticket_id
       t.string :email
@@ -128,6 +180,10 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :code_notifications, :code_ticket_id
+    add_index :code_notifications, :email
+    add_index :code_notifications, :official
+
     create_table :code_commits do |t|
       t.string :author
       t.string :url
@@ -139,6 +195,9 @@ class CreateTickets < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :code_commits, :code_ticket_id
+    add_index :code_commits, :support_identity_id
+    add_index :code_commits, :status
 
     create_table :release_notes, :force => true do |t|
       t.string   :release
@@ -148,6 +207,7 @@ class CreateTickets < ActiveRecord::Migration
       t.integer :content_sanitizer_version, :limit => 2, :default => 0, :null => false
       t.timestamps
     end
+    add_index :release_notes, :posted
 
   end
 

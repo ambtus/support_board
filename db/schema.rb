@@ -24,6 +24,10 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  add_index "code_commits", ["code_ticket_id"], :name => "index_code_commits_on_code_ticket_id"
+  add_index "code_commits", ["status"], :name => "index_code_commits_on_status"
+  add_index "code_commits", ["support_identity_id"], :name => "index_code_commits_on_support_identity_id"
+
   create_table "code_details", :force => true do |t|
     t.integer  "code_ticket_id"
     t.integer  "support_identity_id"
@@ -31,11 +35,16 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.boolean  "system_log",                             :default => false
     t.string   "content",                                :default => ""
     t.boolean  "private",                                :default => false
-    t.boolean  "resolved_ticket",                        :default => false
     t.integer  "content_sanitizer_version", :limit => 2, :default => 0,     :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "code_details", ["code_ticket_id"], :name => "index_code_details_on_code_ticket_id"
+  add_index "code_details", ["private"], :name => "index_code_details_on_private"
+  add_index "code_details", ["support_identity_id"], :name => "index_code_details_on_support_identity_id"
+  add_index "code_details", ["support_response"], :name => "index_code_details_on_support_response"
+  add_index "code_details", ["system_log"], :name => "index_code_details_on_system_log"
 
   create_table "code_notifications", :force => true do |t|
     t.integer  "code_ticket_id"
@@ -44,6 +53,10 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "code_notifications", ["code_ticket_id"], :name => "index_code_notifications_on_code_ticket_id"
+  add_index "code_notifications", ["email"], :name => "index_code_notifications_on_email"
+  add_index "code_notifications", ["official"], :name => "index_code_notifications_on_official"
 
   create_table "code_tickets", :force => true do |t|
     t.string   "summary",                   :limit => 256, :default => ""
@@ -58,6 +71,11 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  add_index "code_tickets", ["code_ticket_id"], :name => "index_code_tickets_on_code_ticket_id"
+  add_index "code_tickets", ["release_note_id"], :name => "index_code_tickets_on_release_note_id"
+  add_index "code_tickets", ["status"], :name => "index_code_tickets_on_status"
+  add_index "code_tickets", ["support_identity_id"], :name => "index_code_tickets_on_support_identity_id"
+
   create_table "code_votes", :force => true do |t|
     t.integer  "code_ticket_id"
     t.integer  "user_id"
@@ -66,6 +84,10 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "code_votes", ["code_ticket_id"], :name => "index_code_votes_on_code_ticket_id"
+  add_index "code_votes", ["support_ticket_id"], :name => "index_code_votes_on_support_ticket_id"
+  add_index "code_votes", ["user_id"], :name => "index_code_votes_on_user_id"
 
   create_table "faq_details", :force => true do |t|
     t.integer  "faq_id"
@@ -79,6 +101,12 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  add_index "faq_details", ["faq_id"], :name => "index_faq_details_on_faq_id"
+  add_index "faq_details", ["private"], :name => "index_faq_details_on_private"
+  add_index "faq_details", ["support_identity_id"], :name => "index_faq_details_on_support_identity_id"
+  add_index "faq_details", ["support_response"], :name => "index_faq_details_on_support_response"
+  add_index "faq_details", ["system_log"], :name => "index_faq_details_on_system_log"
+
   create_table "faq_notifications", :force => true do |t|
     t.integer  "faq_id"
     t.string   "email"
@@ -87,6 +115,10 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  add_index "faq_notifications", ["email"], :name => "index_faq_notifications_on_email"
+  add_index "faq_notifications", ["faq_id"], :name => "index_faq_notifications_on_faq_id"
+  add_index "faq_notifications", ["official"], :name => "index_faq_notifications_on_official"
+
   create_table "faq_votes", :force => true do |t|
     t.integer  "faq_id"
     t.integer  "support_ticket_id"
@@ -94,6 +126,9 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "faq_votes", ["faq_id"], :name => "index_faq_votes_on_faq_id"
+  add_index "faq_votes", ["support_ticket_id"], :name => "index_faq_votes_on_support_ticket_id"
 
   create_table "faqs", :force => true do |t|
     t.string   "summary",                   :limit => 256, :default => ""
@@ -106,6 +141,9 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  add_index "faqs", ["position"], :name => "index_faqs_on_position"
+  add_index "faqs", ["status"], :name => "index_faqs_on_status"
+
   create_table "release_notes", :force => true do |t|
     t.string   "release"
     t.text     "content"
@@ -114,6 +152,8 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "release_notes", ["posted"], :name => "index_release_notes_on_posted"
 
   create_table "roles", :force => true do |t|
     t.string   "name",              :limit => 40
@@ -143,12 +183,21 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  add_index "support_details", ["private"], :name => "index_support_details_on_private"
+  add_index "support_details", ["support_identity_id"], :name => "index_support_details_on_support_identity_id"
+  add_index "support_details", ["support_response"], :name => "index_support_details_on_support_response"
+  add_index "support_details", ["support_ticket_id"], :name => "index_support_details_on_support_ticket_id"
+  add_index "support_details", ["system_log"], :name => "index_support_details_on_system_log"
+
   create_table "support_identities", :force => true do |t|
     t.string   "name",                          :null => false
     t.boolean  "official",   :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "support_identities", ["name"], :name => "index_support_identities_on_name"
+  add_index "support_identities", ["official"], :name => "index_support_identities_on_official"
 
   create_table "support_notifications", :force => true do |t|
     t.integer  "support_ticket_id"
@@ -158,6 +207,11 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "support_notifications", ["email"], :name => "index_support_notifications_on_email"
+  add_index "support_notifications", ["official"], :name => "index_support_notifications_on_official"
+  add_index "support_notifications", ["public_watcher"], :name => "index_support_notifications_on_public_watcher"
+  add_index "support_notifications", ["support_ticket_id"], :name => "index_support_notifications_on_support_ticket_id"
 
   create_table "support_tickets", :force => true do |t|
     t.integer  "user_id"
@@ -180,6 +234,16 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
   end
 
+  add_index "support_tickets", ["anonymous"], :name => "index_support_tickets_on_anonymous"
+  add_index "support_tickets", ["authentication_code"], :name => "index_support_tickets_on_authentication_code"
+  add_index "support_tickets", ["code_ticket_id"], :name => "index_support_tickets_on_code_ticket_id"
+  add_index "support_tickets", ["email"], :name => "index_support_tickets_on_email"
+  add_index "support_tickets", ["faq_id"], :name => "index_support_tickets_on_faq_id"
+  add_index "support_tickets", ["private"], :name => "index_support_tickets_on_private"
+  add_index "support_tickets", ["status"], :name => "index_support_tickets_on_status"
+  add_index "support_tickets", ["support_identity_id"], :name => "index_support_tickets_on_support_identity_id"
+  add_index "support_tickets", ["user_id"], :name => "index_support_tickets_on_user_id"
+
   create_table "users", :force => true do |t|
     t.string   "email",               :null => false
     t.string   "login",               :null => false
@@ -191,5 +255,7 @@ ActiveRecord::Schema.define(:version => 20101203221944) do
     t.datetime "updated_at"
     t.integer  "support_identity_id"
   end
+
+  add_index "users", ["support_identity_id"], :name => "index_users_on_support_identity_id"
 
 end
