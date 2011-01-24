@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
   # Allows other models to get the current user with User.current_user
   cattr_accessor :current_user
 
- def support_identity_with_create
+  def support_identity_with_create
     support_identity_without_create || SupportIdentity.create(:name => self.login, :user => self)
   end
   alias_method_chain :support_identity, :create

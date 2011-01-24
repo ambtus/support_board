@@ -192,7 +192,7 @@ class SupportTicketWorkflowTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("jim")
     assert_raise(SecurityError) { ticket.post! }
   end
-  test "needs_fix" do
+  test "needs_fix not anonymous" do
     ticket = SupportTicket.find(1)
     assert_equal 8, CodeTicket.count
     assert ticket.unowned?
@@ -201,8 +201,16 @@ class SupportTicketWorkflowTest < ActiveSupport::TestCase
     assert ticket.waiting?
     assert_equal "unowned -> waiting", ticket.support_details.system_log.last.content
     assert_equal "sam", ticket.support_identity.name
+    assert_equal "/", code_ticket.url
+    assert_equal code_ticket.browser, "Chrome 10.0.638.0 (Windows 7)"
     assert_equal 9, CodeTicket.count
     assert_equal 3, code_ticket.vote_count
+  end
+  test "needs_fix anonymous" do
+    ticket = SupportTicket.find(20)
+    User.current_user = User.find_by_login("sam")
+    assert code_ticket = ticket.needs_fix!
+    assert_nil code_ticket.url
   end
   test "answer" do
     ticket = SupportTicket.find(1)

@@ -138,6 +138,7 @@ class Faq < ActiveRecord::Base
 
   # only logged in users or guest owners can comment
   def comment!(content, official=true, make_private = false, code=nil)
+    return if content.blank?
     raise "not open for comments" unless self.rfc?
     raise_unless_logged_in_or_guest(code)
     support_response = (official && User.current_user.support_volunteer?)

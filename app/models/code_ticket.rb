@@ -389,22 +389,33 @@ class CodeTicket < ActiveRecord::Base
 
   # only logged in users can comment
   # only support volunteers can comment on non-open tickets
-  def comment!(content, official_comment=true, private_comment = false)
-    raise "Couldn't comment. Not logged in." unless User.current_user
-    support_response = (official_comment && User.current_user.support_volunteer?)
-    raise ArgumentError, "Only official comments can be private" if private_comment && !support_response
-    if self.unowned? || support_response
-      self.code_details.create(:content => content,
-                               :support_identity_id => User.current_user.support_identity.id,
-                               :support_response => support_response,
-                               :system_log => false,
-                               :private => !!private_comment)
-      self.send_update_notifications(private_comment)
-      # DECISION should notifications be sent before or after you're added to the ticket?
-      self.watch! unless self.code_ticket_id
-    else
-      raise "Couldn't comment. Only official comments allowed."
+  def comment!(content, response=nil)
+    return if content.blank?
+    raise SecurityError, "Couldn't comment. Not logged in." unless User.current_user
+    support_response = false
+    private_response = false
+    if response.nil?
+      response = User.current_user.support_volunteer? ? "official" : "unofficial"
     end
+    case response
+    when "official"
+      raise SecurityError, "only volunteers can comment officially" unless User.current_user.support_volunteer?
+      support_response = true
+    when "private"
+      raise SecurityError, "only volunteers can comment privately" unless User.current_user.support_volunteer?
+      private_response = true
+      support_response = true
+    when "unofficial"
+      raise "Couldn't comment. Only official comments allowed." unless self.unowned?
+    end
+    self.code_details.create(:content => content,
+                             :support_identity_id => User.current_user.support_identity.id,
+                             :support_response => support_response,
+                             :system_log => false,
+                             :private => private_response)
+    self.send_update_notifications(private_response)
+    # DECISION should notifications be sent before or after you're added to the ticket?
+    self.watch! unless self.code_ticket_id
   end
 
   # only logged in users can watch

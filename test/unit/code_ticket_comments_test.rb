@@ -19,7 +19,7 @@ class CodeTicketCommentsTest < ActiveSupport::TestCase
   test "guest comment on unowned ticket" do
     ticket = CodeTicket.find(1)
     User.current_user = nil
-    assert_raise(RuntimeError) { ticket.comment!("something") }
+    assert_raise(SecurityError) { ticket.comment!("something") }
   end
   test "user comment on unowned ticket" do
     ticket = CodeTicket.find(1)
@@ -33,12 +33,12 @@ class CodeTicketCommentsTest < ActiveSupport::TestCase
   test "user private comment ticket" do
     ticket = CodeTicket.find(1)
     User.current_user = User.find_by_login("dean")
-    assert_raise(ArgumentError) { ticket.comment!("something", true, true) }
+    assert_raise(SecurityError) { ticket.comment!("something", "private") }
   end
   test "volunteer comment unofficially on unowned ticket" do
     ticket = CodeTicket.find(1)
     User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("something", false)
+    assert ticket.comment!("something", "unofficial")
     assert_match "sam wrote", ticket.code_details.last.info
   end
   test "volunteer comment officially on unowned ticket" do
@@ -46,22 +46,19 @@ class CodeTicketCommentsTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     assert ticket.comment!("something")
     assert_match "sam (volunteer) wrote", ticket.code_details.last.info
+    assert ticket.comment!("more stuff", "official")
+    assert_match "sam (volunteer) wrote", ticket.code_details.last.info
   end
   test "volunteer private official comment on unowned ticket" do
     ticket = CodeTicket.find(1)
     User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("something", true, true)
+    assert ticket.comment!("something", "private")
     assert_match "sam (volunteer) wrote [private]", ticket.code_details.last.info
-  end
-  test "volunteer private unofficial comment on unowned ticket" do
-    ticket = CodeTicket.find(1)
-    User.current_user = User.find_by_login("sam")
-    assert_raise(ArgumentError) { ticket.comment!("something", false, true) }
   end
   test "guest comment on owned ticket" do
     ticket = CodeTicket.find(3)
     User.current_user = nil
-    assert_raise(RuntimeError) { ticket.comment!("something") }
+    assert_raise(SecurityError) { ticket.comment!("something") }
   end
   test "user comment on owned ticket" do
     ticket = CodeTicket.find(3)
@@ -71,7 +68,7 @@ class CodeTicketCommentsTest < ActiveSupport::TestCase
   test "volunteer comment unofficially on owned ticket" do
     ticket = CodeTicket.find(3)
     User.current_user = User.find_by_login("sam")
-    assert_raise(RuntimeError) { ticket.comment!("something", false) }
+    assert_raise(RuntimeError) { ticket.comment!("something", "unofficial") }
   end
   test "volunteer comment officially on owned ticket" do
     ticket = CodeTicket.find(3)
@@ -83,7 +80,7 @@ class CodeTicketCommentsTest < ActiveSupport::TestCase
   test "volunteer private official comment on owned ticket" do
     ticket = CodeTicket.find(3)
     User.current_user = User.find_by_login("sam")
-    assert ticket.comment!("something", true, true)
+    assert ticket.comment!("something", "private")
     assert_match "sam (volunteer) wrote [private]", ticket.code_details.last.info
   end
 end

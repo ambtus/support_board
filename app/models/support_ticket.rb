@@ -404,7 +404,10 @@ class SupportTicket < ActiveRecord::Base
       raise ArgumentError, "can't assign to a duplicate" if code_ticket.code_ticket_id
       CodeVote.create(:code_ticket_id => code_ticket_id, :support_ticket_id => self.id, :vote => 2)
     else
-      code_ticket = CodeTicket.create(:summary => self.summary, :url => self.url, :browser => self.browser_string)
+      visible_url = self.anonymous? ? nil : self.url
+      code_ticket = CodeTicket.create(:summary => self.summary,
+         :url => visible_url,
+         :browser => self.browser_string)
       code_ticket_id = code_ticket.id
       CodeVote.create(:code_ticket_id => code_ticket_id, :support_ticket_id => self.id, :vote => 3)
     end
@@ -484,6 +487,7 @@ class SupportTicket < ActiveRecord::Base
 
   # leaves a non-system_log comment on the ticket. sends notifications.
   def comment!(content, official_comment, private_comment)
+    return if content.blank?
     comment = self.support_details.create(:content => content,
                                :support_identity_id => User.current_user.try(:support_identity).try(:id),
                                :support_response => official_comment,
