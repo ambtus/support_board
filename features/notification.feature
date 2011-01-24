@@ -1,5 +1,7 @@
 Feature: email notifications
 
+# TODO don't send notifications when create a new faq until the faq has been saved...
+
 Scenario: guests should receive email notification on creation
   Given I am on the home page
   When I follow "Open a New Support Ticket"

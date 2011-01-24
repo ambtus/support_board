@@ -267,10 +267,9 @@ Scenario: links to code tickets they're watching, private
 
 
 # TODO
-Scenario: the referring url should be private if the ticket is anonymous, and not if it's not
 Scenario: guests and users should not be able to see private details (support, code or faq)
 Scenario: guests and users should not receive notifications when private details are added (support, code or faq)
 Scenario: guest and user notifications should not include private details (support, code or faq)
 Scenario: support volunteers can be unofficial after the support ticket is unowned if they opened the ticket (they are the owner)
-Scenario: support comments can only be private if they are official (so offer one or the other - and the show ticket as support volunteer needs a corresponding show ticket as owner)
+Scenario: the show ticket as support volunteer needs a corresponding show ticket as owner
 

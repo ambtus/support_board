@@ -41,7 +41,7 @@ class CodeCommit < ActiveRecord::Base
     # support identity needs to be associated with the user
     # also, if someone is already using that name as their support identities, they'll get credited for
     # the submit, but it won't be filterable, because they're not official
-    # TODO create an admin interface for creating support volunteers
+    # TODO create an admin interface for managing support volunteers
     # create new support identities or match them with unmatched existing ones (created from github commits)
     identity = SupportIdentity.create(:name => self.author, :official => true) unless identity
     self.support_identity = identity

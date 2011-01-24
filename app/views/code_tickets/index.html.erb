@@ -1,9 +1,3 @@
-<% #TODO merge sort into filter %>
-<% if params[:by_vote] %>
-  <%= link_to "Sort by position", code_tickets_path(params.merge :by_vote => false) %>
-<% else %>
-<% end %>
-
 <%= form_tag '/code_tickets', :method => :get do %>
   <%= label_tag :status %>
   <%= select_tag :status,

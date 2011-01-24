@@ -1,4 +1,8 @@
 class CreateTickets < ActiveRecord::Migration
+
+# TODO add names to notifications so can send email with names (looks less like spam)
+# TODO change _notifications to _watchers (notifications are the things you send, watcher are the people you send them to)
+
   def self.up
     create_table :support_identities do |t|
       t.string   :name,       :null => false

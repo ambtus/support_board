@@ -132,7 +132,7 @@ class SupportTicketsController < ApplicationController
       @ticket.needs_admin!
     when "Add details"
       if current_user
-        @ticket.user_comment!(params[:content], params[:response]))
+        @ticket.user_comment!(params[:content], params[:response])
       else
         @ticket.guest_owner_comment!(params[:content], session[:authentication_code])
       end

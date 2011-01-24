@@ -105,8 +105,6 @@ Scenario: a faq should get 2 votes when it's created from a guest support ticket
   When I am on the page for the last faq
   Then I should see "2 votes"
 
-# TODO don't send notifications when create a new faq until the faq has been saved...
-
 Scenario: an existing faq should get a vote removed when unlinked from a guest support ticket
   When I am on the page for faq 1
   Then I should see "0 votes"
