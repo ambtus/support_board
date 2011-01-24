@@ -137,7 +137,7 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
   end
   test "reject if not admin" do
     ticket = CodeTicket.first
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert_raise(RuntimeError) { ticket.reject!("") }
   end
   test "steal" do
@@ -197,7 +197,7 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
     ticket = CodeTicket.find(5)
     assert "blair", ticket.support_identity.name
     assert ticket.code_commits.first.matched?
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert ticket.stage!
     assert "blair", ticket.reload.support_identity.name
     assert ticket.code_commits.first.staged?
@@ -227,11 +227,11 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
     ticket = CodeTicket.find(3)
     assert ticket.code_commits.first.verified?
     assert ticket.support_tickets.first.waiting?
-    assert "bofh", ticket.support_identity.name
+    assert "sidra", ticket.support_identity.name
     assert ticket.code_commits.first.verified?
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert ticket.deploy!(ReleaseNote.first.id)
-    assert "bofh", ticket.reload.support_identity.name
+    assert "sidra", ticket.reload.support_identity.name
     assert ticket.code_commits.first.deployed?
     assert ticket.support_tickets.first.closed?
   end
@@ -242,7 +242,7 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
   end
   test "deploy no release note" do
     ticket = CodeTicket.find(3)
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert_raise(ActiveRecord::RecordNotFound) { ticket.deploy!(17) }
   end
   test "stage all - not admin" do
@@ -250,13 +250,13 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
     assert_raise(SecurityError) { CodeTicket.stage! }
   end
   test "stage all - not all code commits matched" do
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert_equal 1, CodeCommit.unmatched.count
     assert_raise(RuntimeError) { CodeTicket.stage! }
   end
   test "stage all" do
     assert_not_empty CodeTicket.committed
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert CodeTicket.find(1).commit!(CodeCommit.find(1))
     assert CodeTicket.stage!
     assert_empty CodeTicket.committed
@@ -266,18 +266,18 @@ class CodeTicketWorkflowTest < ActiveSupport::TestCase
     assert_raise(SecurityError) { CodeTicket.deploy!(2) }
   end
   test "deploy all - not all code tickets verified" do
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert_equal 1, CodeTicket.staged.count
     assert_raise(RuntimeError) { CodeTicket.deploy!(2) }
   end
   test "deploy all - non-existent release note" do
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert_raise(RuntimeError) { CodeTicket.deploy!(17) }
   end
   test "deploy all" do
     assert_not_empty CodeTicket.staged
     assert_not_empty CodeTicket.verified
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     CodeTicket.staged.each {|ct| ct.verify! }
     assert CodeTicket.deploy!(2)
     assert_empty CodeTicket.staged

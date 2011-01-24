@@ -129,6 +129,12 @@ class SupportTicket < ActiveRecord::Base
     end
   end
 
+  def release_note
+    return nil unless self.closed?
+    return nil unless self.code_ticket_id
+    release_note = self.code_ticket.release_note
+  end
+
   # ticket was opened by a guest with an email address
   def guest_ticket?
     self.email
@@ -468,17 +474,31 @@ class SupportTicket < ActiveRecord::Base
   end
 
   # comments left by logged in users.
-  def user_comment!(content, official_comment=true, private_comment = false)
+  def user_comment!(content, response=nil)
+    return if content.blank?
     raise_unless_logged_in
-    official_comment = false unless User.current_user.support_volunteer?
-    raise ArgumentError, "can't be private unless official" if private_comment && !official_comment
-    raise_if_public_watcher(official_comment) unless self.unowned?
-    raise_if_public_watcher(official_comment) if self.private?
-    comment!(content, official_comment, private_comment)
+    support_response = false
+    private_response = false
+    if response.nil?
+      response = User.current_user.support_volunteer? ? "official" : "unofficial"
+    end
+    case response
+    when "official"
+      raise_unless_volunteer
+      support_response = true
+    when "private"
+      raise_unless_volunteer
+      private_response = true
+      support_response = true
+    when "unofficial"
+      raise_unless_user_owner if (self.private? || !self.unowned?)
+    end
+    comment!(content, support_response, private_response)
   end
 
   # comments left by logged out users
   def guest_owner_comment!(content, code)
+    return if content.blank?
     raise_unless_guest_owner(code)
     comment!(content, false, false)
   end
@@ -487,12 +507,11 @@ class SupportTicket < ActiveRecord::Base
 
   # leaves a non-system_log comment on the ticket. sends notifications.
   def comment!(content, official_comment, private_comment)
-    return if content.blank?
     comment = self.support_details.create(:content => content,
                                :support_identity_id => User.current_user.try(:support_identity).try(:id),
                                :support_response => official_comment,
                                :system_log => false,
-                               :private => !!private_comment)
+                               :private => private_comment)
     self.send_update_notifications(private_comment)
     return comment
   end
@@ -634,8 +653,7 @@ class SupportTicket < ActiveRecord::Base
   end
 
   # logged in, but neither owner nor official volunteer
-  def raise_if_public_watcher(official_comment=true)
-    raise SecurityError, "unofficial comments not allowed" if User.current_user.support_volunteer? && !official_comment
+  def raise_if_public_watcher
     raise SecurityError, "not authorized!" if public_watcher?
   end
 

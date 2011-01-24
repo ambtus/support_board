@@ -17,7 +17,7 @@ class CodeTicketTest < ActiveSupport::TestCase
   test "status_line" do
     assert_equal "open", CodeTicket.find(1).status_line
     assert_equal "taken by sam", CodeTicket.find(2).status_line
-    assert_equal "verified by bofh",  CodeTicket.find(3).status_line
+    assert_equal "verified by sidra",  CodeTicket.find(3).status_line
     assert_equal "waiting for verification (commited by rodney)", CodeTicket.find(4).status_line
     assert_equal "committed by blair", CodeTicket.find(5).status_line
     assert_equal "deployed in 1.0 (verified by rodney)", CodeTicket.find(6).status_line

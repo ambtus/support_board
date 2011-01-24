@@ -1,27 +1,10 @@
 <h1>Welcome!</h1>
 <p>This is the demo for the AO3 support board <a href="https://github.com/ambtus/support_board">code</a>.</p>
-<ul>
-<li>Support Board <a href="https://github.com/ambtus/support_board/raw/app/features/support_board.feature">Features</a>
-</li>
-<li>FAQ <a href="https://github.com/ambtus/support_board/raw/app/features/faq.feature"> Features</a>
-</li>
-<li>Support Ticket <a href="https://github.com/ambtus/support_board/raw/app/features/support_ticket.feature">Features</a>
-</li>
-<li>Support Ticket Life Cycle <a href="https://github.com/ambtus/support_board/raw/app/features/support_ticket_cycle.feature">Features</a>
-</li>
-<li>Code Ticket <a href="https://github.com/ambtus/support_board/raw/app/features/code_ticket.feature">Features</a>
-</li>
-<li>Code Ticket Life Cycle <a href="https://github.com/ambtus/support_board/raw/app/features/code_ticket_cycle.feature">Features</a>
-</li>
-<li>Release Note <a href="https://github.com/ambtus/support_board/raw/app/features/release_note.feature">Features</a>
-</li>
-<li>Email Notifications <a href="https://github.com/ambtus/support_board/raw/app/features/notification.feature">Features</a>
-</li>
-<li>Privacy <a href="https://github.com/ambtus/support_board/raw/app/features/privacy.feature">Features</a>
-</li>
-</ul>
-
-Log in as any of the following (password: secret) and click <%= link_to 'Support Board', support_path %> here or in the header to get started
+<p>Support Board <a href="https://github.com/ambtus/support_board/tree/app/features/">features</a>
+and <a href="https://github.com/ambtus/support_board/tree/app/test/unit/"> unit tests</a> using fixtures created using the seed data created from <a href="https://github.com/ambtus/support_board/raw/app/db/demo_seeds.rb">demo_seeds</a>
+</p>
+<p>
+Log in as any of the following (password: secret) or <%= link_to "create a new user", new_user_path %> and click <%= link_to 'Support Board', support_path %> here or in the header to get started
 <h2>users</h2>
 <ul>
   <% @users.each do |user| %>

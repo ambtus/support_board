@@ -17,19 +17,19 @@ module NavigationHelpers
    when /^(.*)'s user page$/i
       user_path(:id => $1)
 
-   when /^the page for support ticket (\d)/
+   when /^the page for support ticket (\d+)/
       support_ticket_path(:id => $1)
 
    when /^the page for the last support ticket/
       support_ticket_path(:id => SupportTicket.last.id)
 
-   when /^the page for code ticket (\d)/
+   when /^the page for code ticket (\d+)/
       code_ticket_path(:id => $1)
 
    when /^the page for the last code ticket/
       code_ticket_path(:id => CodeTicket.last.id)
 
-   when /^the page for faq (\d)/
+   when /^the page for faq (\d+)/
       faq_path(:id => $1)
 
    when /^the page for the last faq/

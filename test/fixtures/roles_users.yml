@@ -7,13 +7,13 @@ blair_volunteer:
 rodney_volunteer:
   user_id: 6
   role_id: 1
-bofh_volunteer:
+sidra_volunteer:
   user_id: 8
   role_id: 1
 rodney_admin:
   user_id: 6
   role_id: 2
-bofh_admin:
+sidra_admin:
   user_id: 8
   role_id: 2
 

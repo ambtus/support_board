@@ -15,7 +15,7 @@ Scenario: volunteers can create new release notes
   Then I should see "Release: 0.8.4.8"
 
 Scenario: support admins can edit release notes which have been posted
-  When I am logged in as "bofh"
+  When I am logged in as "sidra"
     And I am on the support page
     And I follow "Release Notes"
     And I follow "1.0"

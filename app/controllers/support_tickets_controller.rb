@@ -132,7 +132,7 @@ class SupportTicketsController < ApplicationController
       @ticket.needs_admin!
     when "Add details"
       if current_user
-        @ticket.user_comment!(params[:content], params[:official], params[:private])
+        @ticket.user_comment!(params[:content], params[:response]))
       else
         @ticket.guest_owner_comment!(params[:content], session[:authentication_code])
       end
@@ -140,7 +140,6 @@ class SupportTicketsController < ApplicationController
       @ticket.resolve!(params[:resolution])
     when "Needs this fix"
       code = @ticket.needs_fix!(params[:code_ticket_id])
-      redirect_to edit_code_ticket_path(code) and return
     when "Answered by this FAQ"
       @ticket.answer!(params[:faq_id])
     when "Create new code ticket"

@@ -12,7 +12,7 @@ Scenario: volunteers can create draft faqs
   Then I should see "Faq created"
 
 Scenario: support admins can post drafts (aka RFCs)
-  When I am logged in as "bofh"
+  When I am logged in as "sidra"
   When I am on the support page
     And I follow "Frequently Asked Questions"
   Then I should not see "why we don't have enough ZPMs"
@@ -25,7 +25,7 @@ Scenario: support admins can post drafts (aka RFCs)
   Then I should see "why we don't have enough ZPMs"
 
 Scenario: support admins can unpost FAQs
-  When I am logged in as "bofh"
+  When I am logged in as "sidra"
   When I am on the support page
     And I follow "Frequently Asked Questions"
     And I follow "where to find salt"
@@ -51,7 +51,7 @@ Scenario: when a draft FAQ is marked posted, the comments are no longer visible,
     And I press "Add details"
   Then I should see "rodney (volunteer) wrote: please include"
     And I should see "sam (volunteer) wrote: don't forget"
-  When I am logged in as "bofh"
+  When I am logged in as "sidra"
     And I am on the page for faq 2
     And I press "Post"
   Then I should see "why we don't have enough ZPMs"
@@ -177,7 +177,7 @@ Scenario: users can remove a link to a draft FAQ if they don't think it resolves
     And I press "Reopen"
   Then I should see "[open]"
     And I should not see "what's a sentinel?" within "a"
-  When "bofh" posts faq 5
+  When "sidra" posts faq 5
     And I am on the page for faq 5
     Then I should see "what's a sentinel"
     And I should see "0 votes"

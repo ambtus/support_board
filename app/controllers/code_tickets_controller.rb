@@ -98,7 +98,7 @@ class CodeTicketsController < ApplicationController
     when "Don't watch this ticket"
       @ticket.unwatch!
     when "Add details"
-      @ticket.comment!(params[:content], !params[:unofficial])
+      @ticket.comment!(params[:content], params[:response])
     when "Update Code ticket"
       @ticket.update_from_edit!(params[:code_ticket][:summary],
                       params[:code_ticket][:url],

@@ -22,8 +22,10 @@
     <% end %>
     <br \>
     <% if current_user.try(:support_volunteer?) %>
-      <p><%= check_box_tag :official, true, true %> <%= label_tag :official, "Official response?" %>
-      <%= check_box_tag :private, false, false %> <%= label_tag :official, "Private response?" %></p>
+      <p><%= radio_button_tag :response, 'official', true %><%= label_tag :response_official, 'official' %>
+      <%= radio_button_tag :response, 'unofficial', false %><%= label_tag :response_unofficial, 'unofficial' %>
+      <%= radio_button_tag :response, 'private', false %><%= label_tag :response_private, 'private' %>
+    </p>
     <% end %>
     <%= text_area_tag :content, nil, :size => "72x10" %>
     <p><%= submit_tag "Add details" %></p>

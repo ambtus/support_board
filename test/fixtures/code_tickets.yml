@@ -2,96 +2,96 @@
 code_ticket_1: 
   browser: 
   code_ticket_id: 
-  created_at: 2011-01-23 01:19:13 Z
+  created_at: 2011-01-24 04:06:46 Z
   id: 1
   release_note_id: 
   status: unowned
   summary: fix the roof
   summary_sanitizer_version: 0
   support_identity_id: 
-  updated_at: 2011-01-23 01:19:13 Z
+  updated_at: 2011-01-24 04:06:46 Z
   url: 
 code_ticket_2: 
   browser: 
   code_ticket_id: 
-  created_at: 2011-01-23 01:19:13 Z
+  created_at: 2011-01-24 04:06:46 Z
   id: 2
   release_note_id: 
   status: taken
   summary: save the world
   summary_sanitizer_version: 0
   support_identity_id: 1
-  updated_at: 2011-01-23 01:19:13 Z
+  updated_at: 2011-01-24 04:06:46 Z
   url: 
 code_ticket_3: 
   browser: 
   code_ticket_id: 
-  created_at: 2011-01-23 01:19:14 Z
+  created_at: 2011-01-24 04:06:47 Z
   id: 3
   release_note_id: 
   status: verified
   summary: repeal DADT
   summary_sanitizer_version: 0
   support_identity_id: 4
-  updated_at: 2011-01-23 01:19:14 Z
+  updated_at: 2011-01-24 04:06:47 Z
   url: 
 code_ticket_4: 
   browser: 
   code_ticket_id: 
-  created_at: 2011-01-23 01:19:14 Z
+  created_at: 2011-01-24 04:06:47 Z
   id: 4
   release_note_id: 
   status: staged
   summary: build a zpm
   summary_sanitizer_version: 0
   support_identity_id: 2
-  updated_at: 2011-01-23 01:19:14 Z
+  updated_at: 2011-01-24 04:06:47 Z
   url: 
 code_ticket_5: 
   browser: 
   code_ticket_id: 
-  created_at: 2011-01-23 01:19:14 Z
+  created_at: 2011-01-24 04:06:48 Z
   id: 5
   release_note_id: 
   status: committed
   summary: find a sentinel
   summary_sanitizer_version: 0
   support_identity_id: 3
-  updated_at: 2011-01-23 01:19:15 Z
+  updated_at: 2011-01-24 04:06:48 Z
   url: 
 code_ticket_6: 
   browser: 
   code_ticket_id: 
-  created_at: 2011-01-23 01:19:15 Z
+  created_at: 2011-01-24 04:06:48 Z
   id: 6
   release_note_id: 1
   status: closed
   summary: create the world wide web
   summary_sanitizer_version: 0
   support_identity_id: 2
-  updated_at: 2011-01-23 01:19:15 Z
+  updated_at: 2011-01-24 04:06:48 Z
   url: 
 code_ticket_7: 
   browser: Chrome 10.0.638.0 (Windows 7)
   code_ticket_id: 
-  created_at: 2011-01-23 01:19:29 Z
+  created_at: 2011-01-24 04:07:02 Z
   id: 7
   release_note_id: 2
   status: closed
   summary: tag pages look weird
   summary_sanitizer_version: 0
   support_identity_id: 3
-  updated_at: 2011-01-23 01:19:30 Z
+  updated_at: 2011-01-24 04:07:03 Z
   url: /tags
 code_ticket_8: 
   browser: 
   code_ticket_id: 1
-  created_at: 2011-01-23 01:19:33 Z
+  created_at: 2011-01-24 04:07:06 Z
   id: 8
   release_note_id: 
   status: closed
   summary: patch the roof
   summary_sanitizer_version: 0
   support_identity_id: 1
-  updated_at: 2011-01-23 01:19:33 Z
+  updated_at: 2011-01-24 04:07:06 Z
   url: 

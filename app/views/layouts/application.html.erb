@@ -23,6 +23,7 @@
     <% else %>
       <%= render :partial => 'user_sessions/login' %>
     <% end %>
+    <%= link_to 'Home', root_path %>
     <%= link_to 'Support Board', support_path %>
     <%= link_to "Open a New Support Ticket", new_support_ticket_path %>
     <div id=flash_notice><%= notice %></div>

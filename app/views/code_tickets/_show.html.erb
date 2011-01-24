@@ -1,6 +1,14 @@
 <h1><%= link_to_unless_current @ticket.name, @ticket %></h1>
 <%= render :partial => "blurb", :locals => { :ticket => @ticket }  %>
 
+<% unless @ticket.url.blank? %>
+  url: <%= link_to @ticket.url, @ticket.url %>
+<% end %>
+
+<% unless @ticket.browser.blank? %>
+  browser: <%= @ticket.browser %>
+<% end %>
+
 <% @details.each do |detail| %>
   <%= render :partial => "details/blurb", :locals => { :detail => detail }  %>
 <% end %>

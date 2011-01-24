@@ -61,7 +61,7 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal "answered by FAQ", SupportTicket.find(6).status_line # rfc
     assert_equal "taken by sam", SupportTicket.find(3).status_line
     assert_equal "posted by blair", SupportTicket.find(10).status_line
-    assert_equal "closed by bofh", SupportTicket.find(19).status_line # resolved by admin
+    assert_equal "closed by sidra", SupportTicket.find(19).status_line # resolved by admin
   end
   test "guest ticket?" do
     assert SupportTicket.find(1).guest_ticket?
@@ -78,7 +78,7 @@ class SupportTicketTest < ActiveSupport::TestCase
   end
   test "owner? of guest ticket as user" do
     ticket = SupportTicket.find(1)
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert !ticket.owner?
     assert !ticket.owner?(ticket.authentication_code)
   end
@@ -95,7 +95,7 @@ class SupportTicketTest < ActiveSupport::TestCase
   end
   test "owner? of user ticket as user who is not owner" do
     ticket = SupportTicket.find(3)
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert !ticket.owner?
   end
   test "watched? of guest ticket as guest" do
@@ -109,7 +109,7 @@ class SupportTicketTest < ActiveSupport::TestCase
   end
   test "watched? of guest ticket as user" do
     ticket = SupportTicket.find(1)
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert_raise(SecurityError) { ticket.watched?(ticket.authentication_code) }
     assert !ticket.watched?
   end
@@ -126,7 +126,7 @@ class SupportTicketTest < ActiveSupport::TestCase
   end
   test "watched? of user ticket as user who is not owner" do
     ticket = SupportTicket.find(3)
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert !ticket.watched?
   end
   test "public_watcher? when guest" do
@@ -197,7 +197,7 @@ class SupportTicketTest < ActiveSupport::TestCase
     assert_equal "blair", SupportTicket.find(10).support_identity.name
     assert_includes SupportTicket.find(10).mail_to, "blair@ao3.org"
     # resolve! calls take_and_watch
-    assert_equal "bofh", SupportTicket.find(19).support_identity.name
-    assert_includes SupportTicket.find(19).mail_to, "bofh@ao3.org"
+    assert_equal "sidra", SupportTicket.find(19).support_identity.name
+    assert_includes SupportTicket.find(19).mail_to, "sidra@ao3.org"
   end
 end

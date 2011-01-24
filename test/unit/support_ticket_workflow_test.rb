@@ -227,11 +227,11 @@ class SupportTicketWorkflowTest < ActiveSupport::TestCase
   test "resolve" do
     ticket = SupportTicket.find(1)
     assert ticket.unowned?
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert ticket.resolve!("done")
     assert ticket.closed?
     assert_equal "unowned -> closed (done)", ticket.support_details.system_log.last.content
-    assert_equal "bofh", ticket.support_identity.name
+    assert_equal "sidra", ticket.support_identity.name
   end
   test "guest owner accepts answer" do
     ticket = SupportTicket.find(1)

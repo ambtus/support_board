@@ -8,12 +8,43 @@ class CodeCommitTest < ActiveSupport::TestCase
   test "name" do
     assert_equal "Code Commit #1", CodeCommit.find(1).name
   end
+  test "summary" do
+    assert_equal "this should fix it", CodeCommit.find(1).summary
+  end
+  test "empty summary" do
+    commit = CodeCommit.create(:author => "sam")
+    assert_equal "",commit.summary
+  end
+  test "long summary with newlines" do
+    commit = CodeCommit.create(:author => "sam", :message => "short\nsecond line\n#{SecureRandom.hex(100)}")
+    assert_equal "short", commit.summary
+  end
+  test "long summary without spaces" do
+    message = SecureRandom.hex(141)
+    commit = CodeCommit.create(:author => "sam", :message => message)
+    assert_equal message, commit.summary
+  end
+  test "long summary without spaces with newlines" do
+    message = SecureRandom.hex(141)
+    commit = CodeCommit.create(:author => "sam", :message => "#{message}\nsecond line")
+    assert_equal message, commit.summary
+  end
+  test "long summary with spaces" do
+    first = SecureRandom.hex(100)
+    commit = CodeCommit.create(:author => "sam", :message => "#{first} #{SecureRandom.hex(50)}")
+    assert_equal first + "...", commit.summary
+  end
+  test "long summary with spaces and newlines" do
+    first = SecureRandom.hex(100)
+    commit = CodeCommit.create(:author => "sam", :message => "#{first} #{SecureRandom.hex(50)}\nmore stuff")
+    assert_equal first + "...", commit.summary
+  end
   test "info" do
     assert_match "] sam (unmatched)", CodeCommit.find(1).info
     assert_match "] rodney (verified)", CodeCommit.find(2).info
     assert_match "] rodney (staged)", CodeCommit.find(3).info
     assert_match "] blair (matched)", CodeCommit.find(4).info
-    assert_match "] bofh (deployed)", CodeCommit.find(5).info
+    assert_match "] sidra (deployed)", CodeCommit.find(5).info
     assert_match "] rodney (deployed)", CodeCommit.find(6).info
   end
   test "support identity existing" do
@@ -46,7 +77,7 @@ class CodeCommitTest < ActiveSupport::TestCase
     assert ticket.unowned?
     commit = CodeCommit.find(1)
     assert commit.unmatched?
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert ticket.commit!(commit.id)
     assert commit.reload.matched?
     assert_equal ticket, commit.code_ticket
@@ -60,7 +91,7 @@ class CodeCommitTest < ActiveSupport::TestCase
     assert_equal [1], CodeCommit.filter(:owned_by_support_identity => "sam", :status => "all").ids
     assert_equal [4], CodeCommit.filter(:owned_by_support_identity => "blair", :status => "all").ids
     assert_equal [6, 3, 2], CodeCommit.filter(:owned_by_support_identity => "rodney", :status => "all").ids
-    assert_equal [5], CodeCommit.filter(:owned_by_support_identity => "bofh", :status => "all").ids
+    assert_equal [5], CodeCommit.filter(:owned_by_support_identity => "sidra", :status => "all").ids
   end
   test "filter by nonexistent status" do
     assert_raise(TypeError) { CodeCommit.filter(:status => "unknown") }

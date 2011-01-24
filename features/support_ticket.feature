@@ -24,7 +24,7 @@ Scenario: guests can create a support ticket with a valid email address which is
     And I should see "Archive is very slow"
   But I should not see "guest@ao3.org"
     And I should not see "my user name"
-  When I am logged in as "bofh"
+  When I am logged in as "sidra"
     And I am on the page for support ticket 1
   Then I should not see "guest@ao3.org"
 
@@ -36,7 +36,7 @@ Scenario: guests can create a support ticket with initial details. the byline fo
     And I fill in "Details" with "For example, it took a minute for this page to render"
   When I press "Create Support ticket"
     And I should see "ticket owner wrote: For example"
-  When I am logged in as "bofh"
+  When I am logged in as "sidra"
     And I am on the page for the last support ticket
     Then I should see "ticket owner wrote: For example"
 

@@ -43,8 +43,8 @@ class FaqTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     assert_equal false, User.current_user.support_admin?
     assert_raise(SecurityError) { faq.post! }
-    bofh = User.find_by_login("bofh")
-    User.current_user = bofh
+    sidra = User.find_by_login("sidra")
+    User.current_user = sidra
     assert faq.post!
     assert_equal "faq", faq.status
     assert_equal %Q{rfc -> faq}, faq.faq_details.last.content
@@ -162,7 +162,7 @@ class FaqTest < ActiveSupport::TestCase
     assert_raise(RuntimeError) { faq.comment!("something") }
     User.current_user = User.find_by_login("sam")
     assert_raise(RuntimeError) { faq.comment!("something") }
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert_raise(RuntimeError) { faq.comment!("something") }
   end
 end

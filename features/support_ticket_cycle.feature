@@ -89,25 +89,25 @@ Scenario: users cannot comment on owned tickets.
   And I should not see "Details"
 
 Scenario: admin's can mark open tickets admin resolved
-  When I am logged in as "bofh"
+  When I am logged in as "sidra"
     And I am on the support page
     And I follow "Support Tickets"
     And I follow "Support Ticket #1"
     And I fill in "Resolution" with "no longer an issue"
   When I press "Resolve"
-  Then I should see "Status: closed by bofh"
+  Then I should see "Status: closed by sidra"
 
 Scenario: admin's can mark an admin ticket admin resolved
   When I am logged in as "sam"
     And I go to the page for support ticket 1
     And I press "Needs admin attention"
-  When I am logged in as "bofh"
+  When I am logged in as "sidra"
     And I am on the support page
     And I follow "waiting on admin"
     And I follow "Support Ticket #1"
     And I fill in "Resolution" with "resent activation code"
   When I press "Resolve"
-  Then I should see "Status: closed by bofh"
+  Then I should see "Status: closed by sidra"
   When I am on the support page
     And I follow "waiting on admin"
   Then I should not see "Support Ticket #1 some problem"
@@ -173,14 +173,15 @@ Scenario: volunteers can (un)link a support ticket to an existing code ticket
   When I follow "Support Board"
     And I follow "Support Tickets"
     And I follow "Support Ticket #1"
-    And I select "1" from "Code Ticket"
+    And I select "fix the roof"
     And I press "Needs this fix"
+  Then I should see "[waiting for a code fix fix the roof]"
   Then 1 emails should be delivered to "guest@ao3.org"
   When I am on the page for code ticket 1
   Then I should see "Votes: 3"
     And I should see "Related Support tickets"
   When I follow "1"
-  Then I should see "Status: waiting for a code fix Code Ticket #1"
+  Then I should see "[waiting for a code fix fix the roof]"
   When I follow "Support Board"
     And I follow "Support Tickets"
     And I select "waiting" from "Status"

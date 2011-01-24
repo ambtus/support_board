@@ -6,7 +6,7 @@ Scenario: guests can't access private tickets even with a direct link.
     And I should not see "a personal problem"
 
 Scenario: support admins (only - privacy issues) can see the authenticity_token, browser agent and originating IP
-  When I am logged in as "bofh"
+  When I am logged in as "sidra"
     And I am on the page for support ticket 1
   Then I should see "some problem"
     And I should see "authenticity token: 123456"
@@ -267,6 +267,7 @@ Scenario: links to code tickets they're watching, private
 
 
 # TODO
+Scenario: the referring url should be private if the ticket is anonymous, and not if it's not
 Scenario: guests and users should not be able to see private details (support, code or faq)
 Scenario: guests and users should not receive notifications when private details are added (support, code or faq)
 Scenario: guest and user notifications should not include private details (support, code or faq)

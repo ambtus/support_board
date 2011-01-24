@@ -1,7 +1,7 @@
 <%= form_for(@ticket) do |t| %>
   <p><%= t.check_box :turn_off_notifications %> <%= t.label :turn_off_notifications, "Don't send me email notifications about this ticket" %></p>
   <p><%= t.text_field :summary, :size => 100 %> <%= t.label :summary %></p>
-  <p><%= text_area_tag :content, nil, :size => "72x10" %> <%= label_tag :content %></p>
+  <p><%= text_area_tag :details, nil, :size => "72x10" %> <%= label_tag :details %></p>
   <p><%= t.text_field :url, :size => 100 %> <%= t.label :url %></p>
   <p><%= t.text_field :browser, :size => 100 %> <%= t.label :browser %></p>
   <p><%= t.submit %></p>

@@ -1,0 +1,11 @@
+<%= form_for @user do %>
+    <%= text_field_tag :login, nil, :size => 10 %> <%= label_tag :login, "Login (mandatory. visible)" %>
+    <br \>
+    <%= text_field_tag :email, nil, :size => 30 %> <%= label_tag :email, "Email (mandatory. not visible)" %>
+    <p><%= check_box_tag :volunteer %> <%= label_tag :volunteer %>
+    <%= check_box_tag :admin %> <%= label_tag :admin %></p>
+  <p><%= submit_tag %></p>
+<% end %>
+<p>Your password will be "secret" and your login will show up on the front page.
+<p>you will get notifications at the email address entered for any tickets or faqs you are watching.
+

@@ -17,4 +17,14 @@ class ReleaseNote < ActiveRecord::Base
     raise "Couldn't deploy. Not logged in as support admin." unless User.current_user.support_admin?
     self.update_attribute(:posted, true)
   end
+
+  # SANITIZER stuff
+
+  attr_protected :content_sanitizer_version
+  def sanitized_content
+    # FIXME add sanitizer library and change sanitized_summary to summary in views
+    #sanitize_field self, :content
+    content.html_safe
+  end
+
 end

@@ -16,9 +16,12 @@
 <%= form_for(@ticket) do %>
   <% if @add_details %>
     <%= text_area_tag :content, nil, :size => "72x10" %>
+    <p><%= radio_button_tag :response, 'official', true %><%= label_tag :response_official, 'official' %>
     <% if @ticket.unowned? %>
-      <p><%= label_tag :unofficial, "Unofficial response?" %> <%= check_box_tag :unofficial %></p>
+      <%= radio_button_tag :response, 'unofficial', false %><%= label_tag :response_unofficial, 'unofficial' %>
     <% end %>
+      <%= radio_button_tag :response, 'private', false %><%= label_tag :response_private, 'private' %>
+    </p>
     <p><%= submit_tag "Add details" %></p>
   <% end %>
   <p>
@@ -49,12 +52,12 @@
     <% end %>
     <% if @ticket.current_state.events.include?(:commit) %>
       <%= select_tag :code_commit_id, "<option></option>".html_safe +
-                     options_from_collection_for_select(CodeCommit.unmatched, "id", "name") %>
+                     options_from_collection_for_select(CodeCommit.unmatched, "id", "summary") %>
       <%= submit_tag "Commit" %>
     <% end %>
     <% if @ticket.current_state.events.include?(:duplicate) %>
       <%= select_tag :code_ticket_id, "<option></option>".html_safe +
-                     options_from_collection_for_select(CodeTicket.not_closed, "id", "name") %>
+                     options_from_collection_for_select(CodeTicket.not_closed, "id", "summary") %>
       <%= submit_tag "Dupe" %>
     <% end %>
     <% if @ticket.current_state.events.include?(:verify) %>

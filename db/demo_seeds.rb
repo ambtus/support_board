@@ -28,9 +28,9 @@ blair.support_volunteer = "1"
 
 # support admin
 rodney.support_admin = "1"
-bofh = User.create!(:login => "bofh", :email => "bofh@ao3.org",
+sidra = User.create!(:login => "sidra", :email => "sidra@ao3.org",
   :password => "secret", :password_confirmation => "secret")
-bofh.support_admin = "1"
+sidra.support_admin = "1"
 
 # code tickets
 User.current_user = sam
@@ -47,7 +47,7 @@ User.current_user = rodney
 ct2.vote!
 User.current_user = jim
 ct2.vote!
-User.current_user = bofh
+User.current_user = sidra
 ct2.vote!
 
 User.current_user = rodney
@@ -55,7 +55,7 @@ ct3 = CodeTicket.create!(:summary => "repeal DADT")
 ct3.take!
 CodeCommit.create!(:author => "rodney", :message => "finally closes issue 3", :pushed_at => Time.now)
 ct3.reload.stage!
-User.current_user = bofh
+User.current_user = sidra
 ct3.verify!
 User.current_user = rodney
 ct3.vote!
@@ -70,13 +70,13 @@ User.current_user = john
 ct4.comment!("haven't you started this yet?")
 User.current_user = rodney
 ct4.take!
-User.current_user = bofh
-ct4.comment!("rodney, get the lead out!", true, true)
+User.current_user = sidra
+ct4.comment!("rodney, get the lead out!", "private")
 CodeCommit.create!(:author => "rodney", :message => "issue 4. run db:migrate afterwards.", :pushed_at => Time.now)
 User.current_user = rodney
-ct4.comment!("happy now, master?", true, true)
+ct4.comment!("happy now, master?", "private")
 User.current_user = blair
-ct4.comment!("geeze guys, i don't want to know about your kinks", true, true)
+ct4.comment!("geeze guys, i don't want to know about your kinks", "private")
 User.current_user = rodney
 ct4.reload.stage!
 
@@ -88,12 +88,12 @@ User.current_user = blair
 ct5.take!
 CodeCommit.create!(:author => "blair", :message => "related to issue 5", :pushed_at => Time.now)
 
-User.current_user = bofh
+User.current_user = sidra
 ct6 = CodeTicket.create!(:summary => "create the world wide web")
 ct6.comment!("should be an easy days work")
 ct6.vote!
 ct6.take!
-CodeCommit.create!(:author => "bofh", :message => "issue 6", :pushed_at => Time.now)
+CodeCommit.create!(:author => "sidra", :message => "issue 6", :pushed_at => Time.now)
 ct6.reload.stage!
 User.current_user = rodney
 ct6.verify!
@@ -101,20 +101,21 @@ rn = ReleaseNote.create!(:release => "1.0", :content => "new in this release, th
 ct6.deploy!(rn.id)
 rn.post!
 
-User.current_user = bofh
+User.current_user = sidra
 rn2 = ReleaseNote.create!(:release => "2.0", :content => "new in this release, web 2.0!")
+rn3 = ReleaseNote.create!(:release => "2.1", :content => "minor bug fixes")
 
 # faqs
 User.current_user = sam
 faq1 = Faq.create!(:summary => "where to find salt", :content => "in the sea. or the great salt lake. possibly your salt shaker")
-User.current_user = bofh
+User.current_user = sidra
 faq1.post!
 
 User.current_user = rodney
 faq2 = Faq.create!(:summary => "why we don't have enough ZPMs", :content => "this should be self evident")
-faq2.comment!("why do i have to write this?", true, true)
+faq2.comment!("why do i have to write this?", "private")
 User.current_user = blair
-faq2.comment!("because nobody else can", true, true)
+faq2.comment!("because nobody else can", "private")
 
 User.current_user = rodney
 faq3 =Faq.create!(:summary => "what's DADT?", :content => "Ask me no questions and I'll tell you no lies")
@@ -122,10 +123,10 @@ faq3.post!
 User.current_user = nil
 faq3.vote!
 
-User.current_user = bofh
+User.current_user = sidra
 faq4 = Faq.create!(:summary => "how to recover your password", :content => "visit the lost password page")
-User.current_user = bofh
-faq4.comment!("hack the database ;)", true, true)
+User.current_user = sidra
+faq4.comment!("hack the database ;)", "private")
 faq4.post!
 User.current_user = nil
 faq4.vote!
@@ -157,12 +158,12 @@ st2 = SupportTicket.create!(
   :ip_address => "72.14.204.103"
 )
 User.current_user = sam
-st2.user_comment!("a personal problem, my ass", true, true)
+st2.user_comment!("a personal problem, my ass", "private")
 st2.spam!
 User.current_user = rodney
-st2.user_comment!("your ass is not my problem", true, true)
-User.current_user = bofh
-st2.user_comment!("cut it out, guys", true, true)
+st2.user_comment!("your ass is not my problem", "private")
+User.current_user = sidra
+st2.user_comment!("cut it out, guys", "private")
 
 User.current_user = dean
 st3 = SupportTicket.create!(
@@ -238,7 +239,7 @@ st8 = SupportTicket.create!(
   :ip_address => "71.111.1.40"
 )
 User.current_user = sam
-st8.user_comment!("don't make me come looking for you!", false)
+st8.user_comment!("don't make me come looking for you!", "unofficial")
 
 User.current_user = dean
 st9 = SupportTicket.create!(
@@ -249,7 +250,7 @@ st9 = SupportTicket.create!(
   :user_agent => "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
   :ip_address => "71.111.1.40"
 )
-User.current_user = bofh
+User.current_user = sidra
 st9.take!
 
 User.current_user = nil
@@ -288,7 +289,7 @@ st12 = SupportTicket.create!(
 User.current_user = blair
 st12.post!
 User.current_user = sam
-st12.user_comment!("and very well, too", true, false)
+st12.user_comment!("and very well, too")
 
 User.current_user = john
 st13 = SupportTicket.create!(
@@ -312,7 +313,7 @@ st14 = SupportTicket.create!(
   :ip_address => "71.111.1.40"
 )
 User.current_user = sam
-st14.user_comment!("small loss", true, true)
+st14.user_comment!("small loss", "private")
 st14.post!
 
 User.current_user = jim
@@ -339,13 +340,13 @@ st16 = SupportTicket.create!(
   :ip_address => "24.223.182.51"
 )
 User.current_user = blair
-st16.user_comment!("i bet this is jim", true, true)
+st16.user_comment!("i bet this is jim", "private")
 User.current_user = sam
-st16.user_comment!("nah, must be dean", true, true)
+st16.user_comment!("nah, must be dean", "private")
 User.current_user = rodney
-st16.user_comment!("better not be john", true, true)
-User.current_user = bofh
-st16.user_comment!("stop gossiping about the lusers and get back to work", true, true)
+st16.user_comment!("better not be john", "private")
+User.current_user = sidra
+st16.user_comment!("stop gossiping about the lusers and get back to work", "private")
 
 User.current_user = nil
 st17 = SupportTicket.create!(
@@ -373,11 +374,11 @@ st18 = SupportTicket.create!(
 User.current_user = sam
 ct7 = st18.needs_fix!
 CodeCommit.create!(:author => "rodney", :message => "partial fix for issue 7", :pushed_at => Time.now)
-User.current_user = bofh
+User.current_user = sidra
 ct7.reload.stage!
 User.current_user = blair
 ct7.verify!
-User.current_user = bofh
+User.current_user = sidra
 ct7.deploy!(rn2.id)
 rn2.post!
 
@@ -390,7 +391,7 @@ st19 = SupportTicket.create!(
   :user_agent => "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.16 (KHTML, like Gecko) Chrome/10.0.638.0 Safari/534.16",
   :ip_address => "72.14.204.103"
 )
-User.current_user = bofh
+User.current_user = sidra
 st19.resolve!("not our problem")
 
 User.current_user = john
@@ -412,10 +413,10 @@ st21 = SupportTicket.create!(
   :ip_address => "71.111.1.40"
 )
 User.current_user = blair
-st21.user_comment!("i thought he was leaving fandom forever", true, true)
+st21.user_comment!("i thought he was leaving fandom forever", "private")
 st21.needs_admin!
 User.current_user = sam
-st21.user_comment!("forever is a long time", true, true)
+st21.user_comment!("forever is a long time", "private")
 
 User.current_user = nil
 st22 = SupportTicket.create!(

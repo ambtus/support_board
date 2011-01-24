@@ -20,19 +20,19 @@ class CodeTicketFilterTest < ActiveSupport::TestCase
   end
   test "comments_by_support_identity of a volunteer by a non-volunteer" do
     # does not include private comments or system logs, but includes both official and non-official comments
-    assert_equal [6], CodeTicket.filter(:comments_by_support_identity => "bofh", :status => "all").ids
+    assert_equal [6], CodeTicket.filter(:comments_by_support_identity => "sidra", :status => "all").ids
   end
   test "comments_by_support_identity of a volunteer by a volunteer" do
     # includes private comments but not system logs
     User.current_user = User.find_by_login("blair")
-    assert_equal [6, 4], CodeTicket.filter(:comments_by_support_identity => "bofh", :status => "all").ids
+    assert_equal [6, 4], CodeTicket.filter(:comments_by_support_identity => "sidra", :status => "all").ids
   end
   test "owned_by_support_identity" do
     assert_equal [5], CodeTicket.filter(:owned_by_support_identity => "blair").ids
     assert_equal [2, 8], CodeTicket.filter(:owned_by_support_identity => "sam", :status => "all", :sort_by => "oldest first").ids
     assert_equal [4], CodeTicket.filter(:owned_by_support_identity => "rodney").ids
     assert_equal [4, 6], CodeTicket.filter(:owned_by_support_identity => "rodney", :status => "all", :sort_by => "oldest first").ids
-    assert_equal [3], CodeTicket.filter(:owned_by_support_identity => "bofh").ids
+    assert_equal [3], CodeTicket.filter(:owned_by_support_identity => "sidra").ids
   end
   test "closed_in_release unknown release" do
     assert_raise(ActiveRecord::RecordNotFound) { CodeTicket.filter(:closed_in_release => 17) }
@@ -105,7 +105,7 @@ class CodeTicketFilterTest < ActiveSupport::TestCase
   end
   test "a few combinations" do
     assert_equal [7], CodeTicket.filter(:owned_by_support_identity => "blair", :status => "closed").ids
-    assert_empty CodeTicket.filter(:owned_by_support_identity => "bofh", :status => "taken")
+    assert_empty CodeTicket.filter(:owned_by_support_identity => "sidra", :status => "taken")
     assert_equal [2], CodeTicket.filter({:status => "taken", :owned_by_support_identity => "sam"}).ids
     assert_equal [7, 6, 8], CodeTicket.filter({:sort_by => "highest vote", :status => "closed"}).map(&:id) # can't use ids
   end

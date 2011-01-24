@@ -7,6 +7,7 @@
 <%= render :partial => "blurb", :locals => { :note => @release_note }  %>
 
 <% @release_note.code_tickets.each do |ticket| %>
+  <h2><%= link_to ticket.name, ticket %></h2>
   <%= render :partial => "code_tickets/blurb", :locals => { :ticket => ticket }  %>
 <% end %>
 

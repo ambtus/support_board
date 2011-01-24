@@ -8,6 +8,15 @@ class CodeCommit < ActiveRecord::Base
     "Code Commit ##{self.id}"
   end
 
+  def summary
+    return "" if self.message.blank?
+    first_line = self.message.split("\n").first
+    return first_line if first_line.size < 140
+    snip_idx = first_line.index(/\s/, 100)
+    return first_line unless snip_idx
+    first_line[0, snip_idx] + "..."
+  end
+
   def self.create_commits_from_json(payload)
     pushed_at = payload["repository"]["pushed_at"].to_time
     commits = payload["commits"]

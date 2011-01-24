@@ -146,7 +146,7 @@ class SupportTicketFilterTest < ActiveSupport::TestCase
                                               :status => "all", :owned_by_user => "jim").ids
   end
   test "owned_by_support_identity respects anonymity when filtered by user" do
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert_equal [], SupportTicket.filter(:owned_by_support_identity => "blair",
                                           :status => "all", :owned_by_user => "jim").ids
   end
@@ -165,7 +165,7 @@ class SupportTicketFilterTest < ActiveSupport::TestCase
     assert_equal [4], SupportTicket.filter({:status => "waiting", :owned_by_user => "john"}).ids
   end
   test "filtered by status respects anonymity when filtered by user" do
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     assert_equal [], SupportTicket.filter({:status => "waiting", :owned_by_user => "john"}).ids
   end
 end

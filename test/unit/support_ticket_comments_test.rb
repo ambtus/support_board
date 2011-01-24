@@ -202,7 +202,7 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     assert !ticket.anonymous?
     assert_equal 1, ticket.support_details.count
     assert_match "sam wrote", ticket.support_details.first.info
-    assert ticket.user_comment!("i'm warning you", true)
+    assert ticket.user_comment!("i'm warning you", "official")
     assert_match "sam (volunteer) wrote", ticket.support_details[1].reload.info
     assert_equal 2, ticket.support_details.count
     assert ticket.hide_username!
@@ -245,17 +245,17 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
   test "volunteers can't comment on tickets unofficially unless they're unowned" do
     User.current_user = User.find_by_login("sam")
     ticket = SupportTicket.find(2)
-    assert_raise(SecurityError) { ticket.user_comment!("spam ticket", false) }
+    assert_raise(SecurityError) { ticket.user_comment!("spam ticket", "unofficial") }
     ticket = SupportTicket.find(3)
-    assert_raise(SecurityError) { ticket.user_comment!("taken ticket", false) }
+    assert_raise(SecurityError) { ticket.user_comment!("taken ticket", "unofficial") }
     ticket = SupportTicket.find(14)
-    assert_raise(SecurityError) { ticket.user_comment!("posted ticket", false) }
+    assert_raise(SecurityError) { ticket.user_comment!("posted ticket", "unofficial") }
     ticket = SupportTicket.find(7)
-    assert_raise(SecurityError) { ticket.user_comment!("waiting ticket", false) }
+    assert_raise(SecurityError) { ticket.user_comment!("waiting ticket", "unofficial") }
     ticket = SupportTicket.find(17)
-    assert_raise(SecurityError) { ticket.user_comment!("waiting_on_admin ticket", false) }
+    assert_raise(SecurityError) { ticket.user_comment!("waiting_on_admin ticket", "unofficial") }
     ticket = SupportTicket.find(19)
-    assert_raise(SecurityError) { ticket.user_comment!("closed ticket", false) }
+    assert_raise(SecurityError) { ticket.user_comment!("closed ticket", "unofficial") }
   end
 
   # official volunteer comments
@@ -263,7 +263,7 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     ticket = SupportTicket.find(8)
     assert_equal 1, ticket.support_details.written_comments.count
-    assert ticket.user_comment!("i'm warning you", true)
+    assert ticket.user_comment!("i'm warning you", "official")
     assert_match "i'm warning you", ticket.support_details.last.content
     assert_match "sam (volunteer) wrote", ticket.support_details.last.info
     assert_equal 2, ticket.support_details.written_comments.count
@@ -287,12 +287,12 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     assert_equal 4, ticket.support_details.written_comments.count
   end
   test "volunteers can comment on posted ticket" do
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     ticket = SupportTicket.find(12)
     assert_equal 1, ticket.support_details.written_comments.count
     assert ticket.user_comment!(";)")
     assert_match ";)", ticket.support_details.last.content
-    assert_match "bofh (volunteer) wrote", ticket.support_details.last.info
+    assert_match "sidra (volunteer) wrote", ticket.support_details.last.info
     assert_equal 2, ticket.support_details.written_comments.count
   end
   test "volunteers can comment on waiting ticket" do
@@ -305,12 +305,12 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     assert_equal 1, ticket.support_details.written_comments.count
   end
   test "volunteers can comment on waiting_on_admin ticket" do
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     ticket = SupportTicket.find(21)
     assert_equal 2, ticket.support_details.written_comments.count
     assert ticket.user_comment!("64 bytes from 127.0.0.1")
     assert_match "64 bytes from 127.0.0.1", ticket.support_details.last.content
-    assert_match "bofh (volunteer) wrote", ticket.support_details.last.info
+    assert_match "sidra (volunteer) wrote", ticket.support_details.last.info
     assert_equal 3, ticket.support_details.written_comments.count
   end
   test "volunteers can comment on closed ticket" do
@@ -328,7 +328,7 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     ticket = SupportTicket.find(3)
     assert_equal 0, ticket.support_details.where(:private => true).count
-    assert ticket.user_comment!("ping", true, true)
+    assert ticket.user_comment!("ping", "private")
     assert_match "ping", ticket.support_details.last.content
     assert_match "sam (volunteer) wrote [private]", ticket.support_details.last.info
     assert_equal 1, ticket.support_details.where(:private => true).count
@@ -337,7 +337,7 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     ticket = SupportTicket.find(3)
     assert_equal 0, ticket.support_details.where(:private => true).count
-    assert ticket.user_comment!("ping", true, true)
+    assert ticket.user_comment!("ping", "private")
     assert_match "ping", ticket.support_details.last.content
     assert_match "sam (volunteer) wrote [private]", ticket.support_details.last.info
     assert_equal 1, ticket.support_details.where(:private => true).count
@@ -346,43 +346,43 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
     User.current_user = User.find_by_login("sam")
     ticket = SupportTicket.find(3)
     assert_equal 0, ticket.support_details.where(:private => true).count
-    assert ticket.user_comment!("ping", true, true)
+    assert ticket.user_comment!("ping", "private")
     assert_match "ping", ticket.support_details.last.content
     assert_match "sam (volunteer) wrote [private]", ticket.support_details.last.info
     assert_equal 1, ticket.support_details.where(:private => true).count
   end
   test "volunteers can comment privately on posted ticket" do
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     ticket = SupportTicket.find(12)
     assert_equal 0, ticket.support_details.where(:private => true).count
-    assert ticket.user_comment!("foo bar", true, true)
+    assert ticket.user_comment!("foo bar", "private")
     assert_match "foo bar", ticket.support_details.last.content
-    assert_match "bofh (volunteer) wrote [private]", ticket.support_details.last.info
+    assert_match "sidra (volunteer) wrote [private]", ticket.support_details.last.info
     assert_equal 1, ticket.support_details.where(:private => true).count
   end
   test "volunteers can comment privately on waiting ticket" do
     User.current_user = User.find_by_login("rodney")
     ticket = SupportTicket.find(4)
     assert_equal 0, ticket.support_details.where(:private => true).count
-    assert ticket.user_comment!("gay marriage next?", true, true)
+    assert ticket.user_comment!("gay marriage next?", "private")
     assert_match "gay marriage next?", ticket.support_details.last.content
     assert_match "rodney (volunteer) wrote [private]", ticket.support_details.last.info
     assert_equal 1, ticket.support_details.where(:private => true).count
   end
   test "volunteers can comment privately on waiting_on_admin ticket" do
-    User.current_user = User.find_by_login("bofh")
+    User.current_user = User.find_by_login("sidra")
     ticket = SupportTicket.find(21)
     assert_equal 2, ticket.support_details.where(:private => true).count
-    assert ticket.user_comment!("Forever Is Just A Minute Away", true, true)
+    assert ticket.user_comment!("Forever Is Just A Minute Away", "private")
     assert_match "Forever Is Just A Minute Away", ticket.support_details.last.content
-    assert_match "bofh (volunteer) wrote [private]", ticket.support_details.last.info
+    assert_match "sidra (volunteer) wrote [private]", ticket.support_details.last.info
     assert_equal 3, ticket.support_details.where(:private => true).count
   end
   test "volunteers can comment privately on closed ticket" do
     User.current_user = User.find_by_login("blair")
     ticket = SupportTicket.find(6)
     assert_equal 0, ticket.support_details.where(:private => true).count
-    assert ticket.user_comment!("anyone know who this guy is?", true, true)
+    assert ticket.user_comment!("anyone know who this guy is?", "private")
     assert_match "anyone know who this guy is?", ticket.support_details.last.content
     assert_match "blair (volunteer) wrote [private]", ticket.support_details.last.info
     assert_equal 1, ticket.support_details.where(:private => true).count

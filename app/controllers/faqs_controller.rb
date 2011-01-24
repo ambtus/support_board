@@ -61,7 +61,7 @@ class FaqsController < ApplicationController
     when "Reopen for comments"
       @faq.open_for_comments!(params[:reason])
     when "Add details"
-      @faq.comment!(params[:content], params[:official], params[:private], session[:authentication_code])
+      @faq.comment!(params[:content], params[:response], session[:authentication_code])
     when "Watch this FAQ"
       @faq.watch!(session[:authentication_code])
     when "Don't watch this FAQ"
