@@ -1,27 +1,16 @@
-Feature: support tickets have privacy concerns
+Feature: privacy related scenarios
 
 Scenario: guests can't access private tickets even with a direct link.
   When I am on the page for support ticket 2
   Then I should see "Sorry, you don't have permission"
     And I should not see "a personal problem"
 
-Scenario: support admins (only - privacy issues) can see the authenticity_token, browser agent and originating IP
+Scenario: support admins (only - privacy issues) can see the authenticity_token, and originating IP
   When I am logged in as "sidra"
     And I am on the page for support ticket 1
   Then I should see "some problem"
-    And I should see "authenticity token: 123456"
-    And I should see "user agent: Mozilla/5.0"
+    And I should see "authenticity token: OogoGee7oosheeciogie"
     And I should see "remote IP: 72.14.204.103"
-
-Scenario: guests can't make their private support tickets public
-  Given I am on the home page
-  When I follow "Open a New Support Ticket"
-  When I fill in "Email" with "guest@ao3.org"
-    And I fill in "Summary" with "Archive is very slow"
-    And I check "Private"
-  When I press "Create Support ticket"
-  Then I should see "Access: Private"
-    But I should not see "Ticket will only be visible"
 
 Scenario: guests can make their public support tickets private, even to users who already commented who should no longer get email
   When "jim" watches support ticket 1
@@ -45,10 +34,10 @@ Scenario: email to others shouldn't include the authorization
     And I press "Watch this ticket"
   When I am logged out
     And "sam" comments on support ticket 1
+  Then 1 email should be delivered to "guest@ao3.org"
+    And the email should contain "authentication_code"
   Then 1 email should be delivered to "jim@ao3.org"
-  When I click the first link in the email
-  Then I should see "sam (volunteer) wrote"
-    But I should not see "Ticket will only be visible"
+    And the email should not contain "authentication_code"
 
 Scenario: users can't access private tickets
   Given I am logged in as "dean"
@@ -99,57 +88,56 @@ Scenario: links to code tickets a user is watching are private
 Scenario: users can hide their name after creation
   Given I am logged in as "dean"
   And I am on the page for support ticket 3
-  Then I should see "User: dean"
+  Then I should see "(dean)"
     And I should see "dean wrote: and the holy water"
   When I press "Hide my user name"
-  Then I should not see "User: dean"
+  Then I should not see "(dean)"
     And I should see "ticket owner wrote: and the holy water"
 
 Scenario: users can unhide their name after creation
-  Given I am logged in as "sam"
-  And I am on the page for support ticket 8
-  Then I should not see "User: sam"
-    And I should see "ticket owner wrote: don't make me come looking for you!"
+  Given I am logged in as "john"
+  And I am on the page for support ticket 4
+  Then I should not see "(john)"
+    And I should see "ticket owner wrote: the sooner the better"
   When I press "Display my user name"
-  Then I should see "User: sam"
-    And I should see "sam wrote: don't make me come looking for you!"
+  Then I should see "(john [Private])"
+    And I should see "john wrote: the sooner the better"
 
 Scenario: user's tickets should be available by filtering, respecting private and show user name settings
   Given I am logged out
     And I am on the support page
     And I follow "Support Tickets"
-  Then I should see "Support Ticket #1 [unowned]"
-    And I should see "Support Ticket #3 [taken]"
-    And I should see "Support Ticket #7 [waiting]"
-    And I should see "Support Ticket #8 [unowned]"
-    And I should see "Support Ticket #9 [taken]"
-    And I should see "Support Ticket #18 [waiting]"
-    And I should see "Support Ticket #20 [unowned]"
-    And I should see "Support Ticket #21 [waiting_on_admin]"
+  Then I should see "Support Ticket #1 some problem (a guest) [open]"
+    And I should see "Support Ticket #3 where's the salt? (dean) [taken by sam]"
+    And I should see "Support Ticket #7 where can I find a guide (a user) [waiting for a code fix find a sentinel]"
+    And I should see "Support Ticket #8 where are you, dean? (sam) [open]"
+    And I should see "Support Ticket #9 where are you, castiel? (a user) [taken by sidra]"
+    And I should see "Support Ticket #21 please give me volunteer status (dean) [waiting for an admin]"
+  # shouldn't see private tickets
   But I should not see "Support Ticket #4"
     And I should not see "Support Ticket #16"
 
   When I fill in "Opened by" with "john"
     And I press "Filter"
-  Then I should see "0 Tickets found"
+  Then I should see "0 Found"
   When I fill in "Opened by" with "dean"
     And I press "Filter"
-  Then I should see "2 Tickets found"
+  Then I should see "2 Found"
     And I should see "Support Ticket #3"
     And I should see "Support Ticket #21"
   When I fill in "Opened by" with "jim"
     And I press "Filter"
-  Then I should see "0 Tickets found"
+  Then I should see "0 Found"
 
   Given I am logged in as "jim"
     And I am on the support page
     And I follow "Support Tickets"
   When I fill in "Opened by" with "john"
     And I press "Filter"
-  Then I should see "0 Tickets found"
+  Then I should see "0 Found"
   When I fill in "Opened by" with "jim"
     And I press "Filter"
-  Then I should see "2 Tickets found"
+  Then I should see "2 Found"
     And I should see "Support Ticket #7"
     And I should see "Support Ticket #16"
 
@@ -158,10 +146,10 @@ Scenario: user's tickets should be available by filtering, respecting private an
     And I follow "Support Tickets"
   When I fill in "Opened by" with "jim"
     And I press "Filter"
-  Then I should see "0 Tickets found"
+  Then I should see "0 Found"
   When I fill in "Opened by" with "dean"
     And I press "Filter"
-  Then I should see "3 Tickets found"
+  Then I should see "3 Found"
     And I should see "Support Ticket #3"
     And I should see "Support Ticket #9"
     And I should see "Support Ticket #21"
@@ -179,70 +167,58 @@ Scenario: user's tickets should be available by filtering, respecting private an
 
   When I fill in "Opened by" with "john"
     And I press "Filter"
-  Then I should see "0 Tickets found"
+  Then I should see "0 Found"
   When I fill in "Opened by" with "dean"
     And I press "Filter"
-  Then I should see "2 Tickets found"
+  Then I should see "2 Found"
     And I should see "Support Ticket #3"
     And I should see "Support Ticket #21"
   When I fill in "Opened by" with "jim"
     And I press "Filter"
-  Then I should see "0 Tickets found"
+  Then I should see "0 Found"
 
 Scenario: support board volunteers can access and take private tickets
   Given I am logged in as "blair"
   When I follow "Support Board"
     And I follow "Support Tickets"
     And I follow "Support Ticket #16"
-  Then I should see "Details"
+    Then I should see "Private"
   When I press "Take"
-  Then I should see "Status: taken by blair"
-    And I should see "Access: Private"
+  Then I should see "taken by blair"
 
-Scenario: support board volunteers can make tickets private, but not public again
+Scenario: support board volunteers can make tickets private
   When I am logged in as "blair"
     And I am on the page for support ticket 1
   Then I should see "Ticket will only be visible to"
     And I press "Make private"
-  Then I should see "Access: Private"
-    And I should not see "Ticket will only be visible to"
-
-Scenario: private user support tickets can't be made public by volunteers
-  When I am logged in as "blair"
-    And I am on the page for support ticket 5
-  Then I should see "Access: Private"
-    And I should not see "Ticket will only be visible to"
+  Then I should see "Private"
 
 Scenario: visibility on the comment board
   # logged out
   When I am logged out
     And I follow "Support Board"
     And I follow "Comments"
-  Then I should not see "Support Ticket #"
-    And I should not see "happy@ao3.org"
+  Then I should not see "happy@ao3.org"
     And I should not see "newbie"
     And I should not see "john"
     And I should not see "thanks for fixing it"
     And I should not see "thank you for helping"
-  But I should see "#10 A guest wrote: You guys rock!"
-    And I should see "#12 A user wrote: you guys suck!"
-    And I should see "#14 dean wrote: I'm leaving fandom forever!"
-  When I follow "#12"
-    Then I should not see "Details"
+  But I should see "#10 (a guest) You guys rock!"
+    And I should see "#12 (a user) you guys suck!"
+    And I should see "#14 (dean) I'm leaving fandom forever!"
 
   # logged in as support volunteer can see private comments
   When I am logged in as "sam"
     And I follow "Support Board"
     And I follow "Comments"
-  Then I should not see "Support Ticket #"
-    And I should not see "happy@ao3.org"
+  Then I should not see "happy@ao3.org"
     And I should not see "newbie"
-  But I should see "#10 A guest wrote: You guys rock!"
-    And I should see "#11 A guest wrote: thanks for fixing it"
-    And I should see "#12 A user wrote: you guys suck!"
-    And I should see "#13 A user wrote: I like the archive"
-    And I should see "#14 dean wrote: I'm leaving fandom forever!"
-    And I should see "#15 jim wrote: thank you for helping"
+  But I should see "#10 (a guest) You guys rock!"
+    And I should see "#11 (a guest [Private]) thanks for fixing it"
+    And I should see "#12 (a user) you guys suck!"
+    And I should see "#13 (a user [Private]) I like the archive"
+    And I should see "#14 (dean) I'm leaving fandom forever!"
+    And I should see "#15 (jim [Private]) thank you for helping"
 
 Scenario: support volunteers (only - possible privacy issues) can see the referring URL
   When I am on the page for support ticket 8
@@ -252,6 +228,18 @@ Scenario: support volunteers (only - possible privacy issues) can see the referr
     And I am on the page for support ticket 8
   Then I should see "where are you, dean?"
     And I should see "referring url: /users/dean"
+
+Scenario: support volunteers can't see the referring URL for anonymous tickets
+  When I am logged in as "blair"
+  When I am on the page for support ticket 4
+  Then I should see "repeal DADT"
+    But I should not see "referring url: /faqs/3"
+  When I am logged in as "john"
+    And I am on the page for support ticket 4
+    And I press "Display my user name"
+  When I am logged in as "blair"
+    And I am on the page for support ticket 4
+    Then I should see "referring url: /faqs/3"
 
 Scenario: links to code tickets they're watching, private
   Given "jim" watches code ticket 1

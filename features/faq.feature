@@ -170,7 +170,7 @@ Scenario: users reading a posted FAQ can mark it as "this answered my question" 
 Scenario: users can remove a link to a draft FAQ if they don't think it resolves their ticket. also removes the vote.
   Given I am logged in as "jim"
   And I am on the page for support ticket 6
-  Then I should see "what's wrong with me? [answered by FAQ what's a sentinel?]"
+  Then I should see "[answered by FAQ what's a sentinel?]"
   When I fill in "Reason" with "I am not a freak!"
     And I press "Reopen"
   Then I should see "[open]"
@@ -199,8 +199,6 @@ Scenario: users can remove a link to a posted FAQ if they don't think it resolve
   Then I should see "4 votes"
 
 
-# TODO
-Scenario: volunteers can send email to an admin asking them to post a faq
 
 # TODO
 Scenario: faqs can be translated

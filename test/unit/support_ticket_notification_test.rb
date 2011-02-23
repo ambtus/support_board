@@ -2,16 +2,26 @@ require 'test_helper'
 
 class SupportTicketNotificationTest < ActiveSupport::TestCase
   test "a guest ticket with default owner notifications" do
-    # FIXME
+    assert ticket = SupportTicket.create!(:summary => "something short", :email => "guest@ao3.org")
+    assert_nil ticket.user
+    assert_equal ["guest@ao3.org"], ticket.mail_to
   end
   test "a user ticket with default owner notifications" do
-    # FIXME
+    dean = User.find_by_login("dean")
+    User.current_user = dean
+    assert ticket = SupportTicket.create!(:summary => "something short")
+    assert_equal ["dean@ao3.org"], ticket.mail_to
   end
   test "create a guest ticket without notifications" do
-    # FIXME
+    assert ticket = SupportTicket.create!(:summary => "something short", :email => "guest@ao3.org", :turn_off_notifications => "1")
+    assert_nil ticket.user
+    assert_equal [], ticket.mail_to
   end
   test "create a user ticket without notifications" do
-    # FIXME
+    dean = User.find_by_login("dean")
+    User.current_user = dean
+    assert ticket = SupportTicket.create!(:summary => "something short", :turn_off_notifications => "1")
+    assert_equal [], ticket.mail_to
   end
   test "watch guest ticket" do
     ticket = SupportTicket.find(1)

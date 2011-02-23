@@ -16,7 +16,7 @@ class SupportTicketMailer < ActionMailer::Base
 
   def update_notification(ticket, recipient)
     @ticket = ticket
-    if @ticket.authentication_code && recipient == ticket.email
+    if ticket.guest_ticket? && recipient == ticket.email
       @url = support_ticket_url(@ticket, :authentication_code => @ticket.authentication_code)
     else
       @url = support_ticket_url(@ticket)
@@ -38,7 +38,6 @@ class SupportTicketMailer < ActionMailer::Base
   def steal_notification(ticket, stealer)
     @ticket = ticket
     @stealer = stealer
-    @url = support_ticket_url(@ticket)
     mail(
       :to => @ticket.support_identity.user.email,
       :subject => "[AO3] Stolen #{ticket.name}"
@@ -47,7 +46,6 @@ class SupportTicketMailer < ActionMailer::Base
 
   def request_to_take(ticket, user, requestor)
     @ticket = ticket
-    @url = support_ticket_url(@ticket)
     @requestor = requestor
     @user = user
     mail(

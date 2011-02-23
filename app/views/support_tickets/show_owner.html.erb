@@ -2,15 +2,19 @@
   <%= link_to "view ticket as support volunteer", support_ticket_path(@ticket, :support => true) %>
 <% end %>
 
+<h1><%= @ticket.name %></h1>
 <%= render "show" %>
 
 <%= form_for(@ticket) do %>
   <%= hidden_field_tag :authentication_code, session[:authentication_code] %>
-  <%= hidden_field_tag :email, @ticket.email %>
   <% if @add_details %>
     <p><%= text_area_tag :content, nil, :size => "72x10" %></p>
     <% if current_user.try(:support_volunteer?) %>
-      <p><%= check_box_tag :official, true, true %> <%= label_tag :official, "Official details?" %></p>
+      <p>
+      <%= radio_button_tag :response, 'official', false %><%= label_tag :response_official, 'official' %>
+      <%= radio_button_tag :response, 'unofficial', true %><%= label_tag :response_unofficial, 'unofficial' %>
+      <%= radio_button_tag :response, 'private', false %><%= label_tag :response_private, 'private (and official)' %>
+    </p>
     <% end %>
     <p><%= submit_tag "Add details" %></p>
   <% end %>

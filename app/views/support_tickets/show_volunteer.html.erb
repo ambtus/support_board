@@ -2,28 +2,27 @@
   <%= link_to "view ticket as owner", support_ticket_path(@ticket) %>
 <% end %>
 
+<h1><%= @ticket.name %></h1>
 <% if current_user.support_admin? %>
-    <dt>authenticity token:</dt>
-      <dd><%= @ticket.authenticity_token %></dd>
-    <dt>remote IP:</dt>
-      <dd><%= @ticket.ip_address %></dd>
-    <dt>user agent:</dt>
-      <dd><%= @ticket.browser_hash %></dd>
-    <dt>referring url:</dt>
-      <dd><%= link_to @ticket.url, @ticket.url %></dd>
-  </dl>
+  <p>authenticity token: <%= @ticket.authenticity_token %></p>
+  <p>remote IP: <%= @ticket.ip_address %></p>
 <% end %>
+<% unless @ticket.anonymous? %>
+  <p>referring url: <%= link_to @ticket.url, @ticket.url %></p>
+<% end %>
+<p>user agent: <%= @ticket.browser_string %></p>
 
 <%= render "show" %>
 
 <%= form_for(@ticket) do %>
   <% if @add_details %>
     <p><%= text_area_tag :content, nil, :size => "72x10" %></p>
+    <p><%= radio_button_tag :response, 'official', true %><%= label_tag :response_official, 'official' %>
     <% if @ticket.unowned? %>
-      <p><%= check_box_tag :official, true, true %> <%= label_tag :official, "Official details?" %></p>
-    <% else %>
-      <%= hidden_field_tag :official, true %>
+      <%= radio_button_tag :response, 'unofficial', false %><%= label_tag :response_unofficial, 'unofficial' %>
     <% end %>
+      <%= radio_button_tag :response, 'private', false %><%= label_tag :response_private, 'private' %>
+    </p>
     <p><%= submit_tag "Add details" %></p>
   <% end %>
   <p>
@@ -66,7 +65,7 @@
     <% if @ticket.stealable? %>
       <%= submit_tag "Steal" %>
     <% end %>
-    <% if [:unowned, :taken].include?(@ticket.current_state) %>
+    <% if [:unowned, :taken].include?(@ticket.current_state.name) %>
       <%= select_tag :support_identity_id,
                    options_from_collection_for_select(SupportIdentity.official, "id", "name") %>
       <%= submit_tag "Send request to take" %>
@@ -82,6 +81,6 @@
     <p><%= select_tag :faq_id,
                    options_from_collection_for_select(Faq.all, "id", "sanitized_summary") %>
     <%= submit_tag "Answered by this FAQ" %>
-    <%= submit_tag "Create new FAQ" %></p>
+    <%= link_to "Create new FAQ", new_faq_path %></p>
   <% end %>
 <% end %>

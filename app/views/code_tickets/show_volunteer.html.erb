@@ -20,7 +20,7 @@
     <% if @ticket.unowned? %>
       <%= radio_button_tag :response, 'unofficial', false %><%= label_tag :response_unofficial, 'unofficial' %>
     <% end %>
-      <%= radio_button_tag :response, 'private', false %><%= label_tag :response_private, 'private' %>
+      <%= radio_button_tag :response, 'private', false %><%= label_tag :response_private, 'private (and official)' %>
     </p>
     <p><%= submit_tag "Add details" %></p>
   <% end %>

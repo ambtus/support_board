@@ -26,13 +26,14 @@ class Faq < ActiveRecord::Base
   after_create :add_default_watchers
   def add_default_watchers
     # on create, add owner to the notifications unless indicated otherwise
-    self.watch! if turn_off_notifications.blank?
+    self.watch! unless turn_off_notifications == "1"
 
     # TODO make default groups. e.g. support, that people can add and remove themselves to
     # so that when faqs are created the notifications are populated with these groups.
     # when someone is added to that group, add them to all tickets
     # this allows people to remove themselves from individual tickets if they usually watch all
     # and add themselves to individual tickets if they usually don't watch all
+    self.send_create_notifications
   end
 
   ### HELPER METHODS
@@ -188,6 +189,11 @@ class Faq < ActiveRecord::Base
 
   ### SEND NOTIFICATIONS
 
+  def send_create_notifications
+    self.mail_to.each do |recipient|
+      FaqMailer.create_notification(self, recipient).deliver
+    end
+  end
   def send_update_notifications(private = false)
     self.mail_to(private).each do |recipient|
       FaqMailer.update_notification(self, recipient).deliver

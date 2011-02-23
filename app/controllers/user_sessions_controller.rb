@@ -11,6 +11,7 @@ class UserSessionsController < ApplicationController
     else
       # reset user session so errors don't indicate where the problem is
       @user_session = UserSession.new(params[:user_session])
+      flash[:error] = "Sorry"
       render :new
     end
   end

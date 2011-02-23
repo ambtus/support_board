@@ -1,7 +1,5 @@
 Feature: email notifications
 
-# TODO don't send notifications when create a new faq until the faq has been saved...
-
 Scenario: guests should receive email notification on creation
   Given I am on the home page
   When I follow "Open a New Support Ticket"
@@ -12,9 +10,12 @@ Scenario: guests should receive email notification on creation
 
 Scenario: guests email notifications should have a link with authentication code
   When "dean" comments on support ticket 1
+  And I am logged out
   Then 1 email should be delivered to "guest@ao3.org"
   When I click the first link in the email
-  Then I should see "Details:"
+    And I fill in "content" with "i have more information"
+    And I press "Add details"
+  Then I should see "ticket owner wrote: i have more information"
 
 Scenario: guests can toggle notifications for individual tickets
   When I am on the home page
@@ -23,7 +24,8 @@ Scenario: guests can toggle notifications for individual tickets
     And I press "Send me access links to my support tickets"
   Then 1 email should be delivered to "guest@ao3.org"
     And all emails have been delivered
-  When I click the first link in the email
+  When I am logged out
+    And I click the first link in the email
     And I press "Don't watch this ticket"
     And "sam" comments on support ticket 1
   Then 0 emails should be delivered to "guest@ao3.org"
@@ -44,11 +46,11 @@ Scenario: users can (un)monitor public tickets
   When "sam" comments on support ticket 1
   Then 0 emails should be delivered to "dean@ao3.org"
 
-Scenario: users should receive 1 initial notification
+Scenario: users should receive only 1 initial notification even with an initial detail
   Given I am logged in as "dean"
   When I follow "Open a New Support Ticket"
   When I fill in "Summary" with "Archive is very slow"
-    And I fill in "Details" with "For example, this page took forever to load"
+    And I fill in "content" with "For example, this page took forever to load"
     And I press "Create Support ticket"
   Then 1 email should be delivered to "dean@ao3.org"
 
@@ -80,7 +82,7 @@ Scenario: users can create support tickets with no notifications
 Scenario: users can turn notifications on and off their own tickets. change in notifications shouldn't trigger email.
   When I am logged in as "dean"
   And I am on the page for support ticket 3
-    And I fill in "Details" with "sam, are you around?"
+    And I fill in "content" with "sam, are you around?"
     And I press "Add details"
   Then I should see "dean wrote: sam, are you around?"
     And 1 email should be delivered to "dean@ao3.org"
@@ -99,16 +101,19 @@ Scenario: users can turn notifications on and off their own tickets. change in n
 Scenario: volunteers can send email to another volunteer asking them to take a ticket
   When I am logged in as "blair"
     And I am on the page for support ticket 1
-    Then I should see "Status: open"
-  When I select "sam" from "Support Volunteers"
+    Then I should see "[open]"
+  When I select "sam" from "support_identity_id"
     And I press "Send request to take"
   Then 1 email should be delivered to "sam@ao3.org"
     And the email should contain "Please consider taking"
     And the email should contain "Support Ticket #1"
-    And the email should contain "Thank you, blair"
+    And the email should contain "Thank you,<br />\nblair"
   When I click the first link in the email
-  Then I should see "Status: open"
+  Then I should see "[open]"
     And I should see "some problem"
+
+# TODO
+Scenario: volunteers can send email to an admin asking them to post a faq
 
 Scenario: users can (un)monitor open code tickets
   Given I am logged in as "jim"
@@ -150,7 +155,7 @@ Scenario: volunteers can steel a code ticket
     And I follow "Open Code Tickets"
     And I follow "Code Ticket #2"
   When I press "Steal"
-    Then I should see "Status: taken by blair"
+    Then I should see "[taken by blair]"
   And 1 email should be delivered to "sam@ao3.org"
     And the email should contain "has been stolen by"
     And the email should contain "blair"
@@ -166,7 +171,7 @@ Scenario: volunteers can mark a support ticket spam/ham, which doesn't send noti
     And I follow "spam"
     And I follow "Support Ticket #1"
     And I press "Mark as ham"
-  Then I should see "Status: open"
+  Then I should see "[open]"
     And 0 emails should be delivered to "guest@ao3.org"
   When I follow "Support Board"
     And I follow "spam"

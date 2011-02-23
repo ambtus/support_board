@@ -1,4 +1,56 @@
-Feature: code tickets life cycle
+Feature: code tickets
+
+### code ticket index
+
+Scenario: can see all open code tickets
+  When I am on the home page
+  When I follow "Support Board"
+    And I follow "Open Code Tickets (Known Issues)"
+  Then I should see "Code Ticket #5 find a sentinel [committed by blair] (2 votes)"
+    And I should see "Code Ticket #4 build a zpm [waiting for verification (commited by rodney)] (0 votes)"
+    And I should see "Code Ticket #3 repeal DADT [verified by sidra] (5 votes)"
+    And I should see "Code Ticket #2 save the world [taken by sam] (4 votes)"
+    And I should see "Code Ticket #1 fix the roof [open] (1 votes)"
+  But I should not see "Code Ticket #6"
+    And I should not see "Code Ticket #7"
+    And I should not see "Code Ticket #8"
+
+Scenario: code tickets can be sorted by votes
+  When I am on the home page
+    And I follow "Support Board"
+    And I follow "Open Code Tickets (Known Issues)"
+  Then I should see "Code Ticket #5" within "#0"
+  When I select "highest vote" from "Sort by"
+    And I press "Filter"
+  Then I should see "Code Ticket #3" within "#0"
+
+Scenario: can find code tickets a user has commented on
+  When I am on the home page
+    And I follow "Support Board"
+    And I follow "Open Code Tickets"
+    And I fill in "With comments by" with "jim"
+    And I press "Filter"
+  Then I should not see "Code Ticket #4"
+    And I follow "Code Ticket #5"
+  Then I should see "jim wrote: what's a sentinel?"
+
+Scenario: can't find code tickets a user has commented on without a user
+  When I am on the home page
+    And I follow "Support Board"
+    And I follow "Code Tickets"
+    And I fill in "With comments by" with "nobody"
+    And I press "Filter"
+  Then I should see "Please check your spelling"
+
+Scenario: link to code tickets they've commented on, public
+  Given "jim" comments on code ticket 1
+  When I am on the support page
+    And I follow "Open Code Tickets"
+    And I fill in "With comments by" with "jim"
+    And I press "Filter"
+  Then I should see "Code Ticket #1"
+    And I should see "Code Ticket #5"
+    But I should not see "Code Ticket #2"
 
 ### new code ticket
 
@@ -55,6 +107,10 @@ Scenario: volunteers can create a new code ticket directly off of a non-anonymou
     But I should not see "browser:"
 
 ### comments, votes and watching unowned tickets
+
+Scenario: guests can view open code tickets
+  When I am on the page for code ticket 1
+  Then I should see "open"
 
 Scenario: users can comment on unowned code tickets
   When I am logged in as "jim"
@@ -157,12 +213,13 @@ Scenario: volunteers can steal a code ticket
 
 ### comments, votes and watching owned tickets
 
-Scenario: users can vote for owned code tickets
-  When I am logged in as "jim"
-    And I am on the page for code ticket 4
-  Then I should see "(0 votes)"
+Scenario: users can view taken code tickets, and vote on them
+  When I am logged in as "john"
+    And I am on the page for code ticket 2
+  Then I should see "taken by sam"
+    Then I should see "(4 votes)"
   When I press "Vote up"
-  Then I should see "(1 votes)"
+    Then I should see "(5 votes)"
 
 Scenario: users can watch code tickets
   When I am logged in as "jim"
@@ -281,3 +338,15 @@ Scenario: volunteers can re-open a closed code ticket
   When I follow "Support Board"
     And I follow "closed" within "#code_tickets"
   Then I should not see "Code Ticket #6"
+
+### comments, votes and watching closed tickets
+
+Scenario: guests can view closed code tickets
+  When I am on the page for code ticket 6
+  Then I should see "deployed in 1.0"
+
+Scenario: users can view closed code tickets
+  When I am logged in as "dean"
+    And I am on the page for code ticket 6
+  Then I should see "deployed in 1.0"
+

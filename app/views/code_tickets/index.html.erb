@@ -21,8 +21,9 @@
 
 <p><%= @tickets.size %> Found</p>
 
-<% @tickets.each do |ticket| %>
-  <h1><%= link_to ticket.name, ticket %></h1>
+<% #FIXME index is a hack for cucumber tests %>
+<% @tickets.each_with_index do |ticket, i| %>
+  <h1 id=<%=i%>><%= link_to ticket.name, ticket %></h1>
   <%= render :partial => "blurb", :locals => { :ticket => ticket }  %>
 <% end %>
 

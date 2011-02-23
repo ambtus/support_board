@@ -24,7 +24,7 @@
     <% if current_user.try(:support_volunteer?) %>
       <p><%= radio_button_tag :response, 'official', true %><%= label_tag :response_official, 'official' %>
       <%= radio_button_tag :response, 'unofficial', false %><%= label_tag :response_unofficial, 'unofficial' %>
-      <%= radio_button_tag :response, 'private', false %><%= label_tag :response_private, 'private' %>
+      <%= radio_button_tag :response, 'private', false %><%= label_tag :response_private, 'private (and official)' %>
     </p>
     <% end %>
     <%= text_area_tag :content, nil, :size => "72x10" %>

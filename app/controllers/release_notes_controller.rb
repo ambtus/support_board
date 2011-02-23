@@ -55,7 +55,14 @@ class ReleaseNotesController < ApplicationController
       redirect_to @release_note and return
     end
     @release_note.attributes=params[:release_note]
-    @release_note.save!
-    redirect_to @release_note
+    if @release_note.save
+      flash[:notice] = "release note updated"
+      redirect_to @release_note
+    else
+      # reset so don't get field with errors which breaks definition lists
+      flash[:error] = @release_note.errors.full_messages.join(", ")
+      @release_note = ReleaseNote.new(params[:release_note])
+      render :new
+    end
   end
 end

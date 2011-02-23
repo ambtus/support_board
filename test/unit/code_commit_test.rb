@@ -172,7 +172,7 @@ class CodeCommitTest < ActiveSupport::TestCase
         "username": "ambtus"
       },
       "id": "b4e2b8f073cdd563e27d990bbf68063250dca7e7",
-      "message": "feature TODOs",
+      "message": "feature stuff",
       "modified": [
         "features\/support_board_volunteer_code.feature",
         "features\/support_board_volunteer_resolution.feature"
@@ -219,7 +219,7 @@ EOF
     assert_equal "Sidra", new_cc.author
     assert_equal "https://github.com/ambtus/support_board/commit/b4e2b8f073cdd563e27d990bbf68063250dca7e7", new_cc.url
     assert_equal "2010/12/17 09:38:33 -0800".to_time, new_cc.pushed_at
-    assert_equal "feature TODOs", new_cc.message
+    assert_equal "feature stuff", new_cc.message
   end
   test "multiple create_commits_from_json" do
     json = <<EOF

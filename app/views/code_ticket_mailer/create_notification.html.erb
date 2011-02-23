@@ -1,3 +1,3 @@
 <p>A new code ticket has been created: <%= link_to @ticket.name, code_ticket_url(@ticket) %></p>
 <%= render :partial => "code_tickets/blurb", :locals => { :ticket => @ticket }  %>
-<%= render :partial => "details/blurb", :locals => { :detail => @ticket.code_details.last }  %>
+<% if @ticket.code_details.count > 0 %><%= render :partial => "details/blurb", :locals => { :detail => @ticket.code_details.last }  %><% end %>

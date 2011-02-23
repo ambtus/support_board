@@ -188,6 +188,7 @@ st4 = SupportTicket.create!(
   :user_agent => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_5; de-de) AppleWebKit/534.15+ (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4",
   :ip_address => "98.223.153.124"
 )
+st4.user_comment!("the sooner the better")
 User.current_user = rodney
 st4.needs_fix!(ct3.id)
 

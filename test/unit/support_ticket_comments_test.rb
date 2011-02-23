@@ -170,11 +170,11 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
   test "users can comment on waiting ticket if it's theirs" do
     User.current_user = User.find_by_login("john")
     ticket = SupportTicket.find(4)
-    assert_equal 0, ticket.support_details.written_comments.count
+    assert_equal 1, ticket.support_details.written_comments.count
     assert ticket.user_comment!("none too soon")
     assert_match "none too soon", ticket.support_details.last.content
     assert_match "ticket owner wrote", ticket.support_details.last.info
-    assert_equal 1, ticket.support_details.written_comments.count
+    assert_equal 2, ticket.support_details.written_comments.count
   end
   test "users can comment on waiting_on_admin ticket if it's theirs" do
     User.current_user = User.find_by_login("dean")
@@ -298,11 +298,11 @@ class SupportTicketCommentTest < ActiveSupport::TestCase
   test "volunteers can comment on waiting ticket" do
     User.current_user = User.find_by_login("rodney")
     ticket = SupportTicket.find(4)
-    assert_equal 0, ticket.support_details.written_comments.count
+    assert_equal 1, ticket.support_details.written_comments.count
     assert ticket.user_comment!("gay marriage next?")
     assert_match "gay marriage next?", ticket.support_details.last.content
     assert_match "rodney (volunteer) wrote", ticket.support_details.last.info
-    assert_equal 1, ticket.support_details.written_comments.count
+    assert_equal 2, ticket.support_details.written_comments.count
   end
   test "volunteers can comment on waiting_on_admin ticket" do
     User.current_user = User.find_by_login("sidra")

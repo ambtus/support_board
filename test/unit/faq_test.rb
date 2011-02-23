@@ -22,7 +22,7 @@ class FaqTest < ActiveSupport::TestCase
   end
   test "create without notification" do
     User.current_user = User.find_by_login("sam")
-    assert faq = Faq.create(:summary => "short summary", :content => "something", :turn_off_notifications => true)
+    assert faq = Faq.create(:summary => "short summary", :content => "something", :turn_off_notifications => "1")
     assert_equal [], faq.mail_to
   end
   test "normal flow" do

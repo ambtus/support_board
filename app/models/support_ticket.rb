@@ -34,19 +34,21 @@ class SupportTicket < ActiveRecord::Base
   validates_length_of :summary, :maximum=> 140 # tweet length!
 
   attr_accessor :turn_off_notifications
+  attr_accessor :no_comments
 
   # add a default set of watchers to new tickets
   # TODO at the moment, this is just the owner
   after_create :add_default_watchers
   def add_default_watchers
     # on create, add owner to the notifications unless indicated otherwise
-    self.watch!(self.authentication_code) if turn_off_notifications.blank?
+    self.watch!(self.authentication_code) unless turn_off_notifications == "1"
 
     # TODO make default groups. e.g. testers, that people can add and remove themselves to
     # so that when tickets are created the notifications are populated with these groups.
     # when someone is added to that group, add them to all tickets (respecting privacy)
     # this allows people to remove themselves from individual tickets if they usually watch all
     # and add themselves to individual tickets if they usually don't watch all
+    self.send_create_notifications if self.no_comments
   end
 
   # FIXME make this a background job so it's asyncronous and can be retried
@@ -210,7 +212,7 @@ class SupportTicket < ActiveRecord::Base
 
     # tickets I am watching, private
     if !params[:watching].blank?
-      raise ArgumentError, "can't determine what email to check" unless User.current_user
+      raise SecurityError, "can't determine what email to check" unless User.current_user
       tickets = tickets.joins(:support_notifications) & SupportNotification.where(:email => User.current_user.email)
     end
 

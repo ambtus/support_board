@@ -18,7 +18,7 @@ class SupportTicketFilterTest < ActiveSupport::TestCase
     assert_equal [5], SupportTicket.filter(:status => "all", :owned_by_user => "john").ids
   end
   test "watching when guest" do
-    assert_raise(ArgumentError) { SupportTicket.filter(:watching => true) }
+    assert_raise(SecurityError) { SupportTicket.filter(:watching => true) }
   end
   test "watching when user" do
     User.current_user = User.find_by_login("jim")

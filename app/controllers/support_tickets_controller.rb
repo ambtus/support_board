@@ -70,7 +70,9 @@ class SupportTicketsController < ApplicationController
     @ticket = SupportTicket.new(params[:support_ticket].merge({
          :authenticity_token => params[:authenticity_token],
          :ip_address => request.remote_ip,
-         :user_agent => request.user_agent}))
+         :user_agent => request.user_agent,
+         :no_comments => params[:content].blank?}))
+
     if @ticket.save
       flash[:notice] = "Support ticket created"
       if current_user
@@ -94,22 +96,21 @@ class SupportTicketsController < ApplicationController
 
     # this, and the corresponding hidden field in show_owner.html shouldn't be needed
     # but capybara is loosing the session information for some reason when posting
-    Rails.logger.debug "update session: #{session}"
+    Rails.logger.debug "session: #{session}"
     if params[:authentication_code]
       session[:authentication_code] = params[:authentication_code]
     end
-    Rails.logger.debug "update fixed session: #{session}"
+    Rails.logger.debug "fixed session: #{session}"
 
-    # FIXME verify authentication code if no current user
     case params[:commit]
     when "This answer resolves my issue"
-      @ticket.accept!(params[:support_detail_id])
+      @ticket.accept!(params[:support_detail_id], session[:authentication_code])
     when "Watch this ticket"
-      @ticket.watch!
+      @ticket.watch!(session[:authentication_code])
     when "Don't watch this ticket"
-      @ticket.unwatch!
+      @ticket.unwatch!(session[:authentication_code])
     when "Make private"
-      @ticket.make_private!
+      @ticket.make_private!(session[:authentication_code])
     when "Hide my user name"
       @ticket.hide_username!
     when "Display my user name"
@@ -145,10 +146,6 @@ class SupportTicketsController < ApplicationController
     when "Create new code ticket"
       new = @ticket.needs_fix!
       redirect_to edit_code_ticket_path(new) and return
-    when "Create new FAQ"
-      faq = Faq.create!(:summary => @ticket.summary, :content => "EDIT ME")
-      @ticket.answer!(faq.id)
-      redirect_to edit_faq_path(faq) and return
     end
     redirect_to @ticket
   end
